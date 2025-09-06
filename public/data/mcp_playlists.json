@@ -1,12 +1,37 @@
-[
-  { "category": "creative",   "name": "Creative Base",      "url": "https://example.com/mcp/creative.json",        "format": "json", "path": "/playlist/id/creative-base",        "description": "クリエイティブ向けMCPサーバーのプレイリスト" },
-  { "category": "creative",   "name": "Creative Extra",     "url": "https://example.com/mcp/creative.toml",        "format": "toml", "path": "/playlist/id/creative-extra",       "description": "クリエイティブ拡張セット" },
-  { "category": "development", "name": "Dev Essentials",     "url": "https://example.com/mcp/dev.json",             "format": "json", "path": "/playlist/id/dev-essentials",        "description": "開発向け基本プレイリスト" },
-  { "category": "development", "name": "Dev Toolchain",      "url": "https://example.com/mcp/dev-tool.toml",        "format": "toml", "path": "/playlist/id/dev-toolchain",        "description": "開発ツールチェーン連携" },
-  { "category": "business",    "name": "Biz Suite",          "url": "https://example.com/mcp/biz.json",             "format": "json", "path": "/playlist/id/requirement",           "description": "要件ドキュメント関連のプレイリスト" },
-  { "category": "business",    "name": "Storyboard Suite",   "url": "https://example.com/mcp/biz-storyboard.json",  "format": "json", "path": "/playlist/id/storyboard",            "description": "ストーリーボード関連のプレイリスト" },
-  { "category": "development", "name": "Video Analysis",      "url": "https://example.com/mcp/video-analysis.json",  "format": "json", "path": "/playlist/id/video-analysis",         "description": "動画解析サービスのプレイリスト" },
-  { "category": "creative",    "name": "Text to Speech",     "url": "https://example.com/mcp/t2s.json",             "format": "json", "path": "/playlist/id/text-to-speech",         "description": "テキスト→音声のプレイリスト" },
-  { "category": "creative",    "name": "Text to Music",      "url": "https://example.com/mcp/t2m.json",             "format": "json", "path": "/playlist/id/text-to-music",          "description": "テキスト→音楽のプレイリスト" },
-  { "category": "business",    "name": "Voice-over",         "url": "https://example.com/mcp/v2a.json",             "format": "json", "path": "/playlist/id/voice-over",             "description": "動画→音声（ボイスオーバー等）のプレイリスト" }
-]
+{
+  "playlists": [
+    {
+      "id": "creative-starter",
+      "name": "クリエイティブスターターパック",
+      "category": "creative",
+      "description": "画像・動画生成の基本セット",
+      "servers": ["t2i-flux-ultra", "t2v-haiper", "i2i-kontext"],
+      "recommended": true
+    },
+    {
+      "id": "dev-essentials",
+      "name": "開発者必須ツール",
+      "category": "development",
+      "description": "コーディング支援の完全セット",
+      "servers": ["code-copilot", "code-analysis", "doc-generator"],
+      "recommended": true
+    },
+    {
+      "id": "business-pro",
+      "name": "ビジネスプロフェッショナル",
+      "category": "business",
+      "description": "ビジネス文書作成・分析ツール",
+      "servers": ["requirement-generator", "translator", "summarizer"],
+      "recommended": false
+    },
+    {
+      "id": "all-in-one",
+      "name": "オールインワンパッケージ",
+      "category": "all",
+      "description": "全機能アクセス可能な統合パッケージ",
+      "servers": ["*"],
+      "recommended": false,
+      "enterprise": true
+    }
+  ]
+}

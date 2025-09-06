@@ -1,0 +1,74 @@
+{
+  "endpoints": [
+    {
+      "category": "画像生成",
+      "endpoint": "/t2i/fal/flux/ultra",
+      "description": "テキストから高品質な画像を生成",
+      "method": "POST",
+      "auth": "Bearer Token"
+    },
+    {
+      "category": "画像生成",
+      "endpoint": "/i2i/fal/flux/kontext",
+      "description": "既存画像のスタイル変換・編集",
+      "method": "POST",
+      "auth": "Bearer Token"
+    },
+    {
+      "category": "動画生成",
+      "endpoint": "/t2v/fal/haiper/standard",
+      "description": "テキストから動画を生成",
+      "method": "POST",
+      "auth": "Bearer Token"
+    },
+    {
+      "category": "動画生成",
+      "endpoint": "/i2v/fal/minimax/hailuo-02",
+      "description": "画像から動画を生成",
+      "method": "POST",
+      "auth": "Bearer Token"
+    },
+    {
+      "category": "音声・音楽",
+      "endpoint": "/t2s/minimax/speech-2-5-turbo",
+      "description": "テキストから自然な音声を生成",
+      "method": "POST",
+      "auth": "Bearer Token"
+    },
+    {
+      "category": "音声・音楽",
+      "endpoint": "/t2m/google/lyria",
+      "description": "プロンプトから音楽を生成",
+      "method": "POST",
+      "auth": "Bearer Token"
+    },
+    {
+      "category": "開発ツール",
+      "endpoint": "/code/github/copilot/completion",
+      "description": "コード補完・生成",
+      "method": "POST",
+      "auth": "Bearer Token"
+    },
+    {
+      "category": "開発ツール",
+      "endpoint": "/code/analysis/security/scan",
+      "description": "セキュリティ脆弱性スキャン",
+      "method": "POST",
+      "auth": "Bearer Token"
+    },
+    {
+      "category": "ビジネス",
+      "endpoint": "/requirement/kamui/generator",
+      "description": "要件定義書の自動生成",
+      "method": "POST",
+      "auth": "Bearer Token"
+    },
+    {
+      "category": "ビジネス",
+      "endpoint": "/translate/deepl/pro",
+      "description": "高精度な多言語翻訳",
+      "method": "POST",
+      "auth": "Bearer Token"
+    }
+  ]
+}

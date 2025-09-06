@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-	<meta name="generator" content="Hugo 0.148.2"><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=62545&amp;path=livereload" data-no-instant defer></script>
+	<meta name="generator" content="Hugo 0.148.2"><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KAMUI OS</title>
+  <title>SaaS Applications</title>
   <meta name="description" content="">
   
   <link rel="stylesheet" href="/css/main.css">
@@ -78,7 +78,7 @@
 <body>
   <div class="sidebar" id="sidebar">
   <div class="sidebar-header">
-    <div class="sidebar-title">KAMUI OS</div>
+    <div class="sidebar-title">SaaS Applications</div>
     <div class="sidebar-subtitle" id="tocCount">目次</div>
   </div>
 
@@ -4518,13 +4518,141 @@
     
     
     
+      <div id="apiEndpointsTableMessage" class="doc-meta"></div>
+<div style="overflow:auto; max-height: 420px; border: 1px solid var(--border); border-radius: 8px;">
+  <table class="menu-table" id="apiEndpointsTable">
+    <thead>
+      <tr>
+        
+        <th>カテゴリ</th>
+        
+        <th>エンドポイント</th>
+        
+        <th>説明</th>
+        
+        <th>メソッド</th>
+        
+        <th>認証</th>
+        
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<script type="application/json" id="api-endpointsInline"></script>
+
+    
+    
+    
+      <div class="flow-wrapper" id="uiFlow">
+  <div class="flow-controls">
+    <strong>UI遷移図</strong>
+    <div class="spacer"></div>
+    <button class="view-btn" id="flowZoomOut">-</button>
+    <button class="view-btn" id="flowZoomReset">100%</button>
+    <button class="view-btn" id="flowZoomIn">+</button>
+  </div>
+  <div class="flow-viewport" id="flowViewport">
+    <div class="flow-inner" id="flowInner" style="width: 1600px; height: 900px;">
+      <svg class="flow-svg" id="flowSvg" width="1600" height="900"></svg>
+      <div class="nodes-layer" id="flowNodes"></div>
+    </div>
+  </div>
+</div>
+
+    
+    
+    
+      <div class="section-image" style="max-width: 920px; margin-bottom: 10px;">
+  <img src="/images/kamui-white-2.png" alt="UI参考（ギャラリー風）" />
+</div>
+<div class="view-options" style="margin: 8px 0 12px 0;">
+  <span class="theme-label">種別:</span>
+  <button class="view-btn" id="btnMcpPlaylist" aria-pressed="true">MCPプレイリスト</button>
+  <button class="view-btn" id="btnMcpCatalog">MCPカタログ</button>
+  <span class="spacer"></span>
+  <span class="theme-label">カテゴリ:</span>
+  <button class="view-btn" id="btnCatCreative">クリエイティブ</button>
+  <button class="view-btn" id="btnCatDevelopment">開発</button>
+  <button class="view-btn" id="btnCatBusiness">ビジネス</button>
+</div>
+<div id="mcpMessage" class="doc-meta"></div>
+<div style="overflow:auto; max-height: 480px; border: 1px solid var(--border); border-radius: 8px;">
+  <table class="menu-table" id="mcpTable">
+    <thead></thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<script type="application/json" id="mcpPlaylistsInline"></script>
+<script type="application/json" id="mcpCatalogInline"></script>
+
     
     
     
     
     
-    
-    
+      <div class="media-grid">
+  
+  <div class="media-item clickable-img" data-path="/images/kamui-gradient-soft-2.png">
+    <img class="media-thumbnail" src="/images/kamui-gradient-soft-2.png" alt="KAMUI CODE メインビジュアル" />
+    <div class="media-info">
+      <div class="media-name">KAMUI CODE メインビジュアル</div>
+    </div>
+  </div>
+  
+  <div class="media-item clickable-img" data-path="/images/kamui-white-2-fullscreen-1.png">
+    <img class="media-thumbnail" src="/images/kamui-white-2-fullscreen-1.png" alt="フルスクリーンUI版1" />
+    <div class="media-info">
+      <div class="media-name">フルスクリーンUI版1</div>
+    </div>
+  </div>
+  
+  <div class="media-item clickable-img" data-path="/images/kamui-white-2-fullscreen-2.png">
+    <img class="media-thumbnail" src="/images/kamui-white-2-fullscreen-2.png" alt="フルスクリーンUI版2" />
+    <div class="media-info">
+      <div class="media-name">フルスクリーンUI版2</div>
+    </div>
+  </div>
+  
+  <div class="media-item clickable-img" data-path="/images/creative-tools-ui-1.png">
+    <img class="media-thumbnail" src="/images/creative-tools-ui-1.png" alt="Creative Toolsクリック後UI版1" />
+    <div class="media-info">
+      <div class="media-name">Creative Toolsクリック後UI版1</div>
+    </div>
+  </div>
+  
+  <div class="media-item clickable-img" data-path="/images/creative-tools-ui-2.png">
+    <img class="media-thumbnail" src="/images/creative-tools-ui-2.png" alt="Creative Toolsクリック後UI版2" />
+    <div class="media-info">
+      <div class="media-name">Creative Toolsクリック後UI版2</div>
+    </div>
+  </div>
+  
+  <div class="media-item clickable-img" data-path="/images/kamui-docs-ui-pattern1-dark.png">
+    <img class="media-thumbnail" src="/images/kamui-docs-ui-pattern1-dark.png" alt="ダークテーマパターン" />
+    <div class="media-info">
+      <div class="media-name">ダークテーマパターン</div>
+    </div>
+  </div>
+  
+  <div class="media-item clickable-img" data-path="/images/kamui-docs-ui-pattern2-gradient.png">
+    <img class="media-thumbnail" src="/images/kamui-docs-ui-pattern2-gradient.png" alt="グラデーションパターン" />
+    <div class="media-info">
+      <div class="media-name">グラデーションパターン</div>
+    </div>
+  </div>
+  
+  <div class="media-item clickable-img" data-path="/images/kamui-docs-ui-pattern5-japanese.png">
+    <img class="media-thumbnail" src="/images/kamui-docs-ui-pattern5-japanese.png" alt="日本語UIパターン" />
+    <div class="media-info">
+      <div class="media-name">日本語UIパターン</div>
+    </div>
+  </div>
+  
+</div>
+
     
     
     
@@ -4578,6 +4706,43 @@
 <li><strong>APIレート制限</strong>: 100リクエスト/分 (ユーザー単位)</li>
 <li><strong>データ保護</strong>: 個人情報のハッシュ化、定期的な監査ログ</li>
 </ul>
+<h2 id="8-受入基準">8. 受入基準</h2>
+<ul>
+<li><strong>基本エンドポイント</strong>: 全カテゴリの基本エンドポイントが動作すること</li>
+<li><strong>認証機能</strong>: Bearer Tokenまたは同等の認証が有効であること</li>
+<li><strong>ドキュメント</strong>: 本HTMLがGitHub Pagesで正常表示されること</li>
+<li><strong>レスポンスタイム</strong>: 95%パーセンタイルが3秒以内</li>
+<li><strong>エラーハンドリング</strong>: 適切なエラーメッセージが返されること</li>
+</ul>
+<h2 id="9-運用保守">9. 運用・保守</h2>
+<ul>
+<li><strong>監視</strong>: エンドポイントのヘルスチェック、レスポンスタイム計測</li>
+<li><strong>ログ管理</strong>: APIリクエストログ、エラーログの集約・分析</li>
+<li><strong>インシデント対応</strong>: 障害時の通知フロー、復旧手順</li>
+<li><strong>メンテナンスウィンドウ</strong>: 定期的なサービス更新時間の設定</li>
+</ul>
+<h2 id="10-付録">10. 付録</h2>
+<h3 id="model-context-protocol-mcp-仕様書">Model Context Protocol (MCP) 仕様書</h3>
+<p>KAMUI CODEが準拠している<a href="https://modelcontextprotocol.io/specification/2025-06-18">Model Context Protocol (MCP) の公式仕様書</a>では、以下の内容が定義されています：</p>
+<ul>
+<li><strong>基本プロトコル</strong>: JSON-RPC 2.0メッセージフォーマット、ステートフルな接続、サーバー・クライアント間の機能ネゴシエーション</li>
+<li><strong>サーバー機能</strong>:
+<ul>
+<li>Resources（コンテキストとデータ）</li>
+<li>Prompts（テンプレート化されたメッセージとワークフロー）</li>
+<li>Tools（AIモデルが実行する関数）</li>
+</ul>
+</li>
+<li><strong>クライアント機能</strong>:
+<ul>
+<li>Sampling（サーバー主導のエージェント動作）</li>
+<li>Roots（URI/ファイルシステム境界の問い合わせ）</li>
+<li>Elicitation（ユーザーからの追加情報リクエスト）</li>
+</ul>
+</li>
+<li><strong>セキュリティ原則</strong>: ユーザーの同意と制御、データプライバシー、ツールの安全性、LLMサンプリング制御</li>
+</ul>
+<p>詳細は<a href="https://modelcontextprotocol.io/specification/2025-06-18">MCP公式仕様書</a>をご参照ください。</p>
 
     
     
@@ -4849,6 +5014,168 @@ gantt
     
     
     
+      
+        <div class="mermaid-wrapper">
+  <div class="mermaid">
+graph TB
+    subgraph &#34;クライアント層&#34;
+        C1[MCPクライアント]
+        C2[HTTPクライアント]
+        C3[SDK/ライブラリ]
+    end
+    
+    subgraph &#34;ゲートウェイ層&#34;
+        GW[&#34;KAMUI CODE ゲートウェイ&lt;br/&gt;({BASE_URL})&#34;]
+    end
+    
+    subgraph &#34;サービスルーター&#34;
+        RT[&#34;カテゴリ別ルーティング&lt;br/&gt;(t2i, i2i, t2v 等)&#34;]
+    end
+    
+    subgraph &#34;プロバイダーサービス&#34;
+        direction TB
+        P1[FAL.ai サービス]
+        P2[Google サービス]
+        P3[MiniMax サービス]
+        P4[Runway サービス]
+        P5[ByteDance サービス]
+    end
+    
+    subgraph &#34;モデルエンドポイント&#34;
+        M1[Imagen4 Ultra]
+        M2[Flux モデル群]
+        M3[Veo3]
+        M4[Hailuo-02]
+        M5[Dreamina v3.1]
+    end
+    
+    C1 --&gt; GW
+    C2 --&gt; GW
+    C3 --&gt; GW
+    GW --&gt; RT
+    RT --&gt; P1
+    RT --&gt; P2
+    RT --&gt; P3
+    RT --&gt; P4
+    RT --&gt; P5
+    P1 --&gt; M1
+    P1 --&gt; M2
+    P2 --&gt; M3
+    P3 --&gt; M4
+    P5 --&gt; M5
+    
+    style RT fill:#2d2d2d,stroke:#4a4a4a,stroke-width:1px
+
+  </div>
+  
+  <div class="mermaid-caption">図: KAMUI CODE システムアーキテクチャ</div>
+  
+</div>
+
+      
+        <div class="mermaid-wrapper">
+  <div class="mermaid">
+sequenceDiagram
+    participant User as ユーザー
+    participant Client as MCPクライアント
+    participant Gateway as KAMUIゲートウェイ
+    participant Provider as プロバイダーAPI
+    participant Model as AIモデル
+    
+    User-&gt;&gt;Client: 生成リクエスト
+    Client-&gt;&gt;Client: mcp/config.json読み込み
+    Client-&gt;&gt;Gateway: POST /t2i/fal/imagen4/ultra
+    Note over Gateway: 認証 &amp; ルーティング
+    Gateway-&gt;&gt;Provider: FAL APIへ転送
+    Provider-&gt;&gt;Model: Imagen4 Ultra実行
+    Model--&gt;&gt;Provider: 生成画像
+    Provider--&gt;&gt;Gateway: 結果返却
+    Gateway--&gt;&gt;Client: URLレスポンス
+    Client--&gt;&gt;User: 結果表示
+
+  </div>
+  
+  <div class="mermaid-caption">図: API呼び出しシーケンス</div>
+  
+</div>
+
+      
+        <div class="mermaid-wrapper">
+  <div class="mermaid">
+flowchart LR
+    subgraph &#34;開発&#34;
+        A[ローカル開発] --&gt; B[Git コミット]
+        B --&gt; C[GitHub へプッシュ]
+    end
+    
+    subgraph &#34;CI/CD パイプライン&#34;
+        C --&gt; D[GitHub Actions]
+        D --&gt; E{テスト成功?}
+        E --&gt;|はい| F[静的ファイルビルド]
+        E --&gt;|いいえ| G[問題修正]
+        G --&gt; B
+    end
+    
+    subgraph &#34;デプロイ&#34;
+        F --&gt; H[GitHub Pages]
+        F --&gt; I[Cloudflare Pages]
+        H --&gt; J[&#34;docs.{BASE_URL}&#34;]
+        I --&gt; K[&#34;{BASE_URL}&#34;]
+    end
+    
+    subgraph &#34;CDN/配信&#34;
+        J --&gt; L[グローバル CDN]
+        K --&gt; L
+        L --&gt; M[エンドユーザー]
+    end
+    
+    style E fill:#f9f,stroke:#333,stroke-width:2px
+
+  </div>
+  
+  <div class="mermaid-caption">図: デプロイメントフロー</div>
+  
+</div>
+
+      
+        <div class="mermaid-wrapper">
+  <div class="mermaid">
+flowchart LR
+    subgraph &#34;監視&#34;
+        M1[ヘルスチェック] --&gt; M2{ステータスOK?}
+        M2 --&gt;|はい| M3[メトリクス記録]
+        M2 --&gt;|いいえ| M4[チームへ通知]
+    end
+    
+    subgraph &#34;インシデント対応&#34;
+        M4 --&gt; I1[問題診断]
+        I1 --&gt; I2{緊急度?}
+        I2 --&gt;|高| I3[即座に修正]
+        I2 --&gt;|低| I4[修正予定]
+        I3 --&gt; I5[ホットフィックスデプロイ]
+        I4 --&gt; I6[定期メンテナンス]
+    end
+    
+    subgraph &#34;メンテナンス&#34;
+        I6 --&gt; U1[サービス更新]
+        U1 --&gt; U2[変更テスト]
+        U2 --&gt; U3[ステージングデプロイ]
+        U3 --&gt; U4{テスト成功?}
+        U4 --&gt;|はい| U5[本番デプロイ]
+        U4 --&gt;|いいえ| U6[ロールバック]
+        U6 --&gt; U2
+    end
+    
+    style I2 fill:#ff9,stroke:#333,stroke-width:2px
+
+  </div>
+  
+  <div class="mermaid-caption">図: 運用フロー</div>
+  
+</div>
+
+      
+    
     
     
       <pre class="code"><code>map[content:{
@@ -5101,6 +5428,43 @@ gantt
 <li><strong>APIレート制限</strong>: 100リクエスト/分 (ユーザー単位)</li>
 <li><strong>データ保護</strong>: 個人情報のハッシュ化、定期的な監査ログ</li>
 </ul>
+<h2 id="8-受入基準">8. 受入基準</h2>
+<ul>
+<li><strong>基本エンドポイント</strong>: 全カテゴリの基本エンドポイントが動作すること</li>
+<li><strong>認証機能</strong>: Bearer Tokenまたは同等の認証が有効であること</li>
+<li><strong>ドキュメント</strong>: 本HTMLがGitHub Pagesで正常表示されること</li>
+<li><strong>レスポンスタイム</strong>: 95%パーセンタイルが3秒以内</li>
+<li><strong>エラーハンドリング</strong>: 適切なエラーメッセージが返されること</li>
+</ul>
+<h2 id="9-運用保守">9. 運用・保守</h2>
+<ul>
+<li><strong>監視</strong>: エンドポイントのヘルスチェック、レスポンスタイム計測</li>
+<li><strong>ログ管理</strong>: APIリクエストログ、エラーログの集約・分析</li>
+<li><strong>インシデント対応</strong>: 障害時の通知フロー、復旧手順</li>
+<li><strong>メンテナンスウィンドウ</strong>: 定期的なサービス更新時間の設定</li>
+</ul>
+<h2 id="10-付録">10. 付録</h2>
+<h3 id="model-context-protocol-mcp-仕様書">Model Context Protocol (MCP) 仕様書</h3>
+<p>KAMUI CODEが準拠している<a href="https://modelcontextprotocol.io/specification/2025-06-18">Model Context Protocol (MCP) の公式仕様書</a>では、以下の内容が定義されています：</p>
+<ul>
+<li><strong>基本プロトコル</strong>: JSON-RPC 2.0メッセージフォーマット、ステートフルな接続、サーバー・クライアント間の機能ネゴシエーション</li>
+<li><strong>サーバー機能</strong>:
+<ul>
+<li>Resources（コンテキストとデータ）</li>
+<li>Prompts（テンプレート化されたメッセージとワークフロー）</li>
+<li>Tools（AIモデルが実行する関数）</li>
+</ul>
+</li>
+<li><strong>クライアント機能</strong>:
+<ul>
+<li>Sampling（サーバー主導のエージェント動作）</li>
+<li>Roots（URI/ファイルシステム境界の問い合わせ）</li>
+<li>Elicitation（ユーザーからの追加情報リクエスト）</li>
+</ul>
+</li>
+<li><strong>セキュリティ原則</strong>: ユーザーの同意と制御、データプライバシー、ツールの安全性、LLMサンプリング制御</li>
+</ul>
+<p>詳細は<a href="https://modelcontextprotocol.io/specification/2025-06-18">MCP公式仕様書</a>をご参照ください。</p>
 
     
     

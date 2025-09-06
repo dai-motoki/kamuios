@@ -1,7 +1,44 @@
-[
-  { "category": "creative",   "title": "Imagen4 Ultra (T2I)",  "url": "https://docs.example.com/catalog/creative/imagen4-ultra",  "path": "/catalog/id/t2i/fal/imagen4/ultra",    "description": "クリエイティブ向けテキスト→画像（FAL Imagen4 Ultra）" },
-  { "category": "creative",   "title": "Flux Kontext (I2I)",   "url": "https://docs.example.com/catalog/creative/flux-kontext",    "path": "/catalog/id/i2i/fal/flux/kontext/max", "description": "画像→画像（Flux Kontext Max）" },
-  { "category": "development", "title": "WAN 2.2-5b (T2V)",     "url": "https://docs.example.com/catalog/dev/wan",                 "path": "/catalog/id/t2v/fal/wan/v2.2-5b/text-to-video", "description": "テキスト→動画（WAN 2.2-5b）" },
-  { "category": "development", "title": "Uploader (Service)",   "url": "https://docs.example.com/catalog/dev/uploader",           "path": "/catalog/id/uploader/fal",              "description": "アップロードサービス" },
-  { "category": "business",    "title": "Requirements Docs",    "url": "https://docs.example.com/catalog/biz/requirement",        "path": "/catalog/id/requirement",               "description": "要件ドキュメントサービス" }
-]
+{
+  "catalog": [
+    {
+      "id": "t2i-flux-ultra",
+      "category": "creative",
+      "name": "Flux Ultra (Text to Image)",
+      "vendor": "FAL",
+      "description": "最高品質のテキストから画像生成",
+      "endpoint": "/t2i/fal/flux/ultra",
+      "features": ["高解像度", "フォトリアル", "アート対応"],
+      "pricing": "Premium"
+    },
+    {
+      "id": "t2v-haiper",
+      "category": "creative",
+      "name": "Haiper (Text to Video)",
+      "vendor": "FAL",
+      "description": "テキストから高品質動画を生成",
+      "endpoint": "/t2v/fal/haiper/standard",
+      "features": ["8秒動画", "HD品質", "スムーズな動き"],
+      "pricing": "Standard"
+    },
+    {
+      "id": "code-copilot",
+      "category": "development",
+      "name": "GitHub Copilot Integration",
+      "vendor": "GitHub",
+      "description": "AIペアプログラミング",
+      "endpoint": "/code/github/copilot/completion",
+      "features": ["コード補完", "関数生成", "バグ修正"],
+      "pricing": "Subscription"
+    },
+    {
+      "id": "requirement-generator",
+      "category": "business",
+      "name": "要件定義書ジェネレーター",
+      "vendor": "KAMUI",
+      "description": "プロジェクト要件の自動生成",
+      "endpoint": "/requirement/kamui/generator",
+      "features": ["テンプレート対応", "多言語", "カスタマイズ可能"],
+      "pricing": "Enterprise"
+    }
+  ]
+}

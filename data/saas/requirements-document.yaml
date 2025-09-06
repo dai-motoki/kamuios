@@ -249,6 +249,174 @@
       </div>
     </div>
   
+  # カスタマージャーニーマップ
+  customer_journey: |
+    <div class="journey-map-container" style="background: #f8f9fa; padding: 20px; border-radius: 12px; margin: 20px 0;">
+      <style>
+        .journey-map {
+          background: white;
+          border-radius: 8px;
+          padding: 15px;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .journey-phases {
+          display: flex;
+          margin-bottom: 15px;
+          position: relative;
+        }
+        .phase {
+          flex: 1;
+          text-align: center;
+          padding: 12px 30px 12px 20px;
+          font-weight: bold;
+          font-size: 14px;
+          color: white;
+          position: relative;
+          margin-right: -20px;
+          clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 50%, calc(100% - 20px) 100%, 0 100%, 20px 50%);
+        }
+        .phase:first-child {
+          padding-left: 30px;
+          clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 50%, calc(100% - 20px) 100%, 0 100%);
+        }
+        .phase:last-child {
+          margin-right: 0;
+          padding-right: 30px;
+          clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 20px 50%);
+        }
+        .phase.awareness { background: #8B5CF6; }
+        .phase.consideration { background: #3B82F6; }
+        .phase.adoption { background: #10B981; }
+        .journey-row {
+          display: flex;
+          align-items: stretch;
+          margin-bottom: 10px;
+        }
+        .journey-label {
+          width: 80px;
+          padding: 10px 8px;
+          font-weight: bold;
+          font-size: 12px;
+          background: #f1f3f5;
+          border-radius: 6px 0 0 6px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+        }
+        .journey-content {
+          flex: 1;
+          display: flex;
+          gap: 5px;
+          padding: 5px;
+        }
+        .journey-cell {
+          flex: 1;
+          background: white;
+          border: 1px solid #e9ecef;
+          border-radius: 6px;
+          padding: 10px;
+          text-align: center;
+          position: relative;
+          font-size: 11px;
+        }
+        .journey-cell.awareness { border-color: #DDD6FE; background: #FAF5FF; }
+        .journey-cell.consideration { border-color: #DBEAFE; background: #F0F9FF; }
+        .journey-cell.adoption { border-color: #D1FAE5; background: #F0FDF4; }
+        
+        /* ダークモード対応 */
+        [data-theme="dark"] .journey-map-container {
+          background: #1f2937;
+          color: #e5e7eb;
+        }
+        [data-theme="dark"] .journey-map {
+          background: #111827;
+        }
+        [data-theme="dark"] .journey-label {
+          background: #1f2937;
+          color: #d1d5db;
+        }
+        [data-theme="dark"] .journey-cell {
+          background: #1f2937;
+          border-color: #4b5563;
+          color: #e5e7eb;
+        }
+      </style>
+      
+      <h3>ユーザージャーニーマップ</h3>
+      <div class="journey-map">
+        <!-- フェーズ -->
+        <div class="journey-phases">
+          <div class="phase awareness">認知・興味</div>
+          <div class="phase consideration">検討・評価</div>
+          <div class="phase adoption">導入・活用</div>
+        </div>
+        
+        <!-- 行動 -->
+        <div class="journey-row">
+          <div class="journey-label">行動</div>
+          <div class="journey-content">
+            <div class="journey-cell awareness">
+              <div style="font-size: 24px; margin-bottom: 5px;">🔍</div>
+              <div>KAMUI CODEを発見</div>
+            </div>
+            <div class="journey-cell awareness">
+              <div style="font-size: 24px; margin-bottom: 5px;">📖</div>
+              <div>機能を確認</div>
+            </div>
+            <div class="journey-cell consideration">
+              <div style="font-size: 24px; margin-bottom: 5px;">⚖️</div>
+              <div>他ツールと比較</div>
+            </div>
+            <div class="journey-cell consideration">
+              <div style="font-size: 24px; margin-bottom: 5px;">🧪</div>
+              <div>無料試用</div>
+            </div>
+            <div class="journey-cell adoption">
+              <div style="font-size: 24px; margin-bottom: 5px;">💳</div>
+              <div>有料プラン購入</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- タッチポイント -->
+        <div class="journey-row">
+          <div class="journey-label">タッチ<br>ポイント</div>
+          <div class="journey-content">
+            <div class="journey-cell awareness">検索・SNS</div>
+            <div class="journey-cell awareness">公式サイト</div>
+            <div class="journey-cell consideration">比較サイト</div>
+            <div class="journey-cell consideration">管理画面</div>
+            <div class="journey-cell adoption">決済画面</div>
+          </div>
+        </div>
+        
+        <!-- 思考 -->
+        <div class="journey-row">
+          <div class="journey-label">思考</div>
+          <div class="journey-content">
+            <div class="journey-cell awareness">統合型ツールを探している</div>
+            <div class="journey-cell awareness">3領域対応が魅力的</div>
+            <div class="journey-cell consideration">他社より機能が豊富</div>
+            <div class="journey-cell consideration">使いやすそう</div>
+            <div class="journey-cell adoption">業務効率が上がりそう</div>
+          </div>
+        </div>
+        
+        <!-- 感情 -->
+        <div class="journey-row">
+          <div class="journey-label">感情</div>
+          <div class="journey-content">
+            <div class="journey-cell awareness">😐 好奇心</div>
+            <div class="journey-cell awareness">😊 期待感</div>
+            <div class="journey-cell consideration">🤔 慎重</div>
+            <div class="journey-cell consideration">😄 満足</div>
+            <div class="journey-cell adoption">🎉 確信</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  
   # デザイン要件セクション
   design_specs:
     colors:
@@ -413,7 +581,156 @@
       デプロイ準備 :deploy, after perf, 7d
       本番リリース :milestone, after deploy, 0d
   
-  # 追加のドキュメント
+  # 追加のMermaid図
+  additional_mermaid:
+    - type: system_architecture
+      content: |
+        graph TB
+            subgraph "クライアント層"
+                C1[MCPクライアント]
+                C2[HTTPクライアント]
+                C3[SDK/ライブラリ]
+            end
+            
+            subgraph "ゲートウェイ層"
+                GW["KAMUI CODE ゲートウェイ<br/>({BASE_URL})"]
+            end
+            
+            subgraph "サービスルーター"
+                RT["カテゴリ別ルーティング<br/>(t2i, i2i, t2v 等)"]
+            end
+            
+            subgraph "プロバイダーサービス"
+                direction TB
+                P1[FAL.ai サービス]
+                P2[Google サービス]
+                P3[MiniMax サービス]
+                P4[Runway サービス]
+                P5[ByteDance サービス]
+            end
+            
+            subgraph "モデルエンドポイント"
+                M1[Imagen4 Ultra]
+                M2[Flux モデル群]
+                M3[Veo3]
+                M4[Hailuo-02]
+                M5[Dreamina v3.1]
+            end
+            
+            C1 --> GW
+            C2 --> GW
+            C3 --> GW
+            GW --> RT
+            RT --> P1
+            RT --> P2
+            RT --> P3
+            RT --> P4
+            RT --> P5
+            P1 --> M1
+            P1 --> M2
+            P2 --> M3
+            P3 --> M4
+            P5 --> M5
+            
+            style RT fill:#2d2d2d,stroke:#4a4a4a,stroke-width:1px
+    - type: api_sequence
+      content: |
+        sequenceDiagram
+            participant User as ユーザー
+            participant Client as MCPクライアント
+            participant Gateway as KAMUIゲートウェイ
+            participant Provider as プロバイダーAPI
+            participant Model as AIモデル
+            
+            User->>Client: 生成リクエスト
+            Client->>Client: mcp/config.json読み込み
+            Client->>Gateway: POST /t2i/fal/imagen4/ultra
+            Note over Gateway: 認証 & ルーティング
+            Gateway->>Provider: FAL APIへ転送
+            Provider->>Model: Imagen4 Ultra実行
+            Model-->>Provider: 生成画像
+            Provider-->>Gateway: 結果返却
+            Gateway-->>Client: URLレスポンス
+            Client-->>User: 結果表示
+    - type: deployment_flow
+      content: |
+        flowchart LR
+            subgraph "開発"
+                A[ローカル開発] --> B[Git コミット]
+                B --> C[GitHub へプッシュ]
+            end
+            
+            subgraph "CI/CD パイプライン"
+                C --> D[GitHub Actions]
+                D --> E{テスト成功?}
+                E -->|はい| F[静的ファイルビルド]
+                E -->|いいえ| G[問題修正]
+                G --> B
+            end
+            
+            subgraph "デプロイ"
+                F --> H[GitHub Pages]
+                F --> I[Cloudflare Pages]
+                H --> J["docs.{BASE_URL}"]
+                I --> K["{BASE_URL}"]
+            end
+            
+            subgraph "CDN/配信"
+                J --> L[グローバル CDN]
+                K --> L
+                L --> M[エンドユーザー]
+            end
+            
+            style E fill:#f9f,stroke:#333,stroke-width:2px
+    - type: operations_flow
+      content: |
+        flowchart LR
+            subgraph "監視"
+                M1[ヘルスチェック] --> M2{ステータスOK?}
+                M2 -->|はい| M3[メトリクス記録]
+                M2 -->|いいえ| M4[チームへ通知]
+            end
+            
+            subgraph "インシデント対応"
+                M4 --> I1[問題診断]
+                I1 --> I2{緊急度?}
+                I2 -->|高| I3[即座に修正]
+                I2 -->|低| I4[修正予定]
+                I3 --> I5[ホットフィックスデプロイ]
+                I4 --> I6[定期メンテナンス]
+            end
+            
+            subgraph "メンテナンス"
+                I6 --> U1[サービス更新]
+                U1 --> U2[変更テスト]
+                U2 --> U3[ステージングデプロイ]
+                U3 --> U4{テスト成功?}
+                U4 -->|はい| U5[本番デプロイ]
+                U4 -->|いいえ| U6[ロールバック]
+                U6 --> U2
+            end
+            
+            style I2 fill:#ff9,stroke:#333,stroke-width:2px
+  
+  # 参考デザイン画像
+  images:
+    - path: /images/kamui-gradient-soft-2.png
+      name: KAMUI CODE メインビジュアル
+    - path: /images/kamui-white-2-fullscreen-1.png
+      name: フルスクリーンUI版1
+    - path: /images/kamui-white-2-fullscreen-2.png
+      name: フルスクリーンUI版2
+    - path: /images/creative-tools-ui-1.png
+      name: Creative Toolsクリック後UI版1
+    - path: /images/creative-tools-ui-2.png
+      name: Creative Toolsクリック後UI版2
+    - path: /images/kamui-docs-ui-pattern1-dark.png
+      name: ダークテーマパターン
+    - path: /images/kamui-docs-ui-pattern2-gradient.png
+      name: グラデーションパターン
+    - path: /images/kamui-docs-ui-pattern5-japanese.png
+      name: 日本語UIパターン
+  
   additional_content: |
     ## 6. API仕様
     
@@ -434,6 +751,40 @@
     - **通信暗号化**: TLS 1.3以上
     - **APIレート制限**: 100リクエスト/分 (ユーザー単位)
     - **データ保護**: 個人情報のハッシュ化、定期的な監査ログ
+    
+    ## 8. 受入基準
+    
+    - **基本エンドポイント**: 全カテゴリの基本エンドポイントが動作すること
+    - **認証機能**: Bearer Tokenまたは同等の認証が有効であること
+    - **ドキュメント**: 本HTMLがGitHub Pagesで正常表示されること
+    - **レスポンスタイム**: 95%パーセンタイルが3秒以内
+    - **エラーハンドリング**: 適切なエラーメッセージが返されること
+    
+    ## 9. 運用・保守
+    
+    - **監視**: エンドポイントのヘルスチェック、レスポンスタイム計測
+    - **ログ管理**: APIリクエストログ、エラーログの集約・分析
+    - **インシデント対応**: 障害時の通知フロー、復旧手順
+    - **メンテナンスウィンドウ**: 定期的なサービス更新時間の設定
+    
+    ## 10. 付録
+    
+    ### Model Context Protocol (MCP) 仕様書
+    
+    KAMUI CODEが準拠している[Model Context Protocol (MCP) の公式仕様書](https://modelcontextprotocol.io/specification/2025-06-18)では、以下の内容が定義されています：
+    
+    - **基本プロトコル**: JSON-RPC 2.0メッセージフォーマット、ステートフルな接続、サーバー・クライアント間の機能ネゴシエーション
+    - **サーバー機能**: 
+      - Resources（コンテキストとデータ）
+      - Prompts（テンプレート化されたメッセージとワークフロー）
+      - Tools（AIモデルが実行する関数）
+    - **クライアント機能**:
+      - Sampling（サーバー主導のエージェント動作）
+      - Roots（URI/ファイルシステム境界の問い合わせ）
+      - Elicitation（ユーザーからの追加情報リクエスト）
+    - **セキュリティ原則**: ユーザーの同意と制御、データプライバシー、ツールの安全性、LLMサンプリング制御
+    
+    詳細は[MCP公式仕様書](https://modelcontextprotocol.io/specification/2025-06-18)をご参照ください。
   
   # クライアント実装例
   client_samples:
@@ -445,3 +796,62 @@
       title: Claude Desktop実装例
     - id: client-cursor
       title: Cursor IDE実装例
+  
+  # 動的テーブル
+  dynamic_table:
+    id: apiEndpointsTable
+    headers:
+      - カテゴリ
+      - エンドポイント
+      - 説明
+      - メソッド
+      - 認証
+    data_source: api-endpoints
+  
+  # UI遷移図
+  flow_diagram:
+    id: uiFlow
+    type: interactive
+    width: 1600
+    height: 900
+  
+  # 料金プラン比較カード
+  pricing_cards:
+    - title: フリープラン
+      pastel: true
+      badges:
+        - 無料
+      list_class: checks
+      list:
+        - 画像生成: 月30回まで
+        - 動画生成: 月10回まで
+        - 基本モデルのみアクセス
+        - 低優先度処理（待ち時間あり）
+        - コミュニティサポート
+    - title: 従量課金
+      pastel: true
+      badges:
+        - 使った分だけ
+      list_class: checks
+      list:
+        - 全て従量課金（原価+20%マージン）
+        - 中優先度処理（標準的な待ち時間）
+        - メールサポート（48時間以内）
+        - 個人・小規模チーム利用向け
+        - 使った分だけの公平な料金システム
+    - title: エンタープライズ
+      pastel: true
+      badges:
+        - お問い合わせ
+      list_class: checks
+      list:
+        - 全モデル無制限利用
+        - 最新モデル早期アクセス
+        - 最優先処理（即時）
+        - 専用Discordサポート
+        - API使用量分析ダッシュボード
+  
+  # MCPカタログセクション
+  mcp_section:
+    enabled: true
+    image: /images/kamui-white-2.png
