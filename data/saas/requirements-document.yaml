@@ -8,248 +8,333 @@
   content: |
     KAMUI CODE プラットフォームの包括的な要件定義書です。システム要件、デザイン要件、技術仕様、開発計画を網羅しています。
   
-  # プロジェクト概要セクション
-  custom_html: |
-    <style>
-      .requirement-doc {
-        background: var(--card);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 24px;
-        margin-bottom: 20px;
-      }
-      .requirement-header {
-        border-bottom: 2px solid var(--border);
-        padding-bottom: 16px;
-        margin-bottom: 24px;
-      }
-      .requirement-title {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: var(--text);
-        margin-bottom: 8px;
-      }
-      .requirement-meta {
-        display: flex;
-        gap: 20px;
-        font-size: 0.9rem;
-        color: var(--text-weak);
-      }
-      .requirement-section {
-        margin-bottom: 24px;
-      }
-      .requirement-section h3 {
-        font-size: 1.2rem;
-        font-weight: 600;
-        color: var(--link);
-        margin-bottom: 12px;
-      }
-      .requirement-section h4 {
-        font-size: 1rem;
-        font-weight: 600;
-        color: var(--text);
-        margin-bottom: 8px;
-      }
-      .requirement-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 12px;
-      }
-      .requirement-table th,
-      .requirement-table td {
-        border: 1px solid var(--border);
-        padding: 10px;
-        text-align: left;
-      }
-      .requirement-table th {
-        background: var(--sidebar-bg);
-        font-weight: 600;
-        color: var(--text);
-      }
-      .requirement-table td {
-        color: var(--text-weak);
-      }
-      .requirement-list {
-        list-style: none;
-        padding-left: 0;
-      }
-      .requirement-list li {
-        padding: 8px 0;
-        display: flex;
-        align-items: flex-start;
-      }
-      .requirement-list li::before {
-        content: "•";
-        color: var(--link);
-        font-weight: 700;
-        margin-right: 12px;
-        font-size: 1.2rem;
-      }
-    </style>
+  # メインビジュアル
+  image: /images/kamui-gradient-soft-2.png
+  
+  # タブナビゲーション
+  tabs:
+    - id: overview
+      label: 概要
+      icon: 📋
+      active: true
+    - id: users
+      label: ユーザー分析
+      icon: 👥
+    - id: requirements
+      label: 要件定義
+      icon: 📝
+    - id: architecture
+      label: アーキテクチャ
+      icon: 🏗️
+    - id: implementation
+      label: 実装
+      icon: 💻
+    - id: operations
+      label: 運用
+      icon: ⚙️
+  
+  # 要件定義書ヘッダー
+  header_info:
+    version: "2.0"
+    date: "2025年9月"
+    status: "レビュー中"
+  
+  # 概要カード
+  overview_cards:
+    - title: プロジェクト概要
+      icon: 📋
+      content: |
+        KAMUI CODEは、MCP（Model Context Protocol）に準拠した統合型AIプラットフォームです。
+        クリエイティブ、開発、ビジネスの3領域を横断し、あらゆるデジタルコンテンツ制作を支援します。
     
-    <div class="requirement-doc">
-      <div class="requirement-header">
-        <h2 class="requirement-title">KAMUI CODE プラットフォーム 要件定義書</h2>
-        <div class="requirement-meta">
-          <span>バージョン: 2.0</span>
-          <span>更新日: 2025年9月</span>
-          <span>ステータス: レビュー中</span>
+    - title: 対象領域
+      icon: 🎯
+      content: |
+        - **クリエイティブ**: 画像・動画・音楽生成
+        - **開発**: コード生成・分析・デバッグ
+        - **ビジネス**: 翻訳・要約・レポート作成
+    
+    - title: 主要機能
+      icon: ⚡
+      content: |
+        - MCPプロトコル準拠の統合API
+        - 30種類以上のAIモデル対応
+        - リアルタイムプレビュー
+        - 統合ダッシュボード
+  
+  # 機能要件テーブル
+  functional_requirements:
+    - id: FR-001
+      name: テキスト→画像生成 (T2I)
+      description: プロンプトから高品質な画像を生成（Flux, SDXL, Dalle-3対応）
+      priority: 必須
+    - id: FR-002
+      name: 画像→画像変換 (I2I)
+      description: 既存画像の編集・スタイル変換・高解像度化機能
+      priority: 必須
+    - id: FR-003
+      name: テキスト→動画生成 (T2V)
+      description: プロンプトから動画を生成（GenVideo, HaiperAI対応）
+      priority: 必須
+    - id: FR-004
+      name: MCPサーバー統合
+      description: クリエイティブ/開発/ビジネス領域の統合API管理
+      priority: 必須
+    - id: FR-005
+      name: 要件定義書生成
+      description: プロジェクト要件の自動生成・管理機能
+      priority: 推奨
+    - id: FR-006
+      name: ストーリーボード作成
+      description: ビジュアルストーリーテリング支援機能
+      priority: 推奨
+  
+  # 非機能要件
+  non_functional_requirements:
+    - category: パフォーマンス
+      requirements:
+        - 画像生成は5秒以内
+        - UI操作のレスポンスは100ms以内
+        - 同時接続1000ユーザー対応
+    - category: 可用性
+      requirements:
+        - 99.9%以上のアップタイム
+        - 計画メンテナンス月1回以内
+        - 障害復旧時間1時間以内
+    - category: セキュリティ
+      requirements:
+        - HTTPS通信必須
+        - Bearer Token認証
+        - 定期的なセキュリティ監査
+  
+  # 技術スタック
+  tech_stack:
+    frontend:
+      - name: React
+        version: "18.x"
+        purpose: UIフレームワーク
+      - name: TypeScript
+        version: "5.x"
+        purpose: 型安全な開発
+      - name: Tailwind CSS
+        version: "3.x"
+        purpose: スタイリング
+    backend:
+      - name: Node.js
+        version: "20.x"
+        purpose: サーバーランタイム
+      - name: FastAPI
+        version: "0.x"
+        purpose: API開発
+    ai_ml:
+      - name: Stable Diffusion
+        version: "XL"
+        purpose: 画像生成
+      - name: GPT-4
+        version: "Latest"
+        purpose: テキスト生成
+  
+  # セクション区切り
+  sections:
+    - type: overview
+      title: 1. プロジェクト概要
+      content: |
+        KAMUI CODEは、Model Context Protocol (MCP) に準拠した統合型AIプラットフォームです。
+        クリエイティブ、開発、ビジネスの3領域を横断し、あらゆるデジタルコンテンツ制作を支援します。
+  
+    - type: requirements
+      title: 2. システム要件
+      table:
+        headers: ["要件ID", "カテゴリ", "説明", "優先度"]
+        rows:
+          - ["REQ-001", "機能要件", "MCPプロトコル準拠の通信", "必須"]
+          - ["REQ-002", "非機能要件", "レスポンスタイム3秒以内", "必須"]
+          - ["REQ-003", "セキュリティ", "Bearer Token認証", "必須"]
+          - ["REQ-004", "可用性", "99.5%以上のアップタイム", "推奨"]
+  
+    - type: architecture
+      title: 3. アーキテクチャ
+      content: |
+        システムアーキテクチャとエンドポイント設計の詳細は、以下のMermaid図を参照してください。
+  
+  # ユーザーペルソナキャンバス
+  user_personas:
+    - name: 開発者タロウ
+      age: 28歳
+      role: フロントエンドエンジニア
+      icon: 👨‍💻
+      goals:
+        - 開発効率の向上
+        - コード品質の改善
+        - 最新技術の習得
+      pain_points:
+        - 繰り返し作業が多い
+        - ドキュメント作成が面倒
+        - レビュー待ち時間が長い
+      needs:
+        - AIによるコード補完
+        - 自動テスト生成
+        - ドキュメント自動化
+    
+    - name: デザイナー花子
+      age: 32歳
+      role: UIデザイナー
+      icon: 👩‍🎨
+      goals:
+        - クリエイティブな表現
+        - 制作時間の短縮
+        - クライアント満足度向上
+      pain_points:
+        - アイデア出しに時間がかかる
+        - 素材探しが大変
+        - バリエーション作成が面倒
+      needs:
+        - AI画像生成
+        - スタイル変換
+        - 素材ライブラリ
+    
+    - name: PMサトシ
+      age: 35歳
+      role: プロジェクトマネージャー
+      icon: 👨‍💼
+      goals:
+        - プロジェクト成功
+        - チーム生産性向上
+        - 納期厳守
+      pain_points:
+        - 要件定義が曖昧
+        - 進捗管理が複雑
+        - コミュニケーションコスト
+      needs:
+        - 要件定義書自動生成
+        - プロジェクト分析
+        - レポート作成支援
+  
+  # ビジネスモデルキャンバス
+  business_model_canvas: |
+    <div class="canvas-container" style="background: #f8f9fa; padding: 20px; border-radius: 12px; margin: 20px 0;">
+      <h3 style="text-align: center; margin-bottom: 20px;">KAMUI CODE ビジネスモデルキャンバス</h3>
+      <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;">
+        <!-- 第1列 -->
+        <div style="grid-row: span 2; background: white; border: 2px solid #e9ecef; border-radius: 8px; padding: 15px;">
+          <h4 style="color: #8B5CF6; margin-bottom: 10px;">🤝 主要パートナー</h4>
+          <ul style="font-size: 0.9em; margin: 0; padding-left: 20px;">
+            <li>AIモデルプロバイダー（OpenAI, Anthropic等）</li>
+            <li>クラウドインフラ（AWS, GCP）</li>
+            <li>開発者コミュニティ</li>
+            <li>技術パートナー企業</li>
+          </ul>
         </div>
-      </div>
-      
-      <div class="requirement-section">
-        <h3>1. プロジェクト概要</h3>
-        <p>KAMUI CODE は、MCP（Model Context Protocol）に準拠した複数のサーバー群を統合的に提供するプラットフォームです。クリエイティブ、開発、ビジネスの3領域を横断し、AIを活用した画像生成、ビデオ編集、コード生成、文書作成など、あらゆるデジタルコンテンツ制作を一つの環境で完結できるシステムを構築します。</p>
-      </div>
-      
-      <div class="requirement-section">
-        <h3>2. システム要件</h3>
         
-        <h4>2.1 機能要件</h4>
-        <table class="requirement-table">
-          <thead>
-            <tr>
-              <th style="width: 20%">機能ID</th>
-              <th style="width: 30%">機能名</th>
-              <th style="width: 50%">説明</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>FR-001</td>
-              <td>テキスト→画像生成 (T2I)</td>
-              <td>プロンプトから高品質な画像を生成（Flux, SDXL, Dalle-3対応）</td>
-            </tr>
-            <tr>
-              <td>FR-002</td>
-              <td>画像→画像変換 (I2I)</td>
-              <td>既存画像の編集・スタイル変換・高解像度化機能</td>
-            </tr>
-            <tr>
-              <td>FR-003</td>
-              <td>テキスト→動画生成 (T2V)</td>
-              <td>プロンプトから動画を生成（GenVideo, HaiperAI対応）</td>
-            </tr>
-            <tr>
-              <td>FR-004</td>
-              <td>MCPサーバー統合</td>
-              <td>クリエイティブ/開発/ビジネス領域の統合API管理</td>
-            </tr>
-            <tr>
-              <td>FR-005</td>
-              <td>要件定義書生成</td>
-              <td>プロジェクト要件の自動生成・管理機能</td>
-            </tr>
-            <tr>
-              <td>FR-006</td>
-              <td>ストーリーボード作成</td>
-              <td>ビジュアルストーリーテリング支援機能</td>
-            </tr>
-          </tbody>
-        </table>
+        <!-- 第2列 -->
+        <div style="background: white; border: 2px solid #e9ecef; border-radius: 8px; padding: 15px;">
+          <h4 style="color: #3B82F6; margin-bottom: 10px;">🎯 主要活動</h4>
+          <ul style="font-size: 0.9em; margin: 0; padding-left: 20px;">
+            <li>MCPサーバー開発・保守</li>
+            <li>AIモデル統合</li>
+            <li>ユーザーサポート</li>
+            <li>継続的な機能改善</li>
+          </ul>
+        </div>
         
-        <h4>2.2 非機能要件</h4>
-        <ul class="requirement-list">
-          <li><strong>パフォーマンス:</strong> 画像生成は5秒以内、UI操作のレスポンスは100ms以内</li>
-          <li><strong>可用性:</strong> 99.9%以上のアップタイム</li>
-          <li><strong>セキュリティ:</strong> HTTPS通信、認証・認可機能の実装</li>
-          <li><strong>互換性:</strong> Chrome, Firefox, Safari, Edgeの最新版をサポート</li>
-          <li><strong>スケーラビリティ:</strong> 同時接続ユーザー1000人以上に対応</li>
-        </ul>
-      </div>
-      
-      <div class="requirement-section">
-        <h3>3. 技術スタック</h3>
-        <table class="requirement-table">
-          <thead>
-            <tr>
-              <th>カテゴリ</th>
-              <th>技術</th>
-              <th>用途</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>フロントエンド</td>
-              <td>React, TypeScript</td>
-              <td>UIコンポーネントの実装</td>
-            </tr>
-            <tr>
-              <td>スタイリング</td>
-              <td>CSS Modules, Tailwind CSS</td>
-              <td>レスポンシブデザインの実現</td>
-            </tr>
-            <tr>
-              <td>状態管理</td>
-              <td>Redux Toolkit</td>
-              <td>アプリケーション状態の管理</td>
-            </tr>
-            <tr>
-              <td>AI/ML</td>
-              <td>Stable Diffusion API</td>
-              <td>画像生成機能の実装</td>
-            </tr>
-            <tr>
-              <td>ビルドツール</td>
-              <td>Vite</td>
-              <td>高速な開発環境の構築</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      
-      <div class="requirement-section">
-        <h3>4. 開発スケジュール</h3>
-        <table class="requirement-table">
-          <thead>
-            <tr>
-              <th>フェーズ</th>
-              <th>期間</th>
-              <th>主な成果物</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>要件定義</td>
-              <td>2週間</td>
-              <td>要件定義書、画面設計書</td>
-            </tr>
-            <tr>
-              <td>基本設計</td>
-              <td>3週間</td>
-              <td>システム設計書、API仕様書</td>
-            </tr>
-            <tr>
-              <td>実装</td>
-              <td>8週間</td>
-              <td>ソースコード、単体テスト</td>
-            </tr>
-            <tr>
-              <td>テスト</td>
-              <td>3週間</td>
-              <td>結合テスト、受入テスト</td>
-            </tr>
-            <tr>
-              <td>リリース</td>
-              <td>1週間</td>
-              <td>本番環境構築、運用手順書</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      
-      <div class="requirement-section">
-        <h3>5. 制約事項</h3>
-        <ul class="requirement-list">
-          <li>AI画像生成のAPIには利用制限があるため、ユーザーごとに生成回数を制限する</li>
-          <li>動画ファイルのアップロードサイズは500MBまでとする</li>
-          <li>初期リリースでは日本語のみ対応とし、多言語対応は次期バージョンで検討</li>
-          <li>MCPプロトコル準拠のため、JSON-RPC 2.0形式での通信が必須</li>
-        </ul>
+        <div style="background: white; border: 2px solid #e9ecef; border-radius: 8px; padding: 15px;">
+          <h4 style="color: #3B82F6; margin-bottom: 10px;">🔑 主要リソース</h4>
+          <ul style="font-size: 0.9em; margin: 0; padding-left: 20px;">
+            <li>技術チーム</li>
+            <li>AIモデルアクセス</li>
+            <li>サーバーインフラ</li>
+            <li>知的財産</li>
+          </ul>
+        </div>
+        
+        <!-- 第3列 -->
+        <div style="grid-row: span 2; background: #FEF3C7; border: 2px solid #FDE68A; border-radius: 8px; padding: 15px;">
+          <h4 style="color: #F59E0B; margin-bottom: 10px;">💎 価値提案</h4>
+          <ul style="font-size: 0.9em; margin: 0; padding-left: 20px;">
+            <li><strong>統合プラットフォーム</strong><br>3領域を1つのインターフェースで</li>
+            <li><strong>MCP準拠</strong><br>標準化されたプロトコル</li>
+            <li><strong>30+AIモデル</strong><br>最適なモデルを選択可能</li>
+            <li><strong>開発効率向上</strong><br>作業時間を最大80%削減</li>
+          </ul>
+        </div>
+        
+        <!-- 第4列 -->
+        <div style="background: white; border: 2px solid #e9ecef; border-radius: 8px; padding: 15px;">
+          <h4 style="color: #10B981; margin-bottom: 10px;">🤝 顧客関係</h4>
+          <ul style="font-size: 0.9em; margin: 0; padding-left: 20px;">
+            <li>セルフサービス</li>
+            <li>コミュニティサポート</li>
+            <li>専用サポート（Enterprise）</li>
+            <li>定期的なウェビナー</li>
+          </ul>
+        </div>
+        
+        <div style="background: white; border: 2px solid #e9ecef; border-radius: 8px; padding: 15px;">
+          <h4 style="color: #10B981; margin-bottom: 10px;">📢 チャネル</h4>
+          <ul style="font-size: 0.9em; margin: 0; padding-left: 20px;">
+            <li>公式ウェブサイト</li>
+            <li>開発者フォーラム</li>
+            <li>SNS・技術ブログ</li>
+            <li>パートナー経由</li>
+          </ul>
+        </div>
+        
+        <!-- 第5列 -->
+        <div style="grid-row: span 2; background: white; border: 2px solid #e9ecef; border-radius: 8px; padding: 15px;">
+          <h4 style="color: #EC4899; margin-bottom: 10px;">👥 顧客セグメント</h4>
+          <ul style="font-size: 0.9em; margin: 0; padding-left: 20px;">
+            <li><strong>個人開発者</strong><br>効率化を求める</li>
+            <li><strong>スタートアップ</strong><br>少人数で高速開発</li>
+            <li><strong>エンタープライズ</strong><br>大規模プロジェクト</li>
+            <li><strong>クリエイター</strong><br>コンテンツ制作者</li>
+          </ul>
+        </div>
+        
+        <!-- 下段：コスト構造と収益の流れ -->
+        <div style="grid-column: span 2; background: #FEE2E2; border: 2px solid #FCA5A5; border-radius: 8px; padding: 15px;">
+          <h4 style="color: #EF4444; margin-bottom: 10px;">💰 コスト構造</h4>
+          <ul style="font-size: 0.9em; margin: 0; padding-left: 20px;">
+            <li>AIモデル利用料（変動費）</li>
+            <li>インフラコスト（サーバー、ストレージ）</li>
+            <li>開発・運用人件費</li>
+            <li>マーケティング費用</li>
+          </ul>
+        </div>
+        
+        <div style="grid-column: span 3; background: #D1FAE5; border: 2px solid #6EE7B7; border-radius: 8px; padding: 15px;">
+          <h4 style="color: #10B981; margin-bottom: 10px;">💵 収益の流れ</h4>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; font-size: 0.9em;">
+            <div>
+              <strong>フリーミアム</strong>
+              <ul style="margin: 5px 0; padding-left: 20px;">
+                <li>基本機能無料</li>
+                <li>有料アップグレード</li>
+              </ul>
+            </div>
+            <div>
+              <strong>従量課金</strong>
+              <ul style="margin: 5px 0; padding-left: 20px;">
+                <li>API利用量</li>
+                <li>原価+マージン</li>
+              </ul>
+            </div>
+            <div>
+              <strong>サブスクリプション</strong>
+              <ul style="margin: 5px 0; padding-left: 20px;">
+                <li>月額/年額プラン</li>
+                <li>Enterprise契約</li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   
-  # カスタマージャーニーマップ
+  # カスタマージャーニーマップ（別セクション）
+  journey_section:
+    title: カスタマージャーニーマップ
+    description: ユーザーがKAMUI CODEを利用する際の典型的なジャーニー
+  
   customer_journey: |
     <div class="journey-map-container" style="background: #f8f9fa; padding: 20px; border-radius: 12px; margin: 20px 0;">
       <style>
@@ -339,6 +424,18 @@
         [data-theme="dark"] .journey-cell {
           background: #1f2937;
           border-color: #4b5563;
+          color: #e5e7eb;
+        }
+        [data-theme="dark"] .canvas-container {
+          background: #1f2937;
+          color: #e5e7eb;
+        }
+        [data-theme="dark"] .canvas-container > div > div {
+          background: #111827 !important;
+          border-color: #4b5563 !important;
+        }
+        [data-theme="dark"] .canvas-container h3,
+        [data-theme="dark"] .canvas-container h4 {
           color: #e5e7eb;
         }
       </style>
