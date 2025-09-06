@@ -1,6 +1,6 @@
 baseURL: https://example.org/
 languageCode: ja
-title: SaaS Applications
+title: KAMUI OS
 theme: kamui-docs
 
 params:
