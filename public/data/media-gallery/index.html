@@ -1,0 +1,1702 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Media Gallery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #1a1a1a;
+            color: #ffffff;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* サイドバー */
+        .sidebar {
+            width: 280px;
+            background: #0f0f0f;
+            border-right: 1px solid #2a2a2a;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        .sidebar-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-subtitle {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        /* フォルダツリー */
+        .folder-tree {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .tree-item {
+            user-select: none;
+        }
+
+        .tree-label {
+            display: flex;
+            align-items: center;
+            padding: 6px 8px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            color: #999;
+            cursor: pointer;
+        }
+
+        .tree-label:hover {
+            background: #1e1e1e;
+            color: #fff;
+        }
+
+        .tree-label.selected {
+            background: #2d2d2d;
+            color: #fff;
+        }
+
+        .tree-icon {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        .tree-name {
+            flex: 1;
+            font-size: 0.9rem;
+        }
+
+        .tree-count {
+            font-size: 0.75rem;
+            color: #666;
+            margin-left: 8px;
+        }
+
+        .tree-children {
+            margin-left: 20px;
+            display: none;
+        }
+
+        .tree-children.expanded {
+            display: block;
+        }
+
+        .tree-toggle {
+            width: 16px;
+            height: 16px;
+            margin-right: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            color: #666;
+            transition: transform 0.2s;
+        }
+
+        .tree-toggle.expanded {
+            transform: rotate(90deg);
+        }
+
+        /* タグセクション */
+        .sidebar-tags {
+            padding: 15px;
+            border-top: 1px solid #2a2a2a;
+        }
+
+        .tags-title {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .tag {
+            padding: 4px 10px;
+            background: #2d2d2d;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            color: #999;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tag:hover {
+            background: #3d3d3d;
+            color: #fff;
+        }
+
+        .tag.active {
+            background: #4a9eff;
+            color: #fff;
+        }
+
+        /* メインコンテンツ */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ヘッダーバー */
+        .header-bar {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            background: #0f0f0f;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        .search-bar {
+            flex: 1;
+            max-width: 400px;
+            padding: 8px 15px;
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 20px;
+            color: white;
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .search-bar:focus {
+            border-color: #4a9eff;
+            box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.1);
+        }
+
+        .view-options {
+            display: flex;
+            gap: 10px;
+            margin-left: auto;
+        }
+
+        .view-btn {
+            padding: 8px 12px;
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 6px;
+            color: #999;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .view-btn:hover {
+            border-color: #3a3a3a;
+            color: #fff;
+        }
+
+        .view-btn.active {
+            background: #2d2d2d;
+            border-color: #4a9eff;
+            color: #4a9eff;
+        }
+
+        /* ギャラリーコンテナ */
+        .gallery-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .media-grid.list-view {
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+
+        .media-item {
+            background: #0f0f0f;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .media-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .media-item.list-view {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            height: 60px;
+        }
+
+        .media-thumbnail {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            background: #1a1a1a;
+        }
+
+        .list-view .media-thumbnail {
+            width: 40px;
+            height: 40px;
+            margin-right: 15px;
+            border-radius: 4px;
+        }
+        /* HTML thumbnail (scaled iframe) */
+        .media-item.html .media-thumbnail {
+            position: relative;
+            background: #1a1a1a;
+            overflow: hidden;
+        }
+        .html-thumb-frame {
+            position: absolute;
+            top: 0;
+            left: 0;
+            border: 0;
+            transform-origin: 0 0;
+            pointer-events: none;
+            background: white;
+        }
+        .html-thumb-fallback {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg,#364069 0%,#1b2336 100%);
+            color:#fff;
+            font-weight:700;
+            letter-spacing: 0.5px;
+        }
+
+        .media-item.audio .media-thumbnail {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .audio-icon-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .audio-icon-wrapper .main-icon {
+            font-size: 4rem;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+        }
+        
+        .audio-wave-bars {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 3px;
+            height: 30px;
+            align-items: flex-end;
+        }
+        
+        .audio-wave-bars span {
+            width: 4px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 2px;
+            animation: audioWave 1.2s ease-in-out infinite;
+        }
+        
+        .audio-wave-bars span:nth-child(1) { height: 10px; animation-delay: 0s; }
+        .audio-wave-bars span:nth-child(2) { height: 20px; animation-delay: 0.1s; }
+        .audio-wave-bars span:nth-child(3) { height: 15px; animation-delay: 0.2s; }
+        .audio-wave-bars span:nth-child(4) { height: 25px; animation-delay: 0.3s; }
+        .audio-wave-bars span:nth-child(5) { height: 18px; animation-delay: 0.4s; }
+        .audio-wave-bars span:nth-child(6) { height: 22px; animation-delay: 0.5s; }
+        .audio-wave-bars span:nth-child(7) { height: 12px; animation-delay: 0.6s; }
+        
+        @keyframes audioWave {
+            0%, 100% { transform: scaleY(0.5); opacity: 0.5; }
+            50% { transform: scaleY(1); opacity: 1; }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        /* 画像用オーバーレイ */
+        .media-item.image .media-thumbnail {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .image-overlay {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 5px 10px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            backdrop-filter: blur(10px);
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .image-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        
+        .image-lens {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.5);
+            animation: lensZoom 2s ease-in-out infinite;
+        }
+        
+        .image-lens::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            animation: lensPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes lensZoom {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        
+        @keyframes lensPulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        
+        /* 動画用オーバーレイ */
+        .media-item.video .media-thumbnail {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .video-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+        
+        .media-item.video:hover .video-overlay {
+            opacity: 0;
+        }
+        
+        .play-button {
+            width: 0;
+            height: 0;
+            border-left: 20px solid white;
+            border-top: 12px solid transparent;
+            border-bottom: 12px solid transparent;
+            margin-left: 5px;
+            animation: playPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes playPulse {
+            0%, 100% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+        
+        .video-duration {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: white;
+            backdrop-filter: blur(5px);
+        }
+        
+        .video-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.2);
+            overflow: hidden;
+        }
+        
+        .video-progress-bar {
+            height: 100%;
+            width: 30%;
+            background: linear-gradient(90deg, #4a9eff, #00ff88);
+            animation: progressMove 3s ease-in-out infinite;
+        }
+        
+        @keyframes progressMove {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(400%); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .media-info {
+            padding: 10px;
+        }
+
+        .list-view .media-info {
+            flex: 1;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .media-name {
+            font-size: 0.85rem;
+            color: #ccc;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .media-details {
+            font-size: 0.75rem;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .list-view .media-details {
+            margin-top: 0;
+            margin-left: auto;
+        }
+
+        /* 統計バー */
+        .stats-bar {
+            padding: 10px 20px;
+            background: #0f0f0f;
+            border-top: 1px solid #2a2a2a;
+            display: flex;
+            align-items: center;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .stats-info {
+            margin-right: 20px;
+        }
+
+        /* ライトボックス */
+        .lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .lightbox.active {
+            display: flex;
+        }
+
+        .lightbox-content {
+            max-width: 90%;
+            max-height: 90%;
+        }
+
+        .lightbox img,
+        .lightbox video {
+            max-width: 100%;
+            max-height: 90vh;
+            object-fit: contain;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .close-btn:hover {
+            color: #4a9eff;
+        }
+
+        /* ローディング */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        .error {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            color: #ff6b6b;
+        }
+
+        .error-message {
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+
+        /* スクロールバー */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f0f0f;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #3a3a3a;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4a4a4a;
+        }
+
+        /* コンテキストメニュー */
+        .context-menu {
+            position: fixed;
+            background: #1a1a1a;
+            border: 1px solid #3a3a3a;
+            border-radius: 8px;
+            padding: 8px 0;
+            display: none;
+            z-index: 1000;
+            min-width: 200px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .context-menu.active {
+            display: block;
+        }
+
+        .context-menu-item {
+            padding: 10px 20px;
+            color: #ccc;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .context-menu-item:hover {
+            background: #2d2d2d;
+            color: #fff;
+        }
+
+        .context-menu-separator {
+            height: 1px;
+            background: #3a3a3a;
+            margin: 4px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- サイドバー -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">📁 Media Gallery</div>
+            <div class="sidebar-subtitle" id="fileCount">Loading...</div>
+        </div>
+
+        <!-- フォルダツリー -->
+        <div class="folder-tree" id="folderTree">
+            <div class="loading">スキャン中...</div>
+        </div>
+
+        <!-- タグセクション -->
+        <div class="sidebar-tags">
+            <div class="tags-title">Quick Filters</div>
+            <div class="tag-list">
+                <span class="tag active" data-type="all">All</span>
+                <span class="tag" data-type="image">Images</span>
+                <span class="tag" data-type="video">Videos</span>
+                <span class="tag" data-type="audio">Audio</span>
+                <span class="tag" data-type="html">HTML</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- メインコンテンツ -->
+    <div class="main-content">
+        <!-- ヘッダーバー -->
+        <div class="header-bar">
+            <input type="text" class="search-bar" placeholder="Search files..." id="searchInput">
+            <div class="view-options">
+                <button class="view-btn active" data-view="grid">📱 Grid</button>
+                <button class="view-btn" data-view="list">📋 List</button>
+                <button class="view-btn" onclick="scanDirectory()">🔄 Refresh</button>
+            </div>
+        </div>
+
+        <!-- ギャラリーコンテナ -->
+        <div class="gallery-container">
+            <div class="media-grid" id="mediaGrid">
+                <div class="loading">メディアファイルを読み込み中...</div>
+            </div>
+        </div>
+
+        <!-- 統計バー -->
+        <div class="stats-bar">
+            <span class="stats-info" id="statsInfo">Loading...</span>
+            <span style="margin-left: auto;" id="totalSize">Total: Calculating...</span>
+        </div>
+    </div>
+
+    <!-- ライトボックス -->
+    <div class="lightbox" id="lightbox">
+        <span class="close-btn" onclick="closeLightbox()">&times;</span>
+        <div class="lightbox-content" id="lightboxContent"></div>
+    </div>
+
+    <!-- コンテキストメニュー -->
+    <div class="context-menu" id="contextMenu">
+        <div class="context-menu-item" onclick="copyFilePath()">
+            <span>📋</span> ファイルパスをコピー
+        </div>
+        <div class="context-menu-item" onclick="openFile()">
+            <span>📂</span> ファイルを開く
+        </div>
+        <div class="context-menu-item" onclick="openFolder()">
+            <span>📁</span> フォルダを開く
+        </div>
+    </div>
+
+    <script>
+        let allMediaFiles = [];
+        let currentFilter = 'all';
+        let currentPath = '';
+        let selectedFile = null;
+
+        // APIベースURLを取得
+        let apiBaseUrl = '';
+        
+        async function getServerConfig() {
+            // まず現在のポートで試す（HTMLが同じサーバーから配信されている場合）
+            try {
+                const currentPort = window.location.port || '80';
+                const response = await fetch(`http://localhost:${currentPort}/api/config`);
+                if (response.ok) {
+                    const config = await response.json();
+                    apiBaseUrl = `http://localhost:${config.port}`;
+                    return true;
+                }
+            } catch (e) {
+                // 現在のポートで失敗
+            }
+            
+            // 一般的なポートを試す
+            const commonPorts = [7777, 8080, 3000, 3333];
+            for (const port of commonPorts) {
+                try {
+                    const response = await fetch(`http://localhost:${port}/api/config`);
+                    if (response.ok) {
+                        const config = await response.json();
+                        apiBaseUrl = `http://localhost:${config.port}`;
+                        return true;
+                    }
+                } catch (e) {
+                    // このポートでは接続できない
+                }
+            }
+            return false;
+        }
+        
+        // ディレクトリをスキャン
+        async function scanDirectory() {
+            const folderTree = document.getElementById('folderTree');
+            const grid = document.getElementById('mediaGrid');
+            
+            // ローディング表示
+            folderTree.innerHTML = '<div class="loading">スキャン中...</div>';
+            grid.innerHTML = '<div class="loading">メディアファイルを読み込み中...</div>';
+            
+            // サーバー設定を取得
+            if (!apiBaseUrl) {
+                const configSuccess = await getServerConfig();
+                if (!configSuccess) {
+                    console.error('Could not connect to server');
+                    folderTree.innerHTML = '<div class="error">サーバーに接続できません</div>';
+                    showFileInput();
+                    return;
+                }
+            }
+            
+            try {
+                // Node.jsサーバーから取得
+                const response = await fetch(`${apiBaseUrl}/api/scan`);
+                
+                if (!response.ok) {
+                    throw new Error('Server response not ok');
+                }
+                
+                const data = await response.json();
+                
+                console.log('Scanned data:', data);
+                processScannedData(data);
+            } catch (error) {
+                console.error('Error scanning directory:', error);
+                
+                // サーバーが動いていない場合の代替処理
+                folderTree.innerHTML = '<div class="error">サーバーエラー</div>';
+                showFileInput();
+            }
+        }
+
+        // スキャンデータを処理
+        function processScannedData(data) {
+            allMediaFiles = [];
+            const folderTree = document.getElementById('folderTree');
+            folderTree.innerHTML = '';
+            
+            // ルートレベルのファイルを追加
+            if (data.data.files && data.data.files.length > 0) {
+                data.data.files.forEach(file => {
+                    allMediaFiles.push(file);
+                });
+            }
+            
+            // フォルダツリーを構築
+            const rootContainer = document.createElement('div');
+            rootContainer.className = 'tree-item';
+            
+            // ルートフォルダ
+            const rootLabel = document.createElement('div');
+            rootLabel.className = 'tree-label selected';
+            
+            const rootToggle = document.createElement('span');
+            rootToggle.className = 'tree-toggle expanded';
+            rootToggle.textContent = '▼';
+            rootLabel.appendChild(rootToggle);
+            
+            const rootIcon = document.createElement('span');
+            rootIcon.className = 'tree-icon';
+            rootIcon.textContent = '📁';
+            rootLabel.appendChild(rootIcon);
+            
+            const rootName = document.createElement('span');
+            rootName.className = 'tree-name';
+            // basePathから最後のディレクトリ名を取得
+            const dirName = data.basePath ? data.basePath.split('/').pop() || 'Media' : 'Media';
+            rootName.textContent = dirName;
+            rootLabel.appendChild(rootName);
+            
+            const rootCount = document.createElement('span');
+            rootCount.className = 'tree-count';
+            rootCount.textContent = data.data.files.length;
+            rootLabel.appendChild(rootCount);
+            
+            rootContainer.appendChild(rootLabel);
+            
+            const rootChildren = document.createElement('div');
+            rootChildren.className = 'tree-children expanded';
+            
+            // サブフォルダを追加
+            if (data.data.folders && data.data.folders.length > 0) {
+                data.data.folders.forEach(folder => {
+                    const folderItem = createFolderItem(folder);
+                    rootChildren.appendChild(folderItem);
+                });
+            }
+            
+            rootContainer.appendChild(rootChildren);
+            
+            rootLabel.addEventListener('click', () => {
+                rootChildren.classList.toggle('expanded');
+                rootToggle.classList.toggle('expanded');
+                rootToggle.textContent = rootChildren.classList.contains('expanded') ? '▼' : '▶';
+                rootLabel.classList.toggle('selected');
+                
+                // 全ファイルを表示
+                displayMedia(allMediaFiles);
+            });
+            
+            folderTree.appendChild(rootContainer);
+            
+            // メディアファイルを表示
+            displayMedia(allMediaFiles);
+            updateStats();
+        }
+        
+        // フォルダアイテムを作成
+        function createFolderItem(folder) {
+            const container = document.createElement('div');
+            container.className = 'tree-item';
+            
+            const label = document.createElement('div');
+            label.className = 'tree-label';
+            
+            const toggle = document.createElement('span');
+            toggle.className = 'tree-toggle';
+            toggle.textContent = '▶';
+            label.appendChild(toggle);
+            
+            const icon = document.createElement('span');
+            icon.className = 'tree-icon';
+            icon.textContent = '📁';
+            label.appendChild(icon);
+            
+            const name = document.createElement('span');
+            name.className = 'tree-name';
+            name.textContent = folder.name;
+            label.appendChild(name);
+            
+            const count = document.createElement('span');
+            count.className = 'tree-count';
+            count.textContent = (folder.items && folder.items.files) ? folder.items.files.length : 0;
+            label.appendChild(count);
+            
+            container.appendChild(label);
+            
+            const childrenContainer = document.createElement('div');
+            childrenContainer.className = 'tree-children';
+            
+            // このフォルダのファイルを追加
+            if (folder.items && folder.items.files && folder.items.files.length > 0) {
+                folder.items.files.forEach(file => {
+                    allMediaFiles.push(file);
+                });
+            }
+            
+            // サブフォルダを追加
+            if (folder.items && folder.items.folders && folder.items.folders.length > 0) {
+                folder.items.folders.forEach(subfolder => {
+                    const subfolderItem = createFolderItem(subfolder);
+                    childrenContainer.appendChild(subfolderItem);
+                });
+            }
+            
+            container.appendChild(childrenContainer);
+            
+            label.addEventListener('click', (e) => {
+                e.stopPropagation();
+                childrenContainer.classList.toggle('expanded');
+                toggle.classList.toggle('expanded');
+                toggle.textContent = childrenContainer.classList.contains('expanded') ? '▼' : '▶';
+                label.classList.toggle('selected');
+                
+                // このフォルダのファイルを表示
+                const folderFiles = [];
+                function collectFiles(folderData) {
+                    if (folderData.items && folderData.items.files) {
+                        folderData.items.files.forEach(file => folderFiles.push(file));
+                    }
+                    if (folderData.items && folderData.items.folders) {
+                        folderData.items.folders.forEach(subfolder => collectFiles(subfolder));
+                    }
+                }
+                collectFiles(folder);
+                displayMedia(folderFiles);
+                document.getElementById('statsInfo').textContent = `Showing ${folderFiles.length} files from ${folder.name}`;
+            });
+            
+            return container;
+        }
+
+        // 古いフォルダツリー関数（使用しない）
+        function buildFolderTree_old(node, basePath, parentPath = '') {
+            const container = document.createElement('div');
+            container.className = 'tree-item';
+
+            // ルートノード
+            if (parentPath === '') {
+                const label = document.createElement('div');
+                label.className = 'tree-label';
+                
+                const toggle = document.createElement('span');
+                toggle.className = 'tree-toggle expanded';
+                toggle.textContent = '▼';
+                label.appendChild(toggle);
+
+                const icon = document.createElement('span');
+                icon.className = 'tree-icon';
+                icon.textContent = '📁';
+                label.appendChild(icon);
+
+                const name = document.createElement('span');
+                name.className = 'tree-name';
+                name.textContent = basePath.split('/').pop() || 'Root';
+                label.appendChild(name);
+
+                const count = document.createElement('span');
+                count.className = 'tree-count';
+                const totalFiles = node.files ? node.files.length : 0;
+                count.textContent = totalFiles;
+                label.appendChild(count);
+
+                container.appendChild(label);
+
+                const childrenContainer = document.createElement('div');
+                childrenContainer.className = 'tree-children expanded';
+                
+                // ファイルを追加
+                if (node.files && node.files.length > 0) {
+                    node.files.forEach(file => {
+                        allMediaFiles.push(file);
+                    });
+                }
+
+                // サブフォルダを追加
+                if (node.folders && node.folders.length > 0) {
+                    node.folders.forEach(folder => {
+                        childrenContainer.appendChild(buildFolderTree(folder.items, basePath, folder.path));
+                    });
+                }
+
+                container.appendChild(childrenContainer);
+
+                label.addEventListener('click', () => {
+                    childrenContainer.classList.toggle('expanded');
+                    toggle.classList.toggle('expanded');
+                    toggle.textContent = childrenContainer.classList.contains('expanded') ? '▼' : '▶';
+                });
+            } else {
+                // サブフォルダ
+                const label = document.createElement('div');
+                label.className = 'tree-label';
+                
+                const toggle = document.createElement('span');
+                toggle.className = 'tree-toggle';
+                toggle.textContent = '▶';
+                label.appendChild(toggle);
+
+                const icon = document.createElement('span');
+                icon.className = 'tree-icon';
+                icon.textContent = '📁';
+                label.appendChild(icon);
+
+                const name = document.createElement('span');
+                name.className = 'tree-name';
+                name.textContent = parentPath.split('/').pop();
+                label.appendChild(name);
+
+                const count = document.createElement('span');
+                count.className = 'tree-count';
+                count.textContent = node.files.length;
+                label.appendChild(count);
+
+                container.appendChild(label);
+
+                const childrenContainer = document.createElement('div');
+                childrenContainer.className = 'tree-children';
+
+                // ファイルを追加
+                node.files.forEach(file => {
+                    allMediaFiles.push(file);
+                });
+
+                // サブフォルダを追加
+                if (node.folders && node.folders.length > 0) {
+                    node.folders.forEach(folder => {
+                        childrenContainer.appendChild(buildFolderTree(folder.items, basePath, folder.path));
+                    });
+                }
+
+                container.appendChild(childrenContainer);
+
+                label.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    childrenContainer.classList.toggle('expanded');
+                    toggle.classList.toggle('expanded');
+                    toggle.textContent = childrenContainer.classList.contains('expanded') ? '▼' : '▶';
+                    
+                    // フィルタリング
+                    currentPath = parentPath;
+                    filterByFolder(parentPath);
+                });
+            }
+
+            return container;
+        }
+
+        // メディアグリッドを表示
+        function displayMedia(files = allMediaFiles) {
+            const grid = document.getElementById('mediaGrid');
+            
+            // 既存の動画を停止してメモリ解放
+            const oldVideos = grid.querySelectorAll('video');
+            oldVideos.forEach(video => {
+                video.pause();
+                video.src = '';
+                video.load();
+            });
+            
+            grid.innerHTML = '';
+
+            if (files.length === 0) {
+                grid.innerHTML = '<div class="error"><div>メディアファイルが見つかりません</div><div class="error-message">Node.jsサーバーを起動してください: node server.js</div></div>';
+                return;
+            }
+
+            // パフォーマンス改善: DocumentFragmentと仮想スクロール
+            const fragment = document.createDocumentFragment();
+            const maxInitialLoad = 50; // 初期表示数を制限
+            const displayFiles = files.slice(0, maxInitialLoad);
+            
+            displayFiles.forEach(file => {
+                const item = document.createElement('div');
+                item.className = 'media-item';
+                item.dataset.path = file.path;
+                item.dataset.type = file.type;
+
+                if (file.type === 'image') {
+                    item.className = 'media-item image';
+                    item.innerHTML = `
+                        <img class="media-thumbnail" src="http://localhost:7777/${file.path}" alt="${file.name}" loading="lazy">
+                        <div class="media-info">
+                            <div class="media-name">${file.name}</div>
+                            <div class="media-details">Image</div>
+                        </div>
+                    `;
+                } else if (file.type === 'video') {
+                    item.className = 'media-item video';
+                    item.innerHTML = `
+                        <div style="position: relative;">
+                            <video class="media-thumbnail" src="http://localhost:7777/${file.path}" muted preload="metadata"></video>
+                            <div class="video-overlay">
+                                <div class="play-button"></div>
+                            </div>
+                            <div class="video-duration">0:00</div>
+                            <div class="video-progress">
+                                <div class="video-progress-bar"></div>
+                            </div>
+                        </div>
+                        <div class="media-info">
+                            <div class="media-name">${file.name}</div>
+                            <div class="media-details">Video</div>
+                        </div>
+                    `;
+                    // サムネイル表示のために最初のフレームを読み込み
+                    const video = item.querySelector('video');
+                    if (video) {
+                        video.addEventListener('loadedmetadata', () => {
+                            video.currentTime = 0.1;
+                            // 動画の長さを表示
+                            const duration = video.duration;
+                            const minutes = Math.floor(duration / 60);
+                            const seconds = Math.floor(duration % 60);
+                            const durationEl = item.querySelector('.video-duration');
+                            if (durationEl) {
+                                durationEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                            }
+                        });
+                    }
+                } else if (file.type === 'audio') {
+                    item.className = 'media-item audio';
+                    // 音楽ファイル用のカラフルなアイコンをランダムに選択
+                    const musicIcons = ['🎵', '🎶', '🎼', '🎤', '🎧', '🎸', '🎹', '🎺', '🎷', '🥁'];
+                    const colors = [
+                        'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                        'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                        'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+                        'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+                        'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
+                        'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+                        'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)'
+                    ];
+                    const randomIcon = musicIcons[Math.floor(Math.random() * musicIcons.length)];
+                    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                    
+                    item.innerHTML = `
+                        <div class="media-thumbnail audio" style="background: ${randomColor};">
+                            <div class="audio-icon-wrapper">
+                                <span class="main-icon">${randomIcon}</span>
+                            </div>
+                            <div class="audio-wave-bars">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </div>
+                        <div class="media-info">
+                            <div class="media-name">${file.name}</div>
+                            <div class="media-details">Audio</div>
+                        </div>
+                    `;
+                } else if (file.type === 'html') {
+                    item.className = 'media-item html';
+                    item.innerHTML = `
+                        <div class="media-thumbnail">
+                            <div class="html-thumb-fallback">HTML</div>
+                            <iframe class="html-thumb-frame" data-src="http://localhost:7777/${file.path}" loading="lazy" sandbox="allow-scripts allow-forms"></iframe>
+                        </div>
+                        <div class="media-info">
+                            <div class="media-name">${file.name}</div>
+                            <div class="media-details">HTML Page</div>
+                        </div>
+                    `;
+                } else if (file.type === 'html') {
+                    item.className = 'media-item html';
+                    item.innerHTML = `
+                        <div class="media-thumbnail">
+                            <div class="html-thumb-fallback">HTML</div>
+                            <iframe class="html-thumb-frame" data-src="http://localhost:7777/${file.path}" loading="lazy" sandbox="allow-scripts allow-forms"></iframe>
+                        </div>
+                        <div class="media-info">
+                            <div class="media-name">${file.name}</div>
+                            <div class="media-details">HTML Page</div>
+                        </div>
+                    `;
+                }
+
+                // 左クリックでライトボックスを開く
+                item.addEventListener('click', () => openLightbox(file));
+                
+                // 右クリックでコンテキストメニューを表示
+                item.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    selectedFile = file;
+                    showContextMenu(e.pageX, e.pageY);
+                });
+                
+                // 動画のホバー再生
+                if (file.type === 'video') {
+                    const video = item.querySelector('video');
+                    if (video) {
+                        item.addEventListener('mouseenter', () => {
+                            video.play().catch(err => console.log('Play failed:', err));
+                        });
+                        item.addEventListener('mouseleave', () => {
+                            video.pause();
+                            video.currentTime = 0.1; // サムネイル位置に戻す
+                        });
+                    }
+                }
+                
+                fragment.appendChild(item);
+            });
+            
+            grid.appendChild(fragment);
+            // Setup scaled HTML thumbnails after insertion
+            setupHtmlThumbs(grid);
+            
+            // 残りのファイルを遅延読み込み
+            if (files.length > maxInitialLoad) {
+                const loadMoreBtn = document.createElement('div');
+                loadMoreBtn.className = 'load-more-btn';
+                loadMoreBtn.innerHTML = `<button onclick="loadMoreMedia(${maxInitialLoad})">さらに読み込む (${files.length - maxInitialLoad} 件)</button>`;
+                loadMoreBtn.style.cssText = 'text-align: center; padding: 20px;';
+                grid.appendChild(loadMoreBtn);
+            }
+        }
+        
+        // 追加のメディアを読み込む
+        function loadMoreMedia(startIndex) {
+            const grid = document.getElementById('mediaGrid');
+            const loadMoreBtn = grid.querySelector('.load-more-btn');
+            if (loadMoreBtn) loadMoreBtn.remove();
+            
+            const files = currentFilter === 'all' ? allMediaFiles : allMediaFiles.filter(f => f.type === currentFilter);
+            const fragment = document.createDocumentFragment();
+            const endIndex = Math.min(startIndex + 50, files.length);
+            
+            for (let i = startIndex; i < endIndex; i++) {
+                const file = files[i];
+                const item = document.createElement('div');
+                item.className = 'media-item';
+                item.dataset.path = file.path;
+                item.dataset.type = file.type;
+                
+                if (file.type === 'image') {
+                    item.className = 'media-item image';
+                    item.innerHTML = `
+                        <img class="media-thumbnail" src="http://localhost:7777/${file.path}" alt="${file.name}" loading="lazy">
+                        <div class="media-info">
+                            <div class="media-name">${file.name}</div>
+                            <div class="media-details">Image</div>
+                        </div>
+                    `;
+                } else if (file.type === 'video') {
+                    item.innerHTML = `
+                        <video class="media-thumbnail" src="http://localhost:7777/${file.path}" muted preload="metadata"></video>
+                        <div class="media-info">
+                            <div class="media-name">${file.name}</div>
+                            <div class="media-details">Video</div>
+                        </div>
+                    `;
+                    const video = item.querySelector('video');
+                    if (video) {
+                        video.addEventListener('loadedmetadata', () => {
+                            video.currentTime = 0.1;
+                        });
+                    }
+                } else if (file.type === 'audio') {
+                    const musicIcons = ['🎵', '🎶', '🎼', '🎤', '🎧', '🎸', '🎹', '🎺', '🎷', '🥁'];
+                    const colors = [
+                        'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                        'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                        'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+                        'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+                        'linear-gradient(135deg, #30cfd0 0%, #330867 100%)'
+                    ];
+                    const randomIcon = musicIcons[Math.floor(Math.random() * musicIcons.length)];
+                    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                    item.innerHTML = `
+                        <div class="media-thumbnail audio" style="background: ${randomColor};">
+                            <div class="audio-icon-wrapper">
+                                <span class="main-icon">${randomIcon}</span>
+                            </div>
+                            <div class="audio-wave-bars">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </div>
+                        <div class="media-info">
+                            <div class="media-name">${file.name}</div>
+                            <div class="media-details">Audio</div>
+                        </div>
+                    `;
+                } else if (file.type === 'html') {
+                    item.className = 'media-item html';
+                    item.innerHTML = `
+                        <div class="media-thumbnail" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#364069 0%,#1b2336 100%);color:#fff;font-weight:700;">
+                            HTML
+                        </div>
+                        <div class="media-info">
+                            <div class="media-name">${file.name}</div>
+                            <div class="media-details">HTML Page</div>
+                        </div>
+                    `;
+                }
+                
+                // イベントリスナー追加
+                item.addEventListener('click', () => openLightbox(file));
+                item.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    selectedFile = file;
+                    showContextMenu(e.pageX, e.pageY);
+                });
+                
+                if (file.type === 'video') {
+                    const video = item.querySelector('video');
+                    if (video) {
+                        item.addEventListener('mouseenter', () => {
+                            video.play().catch(err => console.log('Play failed:', err));
+                        });
+                        item.addEventListener('mouseleave', () => {
+                            video.pause();
+                            video.currentTime = 0.1;
+                        });
+                    }
+                }
+                
+                fragment.appendChild(item);
+            }
+            
+            grid.appendChild(fragment);
+            
+            // まだ残りがある場合
+            if (endIndex < files.length) {
+                const loadMoreBtn = document.createElement('div');
+                loadMoreBtn.className = 'load-more-btn';
+                loadMoreBtn.innerHTML = `<button onclick="loadMoreMedia(${endIndex})">さらに読み込む (${files.length - endIndex} 件)</button>`;
+                loadMoreBtn.style.cssText = 'text-align: center; padding: 20px;';
+                grid.appendChild(loadMoreBtn);
+            }
+        }
+
+        // フォルダでフィルタリング
+        function filterByFolder(folderPath) {
+            const filtered = allMediaFiles.filter(file => file.path.startsWith(folderPath));
+            displayMedia(filtered);
+            document.getElementById('statsInfo').textContent = `Showing ${filtered.length} files from ${folderPath}`;
+        }
+
+        // タイプでフィルタリング
+        function filterByType(type) {
+            currentFilter = type;
+            
+            if (type === 'all') {
+                displayMedia(allMediaFiles);
+                document.getElementById('statsInfo').textContent = 'Showing all files';
+            } else {
+                const filtered = allMediaFiles.filter(file => file.type === type);
+                displayMedia(filtered);
+                document.getElementById('statsInfo').textContent = `Showing ${filtered.length} ${type} files`;
+            }
+        }
+
+        // 統計情報を更新
+        function updateStats() {
+            const count = allMediaFiles.length;
+            document.getElementById('fileCount').textContent = `${count} items`;
+            
+            const totalSize = allMediaFiles.reduce((sum, file) => sum + (file.size || 0), 0);
+            const sizeInMB = (totalSize / (1024 * 1024)).toFixed(2);
+            document.getElementById('totalSize').textContent = `Total: ${sizeInMB} MB`;
+        }
+
+        // ライトボックスを開く
+        function openLightbox(file) {
+            const lightbox = document.getElementById('lightbox');
+            const content = document.getElementById('lightboxContent');
+
+            if (file.type === 'image') {
+                content.innerHTML = `<img src="http://localhost:7777/${file.path}" alt="${file.name}">`;
+            } else if (file.type === 'video') {
+                content.innerHTML = `<video src="http://localhost:7777/${file.path}" controls autoplay></video>`;
+            } else if (file.type === 'audio') {
+                content.innerHTML = `
+                    <div style="text-align: center; padding: 40px;">
+                        <div style="font-size: 5rem; margin-bottom: 20px;">🎵</div>
+                        <div style="font-size: 1.2rem; margin-bottom: 20px;">${file.name}</div>
+                        <audio src="http://localhost:7777/${file.path}" controls autoplay style="width: 300px;"></audio>
+                    </div>
+                `;
+            } else if (file.type === 'html') {
+                content.innerHTML = `
+                    <div style="width:90vw;height:85vh;max-width:1200px;">
+                        <iframe src="http://localhost:7777/${file.path}" style="width:100%;height:100%;border:0;background:#fff"></iframe>
+                    </div>
+                `;
+            }
+
+            lightbox.classList.add('active');
+        }
+
+        // ライトボックスを閉じる
+        function closeLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            const content = document.getElementById('lightboxContent');
+            lightbox.classList.remove('active');
+
+            const media = content.querySelector('video, audio');
+            if (media) {
+                media.pause();
+            }
+
+            setTimeout(() => {
+                content.innerHTML = '';
+            }, 300);
+        }
+
+        // ファイル入力で代替
+        function showFileInput() {
+            const grid = document.getElementById('mediaGrid');
+            grid.innerHTML = `
+                <div class="error">
+                    <div>⚠️ Node.jsサーバーが起動していません</div>
+                    <div class="error-message">
+                        <p>動的スキャンを使用するには:</p>
+                        <ol style="text-align: left; margin-top: 10px;">
+                            <li>ターミナルを開く</li>
+                            <li>このディレクトリに移動</li>
+                            <li>実行: <code>node server.js</code></li>
+                            <li>ページをリロード</li>
+                        </ol>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 検索機能
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const filtered = allMediaFiles.filter(file =>
+                file.name.toLowerCase().includes(searchTerm)
+            );
+            displayMedia(filtered);
+            document.getElementById('statsInfo').textContent = `Search results: ${filtered.length} files`;
+        });
+
+        // ビュー切り替え
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (this.dataset.view) {
+                    document.querySelectorAll('.view-btn[data-view]').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+
+                    const grid = document.getElementById('mediaGrid');
+                    const items = grid.querySelectorAll('.media-item');
+
+                    if (this.dataset.view === 'list') {
+                        grid.classList.add('list-view');
+                        items.forEach(item => item.classList.add('list-view'));
+                    } else {
+                        grid.classList.remove('list-view');
+                        items.forEach(item => item.classList.remove('list-view'));
+                    }
+                }
+            });
+        });
+
+        // タグフィルター
+        document.querySelectorAll('.tag').forEach(tag => {
+            tag.addEventListener('click', function() {
+                document.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                filterByType(this.dataset.type);
+            });
+        });
+
+        // ESCキーでライトボックスを閉じる
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeLightbox();
+            }
+        });
+
+        // ライトボックス背景クリックで閉じる
+        document.getElementById('lightbox').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeLightbox();
+            }
+        });
+
+        // コンテキストメニューを表示
+        function showContextMenu(x, y) {
+            const contextMenu = document.getElementById('contextMenu');
+            contextMenu.style.left = x + 'px';
+            contextMenu.style.top = y + 'px';
+            contextMenu.classList.add('active');
+        }
+
+        // コンテキストメニューを隠す
+        function hideContextMenu() {
+            const contextMenu = document.getElementById('contextMenu');
+            contextMenu.classList.remove('active');
+        }
+
+        // ファイルパスをコピー
+        function copyFilePath() {
+            if (selectedFile) {
+                // fullPathがあればそれを使用、なければpathを使用
+                const fullPath = selectedFile.fullPath || selectedFile.path;
+                navigator.clipboard.writeText(fullPath).then(() => {
+                    console.log('Copied:', fullPath);
+                    // 通知を表示（オプション）
+                    const notification = document.createElement('div');
+                    notification.textContent = 'パスをコピーしました';
+                    notification.style.cssText = `
+                        position: fixed;
+                        bottom: 20px;
+                        right: 20px;
+                        background: #4a9eff;
+                        color: white;
+                        padding: 10px 20px;
+                        border-radius: 8px;
+                        z-index: 10000;
+                    `;
+                    document.body.appendChild(notification);
+                    setTimeout(() => notification.remove(), 2000);
+                });
+            }
+            hideContextMenu();
+        }
+
+        // ファイルを開く
+        function openFile() {
+            if (selectedFile) {
+                // Node.jsサーバー経由で開く必要がある
+                fetch(`${apiBaseUrl}/api/open-file`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ path: selectedFile.path })
+                }).catch(err => {
+                    // サーバーに機能がない場合、新しいタブで開く
+                    window.open(selectedFile.path, '_blank');
+                });
+            }
+            hideContextMenu();
+        }
+
+        // フォルダを開く
+        function openFolder() {
+            if (selectedFile) {
+                const folderPath = selectedFile.path.substring(0, selectedFile.path.lastIndexOf('/'));
+                fetch(`${apiBaseUrl}/api/open-folder`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ path: folderPath || '.' })
+                }).catch(err => {
+                    console.error('Cannot open folder:', err);
+                });
+            }
+            hideContextMenu();
+        }
+
+        // クリックでコンテキストメニューを閉じる
+        document.addEventListener('click', () => {
+            hideContextMenu();
+        });
+
+        // 初期化
+        function setupHtmlThumbs(root=document) {
+            const IFR_W = 1024; // virtual viewport width (reduced for perf)
+            const IFR_H = 768;  // virtual viewport height (reduced for perf)
+            const MAX_CONCURRENCY = 2;
+            let active = 0;
+            const queue = [];
+
+            function applyScale(thumb, frame) {
+                const h = thumb.clientHeight || 150;
+                const scale = h / IFR_H;
+                frame.style.width = IFR_W + 'px';
+                frame.style.height = IFR_H + 'px';
+                frame.style.transform = 'scale(' + scale + ')';
+            }
+
+            function pump() {
+                while (active < MAX_CONCURRENCY && queue.length) {
+                    const { frame, thumb, item } = queue.shift();
+                    if (!frame.isConnected) continue;
+                    active++;
+                    const fallback = thumb.querySelector('.html-thumb-fallback');
+                    const done = () => {
+                        active = Math.max(0, active - 1);
+                        pump();
+                    };
+                    // Scale before loading to avoid jank
+                    requestAnimationFrame(() => applyScale(thumb, frame));
+                    // Load with timeout fallback
+                    let settled = false;
+                    const to = setTimeout(() => {
+                        if (settled) return; settled = true;
+                        // Keep fallback visible
+                        done();
+                    }, 5000);
+                    frame.addEventListener('load', () => {
+                        if (settled) return; settled = true;
+                        clearTimeout(to);
+                        // Hide fallback when content is loaded
+                        if (fallback) fallback.style.display = 'none';
+                        done();
+                    }, { once: true });
+                    frame.src = frame.dataset.src;
+                    frame.removeAttribute('data-src');
+                }
+            }
+
+            const items = root.querySelectorAll('.media-item.html');
+            items.forEach(it => {
+                const thumb = it.querySelector('.media-thumbnail');
+                const frame = it.querySelector('.html-thumb-frame');
+                if (!thumb || !frame) return;
+
+                // Initial scale and resize handling
+                requestAnimationFrame(() => applyScale(thumb, frame));
+                window.addEventListener('resize', () => applyScale(thumb, frame), { passive: true });
+
+                if (frame.dataset.src) {
+                    const io = new IntersectionObserver((entries, obs) => {
+                        entries.forEach(en => {
+                            if (en.isIntersecting) {
+                                queue.push({ frame, thumb, item: it });
+                                pump();
+                                obs.unobserve(en.target);
+                            }
+                        });
+                    }, { rootMargin: '200px' });
+                    io.observe(it);
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            scanDirectory();
+        });
+    </script>
+</body>
+</html>

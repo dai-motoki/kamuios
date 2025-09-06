@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-	<meta name="generator" content="Hugo 0.148.2"><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+	<meta name="generator" content="Hugo 0.148.2">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SaaS Applications</title>
@@ -200,6 +200,10 @@
         
       
     
+      
+        
+      
+    
   
 
   
@@ -308,6 +312,42 @@
     transform: translateX(4px);
   }
 </style>
+
+<!-- ダッシュボードセクション -->
+<div class="dashboard-sections">
+  <h2 class="dashboard-section-title">ダッシュボード</h2>
+  <div class="dashboard-links">
+    <a href="#" class="saas-app-card" onclick="window.location.hash=''; location.reload(); return false;">
+      <div class="saas-app-title">
+        メインダッシュボード
+        <span class="saas-app-arrow">→</span>
+      </div>
+      <div class="saas-app-description">
+        全体のダッシュボード - 各セクションへのエントリーポイント
+      </div>
+      <div class="saas-app-features">
+        • 要件定義・開発<br>
+        • メディアエディタ<br>
+        • 事業構築・ビジネスツール
+      </div>
+    </a>
+    
+    <a href="#dynamic-media-gallery" class="saas-app-card" onclick="showSectionById('dynamic-media-gallery'); return false;">
+      <div class="saas-app-title">
+        Dynamic Media Gallery
+        <span class="saas-app-arrow">→</span>
+      </div>
+      <div class="saas-app-description">
+        メディアファイルを動的にスキャンして表示するギャラリー
+      </div>
+      <div class="saas-app-features">
+        • ファイル自動スキャン<br>
+        • グリッド/リスト表示<br>
+        • ライトボックス対応
+      </div>
+    </a>
+  </div>
+</div>
 
 <!-- 要件定義・開発セクション -->
 <div class="dashboard-sections">
@@ -4153,6 +4193,65 @@
     
   </section>
   
+  <section class="doc-section" id="dynamic-media-gallery" data-cat="1" data-cat-name="ダッシュボード">
+    <h2>Dynamic Media Gallery</h2>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+      <div style="margin-bottom: 20px;">
+  <button onclick="window.location.hash=''; location.reload();" style="padding: 8px 16px; background: #4a4a4a; border: none; border-radius: 6px; color: white; cursor: pointer; font-size: 14px;">
+    ← ダッシュボードに戻る
+  </button>
+</div>
+
+<div style="background: #0f0f0f; border-radius: 12px; overflow: hidden; margin: 20px 0; min-height: 800px; position: relative;">
+  <!-- ギャラリー埋め込み -->
+  <iframe 
+    src="/data/media-gallery/index.html" 
+    style="width: 100%; height: 800px; border: none; display: block; position: absolute; top: 0; left: 0;"
+    frameborder="0">
+  </iframe>
+</div>
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+  </section>
+  
   <section class="doc-section" id="prompts-repo" data-cat="5" data-cat-name="エージェント">
     <h2>エージェント</h2>
     
@@ -6477,6 +6576,10 @@
         
           
             { id: "\"biz-strategy\"", title: "\"戦略\"", category:  6 , category_name: "\"事業構築\"" },
+          
+        
+          
+            { id: "\"dynamic-media-gallery\"", title: "\"Dynamic Media Gallery\"", category:  1 , category_name: "\"ダッシュボード\"" },
           
         
           

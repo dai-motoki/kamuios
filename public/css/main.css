@@ -63,7 +63,7 @@ body {
 /* クイックリンク: フレックスの最下部に固定（スクロール非連動） */
 .sidebar-footer { margin-top: auto; background: var(--sidebar-bg); border-top: 1px solid var(--border); }
 .sidebar-header { padding: 20px; border-bottom: 1px solid var(--border); }
-.sidebar-title { font-size: 1.3rem; font-weight: 600; margin-bottom: 5px; }
+.sidebar-title { font-size: 1.3rem; font-weight: 600; margin-bottom: 5px; color: #ffffff; }
 .sidebar-subtitle { font-size: 0.85rem; color: var(--text-weak); }
 
 /* ツリー（元UIを踏襲） */

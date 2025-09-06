@@ -86,6 +86,42 @@
       }
     </style>
     
+    <!-- ダッシュボードセクション -->
+    <div class="dashboard-sections">
+      <h2 class="dashboard-section-title">ダッシュボード</h2>
+      <div class="dashboard-links">
+        <a href="#" class="saas-app-card" onclick="window.location.hash=''; location.reload(); return false;">
+          <div class="saas-app-title">
+            メインダッシュボード
+            <span class="saas-app-arrow">→</span>
+          </div>
+          <div class="saas-app-description">
+            全体のダッシュボード - 各セクションへのエントリーポイント
+          </div>
+          <div class="saas-app-features">
+            • 要件定義・開発<br>
+            • メディアエディタ<br>
+            • 事業構築・ビジネスツール
+          </div>
+        </a>
+        
+        <a href="#dynamic-media-gallery" class="saas-app-card" onclick="showSectionById('dynamic-media-gallery'); return false;">
+          <div class="saas-app-title">
+            Dynamic Media Gallery
+            <span class="saas-app-arrow">→</span>
+          </div>
+          <div class="saas-app-description">
+            メディアファイルを動的にスキャンして表示するギャラリー
+          </div>
+          <div class="saas-app-features">
+            • ファイル自動スキャン<br>
+            • グリッド/リスト表示<br>
+            • ライトボックス対応
+          </div>
+        </a>
+      </div>
+    </div>
+    
     <!-- 要件定義・開発セクション -->
     <div class="dashboard-sections">
       <h2 class="dashboard-section-title">要件定義・開発</h2>
