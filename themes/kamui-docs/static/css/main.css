@@ -116,12 +116,15 @@ body {
 .doc-meta { color: var(--text); font-size: 0.9rem; margin-bottom: 18px; }
 .doc-section { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px; margin-bottom: 16px; }
 .doc-section h2 { font-size: 1.1rem; margin-bottom: 10px; color: var(--text); }
+/* Ensure subheadings are readable in dark mode */
+.doc-section h3, .doc-section h4, .doc-section h5, .doc-section h6 { color: var(--text); }
 .doc-section p, .doc-section li { color: var(--text-weak); line-height: 1.7; font-size: 0.95rem; }
 .doc-section ul { margin-left: 1.2em; }
 /* simple table for definitions */
 table.menu-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
 .menu-table th, .menu-table td { border: 1px solid var(--border); padding: 8px 10px; font-size: 0.9rem; vertical-align: top; }
 .menu-table th { background: var(--sidebar-bg); color: var(--text); text-align: left; position: sticky; top: 0; }
+.menu-table td { color: var(--text); }
 .menu-table code { background: var(--code-bg); border: 1px solid var(--code-border); padding: 1px 4px; border-radius: 4px; }
 
 /* セクション内画像ボックス */
@@ -177,6 +180,12 @@ pre.code code { color: var(--text); }
 .markdown-body table { width: 100%; border-collapse: collapse; margin: 14px 0; }
 .markdown-body th, .markdown-body td { border: 1px solid var(--border); padding: 8px 10px; }
 .markdown-body th { background: var(--sidebar-bg); color: var(--text); }
+
+/* Cards: force strong contrast for headings and text in dark mode */
+.card h1, .card h2, .card h3, .card h4, .card h5, .card h6 { color: var(--text); }
+.card p, .card li, .card td { color: var(--text); }
+.card pre, .card code { color: var(--text); }
+.card table th { background: var(--sidebar-bg); color: var(--text); }
 
 /* カード（サーバーカタログ） */
 .card-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }

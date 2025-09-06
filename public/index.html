@@ -4560,7 +4560,8 @@
   .muted { color: var(--text-weak); }
   .table { width: 100%; border-collapse: collapse; }
   .table th, .table td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; }
-  .table th { background: var(--sidebar-bg); }
+  .table th { background: var(--sidebar-bg); color: var(--text); }
+  .table td { color: var(--text); }
   .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
 
   .persona { display: grid; grid-template-columns: 48px 1fr; gap: 10px; align-items: start; }
@@ -4602,13 +4603,13 @@
         
           <div class="card">
             <h4>📋 プロジェクト概要</h4>
-            <div class="muted">KAMUI CODEは、MCP（Model Context Protocol）に準拠した統合型AIプラットフォームです。
+            <div>KAMUI CODEは、MCP（Model Context Protocol）に準拠した統合型AIプラットフォームです。
 クリエイティブ、開発、ビジネスの3領域を横断し、あらゆるデジタルコンテンツ制作を支援します。</div>
           </div>
         
           <div class="card">
             <h4>🎯 対象領域</h4>
-            <div class="muted"><ul>
+            <div><ul>
 <li><strong>クリエイティブ</strong>: 画像・動画・音楽生成</li>
 <li><strong>開発</strong>: コード生成・分析・デバッグ</li>
 <li><strong>ビジネス</strong>: 翻訳・要約・レポート作成</li>
@@ -4618,7 +4619,7 @@
         
           <div class="card">
             <h4>⚡ 主要機能</h4>
-            <div class="muted"><ul>
+            <div><ul>
 <li>MCPプロトコル準拠の統合API</li>
 <li>30種類以上のAIモデル対応</li>
 <li>リアルタイムプレビュー</li>
@@ -4715,233 +4716,6 @@
         
       </div>
       
-      
-      <div style="margin-top: 14px;">
-<style>
-   
-  .canvas-container { 
-    color: var(--text) !important; 
-    background: var(--card) !important; 
-    border: 1px solid var(--border) !important; 
-    border-radius: 12px; 
-  }
-  .canvas-container h3,
-  .canvas-container h4,
-  .canvas-container p,
-  .canvas-container li { color: var(--text) !important; }
-   
-  .canvas-container [style*="background: white"] {
-    background: var(--sidebar-bg) !important;
-    border-color: var(--border) !important;
-  }
-   
-  .canvas-container [style*="#FEF3C7"] { color: #92400e !important; }
-  [data-theme="dark"] .canvas-container { background: #111827 !important; }
-  [data-theme="dark"] .canvas-container [style*="background: white"] { background: #1f2937 !important; }
-</style>
-<div class="canvas-container" style="background: #f8f9fa; padding: 20px; border-radius: 12px; margin: 20px 0;">
-  <h3 style="text-align: center; margin-bottom: 20px;">KAMUI CODE ビジネスモデルキャンバス</h3>
-  <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;">
-    <!-- 第1列 -->
-    <div style="grid-row: span 2; background: white; border: 2px solid #e9ecef; border-radius: 8px; padding: 15px;">
-      <h4 style="color: #8B5CF6; margin-bottom: 10px;">🤝 主要パートナー</h4>
-      <ul style="font-size: 0.9em; margin: 0; padding-left: 20px;">
-        <li>AIモデルプロバイダー（OpenAI, Anthropic等）</li>
-        <li>クラウドインフラ（AWS, GCP）</li>
-        <li>開発者コミュニティ</li>
-        <li>技術パートナー企業</li>
-      </ul>
-    </div>
-    
-    <!-- 第2列 -->
-    <div style="background: white; border: 2px solid #e9ecef; border-radius: 8px; padding: 15px;">
-      <h4 style="color: #3B82F6; margin-bottom: 10px;">🎯 主要活動</h4>
-      <ul style="font-size: 0.9em; margin: 0; padding-left: 20px;">
-        <li>MCPサーバー開発・保守</li>
-        <li>AIモデル統合</li>
-        <li>ユーザーサポート</li>
-        <li>継続的な機能改善</li>
-      </ul>
-    </div>
-    
-    <div style="background: white; border: 2px solid #e9ecef; border-radius: 8px; padding: 15px;">
-      <h4 style="color: #3B82F6; margin-bottom: 10px;">🔑 主要リソース</h4>
-      <ul style="font-size: 0.9em; margin: 0; padding-left: 20px;">
-        <li>技術チーム</li>
-        <li>AIモデルアクセス</li>
-        <li>サーバーインフラ</li>
-        <li>知的財産</li>
-      </ul>
-    </div>
-    
-    <!-- 第3列 -->
-    <div style="grid-row: span 2; background: #FEF3C7; border: 2px solid #FDE68A; border-radius: 8px; padding: 15px;">
-      <h4 style="color: #F59E0B; margin-bottom: 10px;">💎 価値提案</h4>
-      <ul style="font-size: 0.9em; margin: 0; padding-left: 20px;">
-        <li><strong>統合プラットフォーム</strong><br>3領域を1つのインターフェースで</li>
-        <li><strong>MCP準拠</strong><br>標準化されたプロトコル</li>
-        <li><strong>30+AIモデル</strong><br>最適なモデルを選択可能</li>
-        <li><strong>開発効率向上</strong><br>作業時間を最大80%削減</li>
-      </ul>
-    </div>
-    
-    <!-- 第4列 -->
-    <div style="background: white; border: 2px solid #e9ecef; border-radius: 8px; padding: 15px;">
-      <h4 style="color: #10B981; margin-bottom: 10px;">🤝 顧客関係</h4>
-      <ul style="font-size: 0.9em; margin: 0; padding-left: 20px;">
-        <li>セルフサービス</li>
-        <li>コミュニティサポート</li>
-        <li>専用サポート（Enterprise）</li>
-        <li>定期的なウェビナー</li>
-      </ul>
-    </div>
-    
-    <div style="background: white; border: 2px solid #e9ecef; border-radius: 8px; padding: 15px;">
-      <h4 style="color: #10B981; margin-bottom: 10px;">📢 チャネル</h4>
-      <ul style="font-size: 0.9em; margin: 0; padding-left: 20px;">
-        <li>公式ウェブサイト</li>
-        <li>開発者フォーラム</li>
-        <li>SNS・技術ブログ</li>
-        <li>パートナー経由</li>
-      </ul>
-    </div>
-    
-    <!-- 第5列 -->
-    <div style="grid-row: span 2; background: white; border: 2px solid #e9ecef; border-radius: 8px; padding: 15px;">
-      <h4 style="color: #EC4899; margin-bottom: 10px;">👥 顧客セグメント</h4>
-      <ul style="font-size: 0.9em; margin: 0; padding-left: 20px;">
-        <li><strong>個人開発者</strong><br>効率化を求める</li>
-        <li><strong>スタートアップ</strong><br>少人数で高速開発</li>
-        <li><strong>エンタープライズ</strong><br>大規模プロジェクト</li>
-        <li><strong>クリエイター</strong><br>コンテンツ制作者</li>
-      </ul>
-    </div>
-    
-    <!-- 下段：コスト構造と収益の流れ -->
-    <div style="grid-column: span 2; background: #FEE2E2; border: 2px solid #FCA5A5; border-radius: 8px; padding: 15px;">
-      <h4 style="color: #EF4444; margin-bottom: 10px;">💰 コスト構造</h4>
-      <ul style="font-size: 0.9em; margin: 0; padding-left: 20px;">
-        <li>AIモデル利用料（変動費）</li>
-        <li>インフラコスト（サーバー、ストレージ）</li>
-        <li>開発・運用人件費</li>
-        <li>マーケティング費用</li>
-      </ul>
-    </div>
-    
-    <div style="grid-column: span 3; background: #D1FAE5; border: 2px solid #6EE7B7; border-radius: 8px; padding: 15px;">
-      <h4 style="color: #10B981; margin-bottom: 10px;">💵 収益の流れ</h4>
-      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; font-size: 0.9em;">
-        <div>
-          <strong>フリーミアム</strong>
-          <ul style="margin: 5px 0; padding-left: 20px;">
-            <li>基本機能無料</li>
-            <li>有料アップグレード</li>
-          </ul>
-        </div>
-        <div>
-          <strong>従量課金</strong>
-          <ul style="margin: 5px 0; padding-left: 20px;">
-            <li>API利用量</li>
-            <li>原価+マージン</li>
-          </ul>
-        </div>
-        <div>
-          <strong>サブスクリプション</strong>
-          <ul style="margin: 5px 0; padding-left: 20px;">
-            <li>月額/年額プラン</li>
-            <li>Enterprise契約</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-</div>
-      
-
-      
-      <div style="margin-top: 14px;"><style>
-  .voices-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
-  .voice-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
-  .voice-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-  .voice-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--media-bg); border: 1px solid var(--border); overflow: hidden; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--text-weak); }
-  .voice-name { font-weight: 600; }
-  .voice-role { color: var(--text-weak); font-size: 0.85rem; }
-  .voice-body { color: var(--text); font-size: 0.95rem; line-height: 1.6; }
-  .voice-rating { color: #f59e0b; font-size: 0.92rem; margin-top: 6px; }
-</style>
-
-<div>
-  <h3 style="margin: 8px 0 10px;">ユーザーの声</h3>
-  
-  <div class="voices-grid">
-    
-    <div class="voice-card">
-      <div class="voice-head">
-        <div class="voice-avatar">
-          佐
-        </div>
-        <div>
-          <div class="voice-name">佐藤 健</div>
-          <div class="voice-role">プロダクトマネージャー ・ SaaSスタートアップ</div>
-        </div>
-      </div>
-      <div class="voice-body">KAMUI CODE の統合APIと要件定義書テンプレートで、初期フェーズの立ち上げが圧倒的に早くなりました。チーム内の合意形成もスムーズです。
-</div>
-      
-        
-        <div class="voice-rating">
-          ★★★★★
-        </div>
-      
-    </div>
-    
-    <div class="voice-card">
-      <div class="voice-head">
-        <div class="voice-avatar">
-          山
-        </div>
-        <div>
-          <div class="voice-name">山本 花</div>
-          <div class="voice-role">フロントエンドエンジニア ・ 受託開発</div>
-        </div>
-      </div>
-      <div class="voice-body">UIフローとデザイン仕様が明確にまとまっているので、実装の迷いが減りました。Mermaidやガントの埋め込みも便利です。
-</div>
-      
-        
-        <div class="voice-rating">
-          ★★★★☆
-        </div>
-      
-    </div>
-    
-    <div class="voice-card">
-      <div class="voice-head">
-        <div class="voice-avatar">
-          李
-        </div>
-        <div>
-          <div class="voice-name">李 俊</div>
-          <div class="voice-role">機械学習エンジニア ・ 研究開発部門</div>
-        </div>
-      </div>
-      <div class="voice-body">画像・動画生成の要件と運用面の整理が一箇所で完結します。モデル比較やAPIエンドポイントの表も実務で役立っています。
-</div>
-      
-        
-        <div class="voice-rating">
-          ★★★★★
-        </div>
-      
-    </div>
-    
-  </div>
-</div>
-</div>
-      
-
       
       <div class="card" style="margin-top: 14px;">
         <h4 style="margin:0 0 6px;">カスタマージャーニーマップ</h4>
@@ -5131,6 +4905,233 @@
 
 </div>
       
+
+      
+      <div style="margin-top: 14px;"><style>
+  .voices-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+  .voice-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+  .voice-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .voice-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--media-bg); border: 1px solid var(--border); overflow: hidden; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--text-weak); }
+  .voice-name { font-weight: 600; }
+  .voice-role { color: var(--text-weak); font-size: 0.85rem; }
+  .voice-body { color: var(--text); font-size: 0.95rem; line-height: 1.6; }
+  .voice-rating { color: #f59e0b; font-size: 0.92rem; margin-top: 6px; }
+</style>
+
+<div>
+  <h3 style="margin: 8px 0 10px;">ユーザーの声</h3>
+  
+  <div class="voices-grid">
+    
+    <div class="voice-card">
+      <div class="voice-head">
+        <div class="voice-avatar">
+          佐
+        </div>
+        <div>
+          <div class="voice-name">佐藤 健</div>
+          <div class="voice-role">プロダクトマネージャー ・ SaaSスタートアップ</div>
+        </div>
+      </div>
+      <div class="voice-body">KAMUI CODE の統合APIと要件定義書テンプレートで、初期フェーズの立ち上げが圧倒的に早くなりました。チーム内の合意形成もスムーズです。
+</div>
+      
+        
+        <div class="voice-rating">
+          ★★★★★
+        </div>
+      
+    </div>
+    
+    <div class="voice-card">
+      <div class="voice-head">
+        <div class="voice-avatar">
+          山
+        </div>
+        <div>
+          <div class="voice-name">山本 花</div>
+          <div class="voice-role">フロントエンドエンジニア ・ 受託開発</div>
+        </div>
+      </div>
+      <div class="voice-body">UIフローとデザイン仕様が明確にまとまっているので、実装の迷いが減りました。Mermaidやガントの埋め込みも便利です。
+</div>
+      
+        
+        <div class="voice-rating">
+          ★★★★☆
+        </div>
+      
+    </div>
+    
+    <div class="voice-card">
+      <div class="voice-head">
+        <div class="voice-avatar">
+          李
+        </div>
+        <div>
+          <div class="voice-name">李 俊</div>
+          <div class="voice-role">機械学習エンジニア ・ 研究開発部門</div>
+        </div>
+      </div>
+      <div class="voice-body">画像・動画生成の要件と運用面の整理が一箇所で完結します。モデル比較やAPIエンドポイントの表も実務で役立っています。
+</div>
+      
+        
+        <div class="voice-rating">
+          ★★★★★
+        </div>
+      
+    </div>
+    
+  </div>
+</div>
+</div>
+      
+
+      
+      <div style="margin-top: 14px;">
+<style>
+   
+  .canvas-container { 
+    color: var(--text) !important; 
+    background: var(--card) !important; 
+    border: 1px solid var(--border) !important; 
+    border-radius: 12px; 
+  }
+  .canvas-container h3,
+  .canvas-container h4,
+  .canvas-container p,
+  .canvas-container li { color: var(--text) !important; }
+   
+  .canvas-container [style*="background: white"] {
+    background: var(--sidebar-bg) !important;
+    border-color: var(--border) !important;
+  }
+   
+  .canvas-container [style*="#FEF3C7"] { color: #92400e !important; }
+  [data-theme="dark"] .canvas-container { background: #111827 !important; }
+  [data-theme="dark"] .canvas-container [style*="background: white"] { background: #1f2937 !important; }
+</style>
+<div class="canvas-container" style="background: #f8f9fa; padding: 20px; border-radius: 12px; margin: 20px 0;">
+  <h3 style="text-align: center; margin-bottom: 20px;">KAMUI CODE ビジネスモデルキャンバス</h3>
+  <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;">
+    <!-- 第1列 -->
+    <div style="grid-row: span 2; background: white; border: 2px solid #e9ecef; border-radius: 8px; padding: 15px;">
+      <h4 style="color: #8B5CF6; margin-bottom: 10px;">🤝 主要パートナー</h4>
+      <ul style="font-size: 0.9em; margin: 0; padding-left: 20px;">
+        <li>AIモデルプロバイダー（OpenAI, Anthropic等）</li>
+        <li>クラウドインフラ（AWS, GCP）</li>
+        <li>開発者コミュニティ</li>
+        <li>技術パートナー企業</li>
+      </ul>
+    </div>
+    
+    <!-- 第2列 -->
+    <div style="background: white; border: 2px solid #e9ecef; border-radius: 8px; padding: 15px;">
+      <h4 style="color: #3B82F6; margin-bottom: 10px;">🎯 主要活動</h4>
+      <ul style="font-size: 0.9em; margin: 0; padding-left: 20px;">
+        <li>MCPサーバー開発・保守</li>
+        <li>AIモデル統合</li>
+        <li>ユーザーサポート</li>
+        <li>継続的な機能改善</li>
+      </ul>
+    </div>
+    
+    <div style="background: white; border: 2px solid #e9ecef; border-radius: 8px; padding: 15px;">
+      <h4 style="color: #3B82F6; margin-bottom: 10px;">🔑 主要リソース</h4>
+      <ul style="font-size: 0.9em; margin: 0; padding-left: 20px;">
+        <li>技術チーム</li>
+        <li>AIモデルアクセス</li>
+        <li>サーバーインフラ</li>
+        <li>知的財産</li>
+      </ul>
+    </div>
+    
+    <!-- 第3列 -->
+    <div style="grid-row: span 2; background: #FEF3C7; border: 2px solid #FDE68A; border-radius: 8px; padding: 15px;">
+      <h4 style="color: #F59E0B; margin-bottom: 10px;">💎 価値提案</h4>
+      <ul style="font-size: 0.9em; margin: 0; padding-left: 20px;">
+        <li><strong>統合プラットフォーム</strong><br>3領域を1つのインターフェースで</li>
+        <li><strong>MCP準拠</strong><br>標準化されたプロトコル</li>
+        <li><strong>30+AIモデル</strong><br>最適なモデルを選択可能</li>
+        <li><strong>開発効率向上</strong><br>作業時間を最大80%削減</li>
+      </ul>
+    </div>
+    
+    <!-- 第4列 -->
+    <div style="background: white; border: 2px solid #e9ecef; border-radius: 8px; padding: 15px;">
+      <h4 style="color: #10B981; margin-bottom: 10px;">🤝 顧客関係</h4>
+      <ul style="font-size: 0.9em; margin: 0; padding-left: 20px;">
+        <li>セルフサービス</li>
+        <li>コミュニティサポート</li>
+        <li>専用サポート（Enterprise）</li>
+        <li>定期的なウェビナー</li>
+      </ul>
+    </div>
+    
+    <div style="background: white; border: 2px solid #e9ecef; border-radius: 8px; padding: 15px;">
+      <h4 style="color: #10B981; margin-bottom: 10px;">📢 チャネル</h4>
+      <ul style="font-size: 0.9em; margin: 0; padding-left: 20px;">
+        <li>公式ウェブサイト</li>
+        <li>開発者フォーラム</li>
+        <li>SNS・技術ブログ</li>
+        <li>パートナー経由</li>
+      </ul>
+    </div>
+    
+    <!-- 第5列 -->
+    <div style="grid-row: span 2; background: white; border: 2px solid #e9ecef; border-radius: 8px; padding: 15px;">
+      <h4 style="color: #EC4899; margin-bottom: 10px;">👥 顧客セグメント</h4>
+      <ul style="font-size: 0.9em; margin: 0; padding-left: 20px;">
+        <li><strong>個人開発者</strong><br>効率化を求める</li>
+        <li><strong>スタートアップ</strong><br>少人数で高速開発</li>
+        <li><strong>エンタープライズ</strong><br>大規模プロジェクト</li>
+        <li><strong>クリエイター</strong><br>コンテンツ制作者</li>
+      </ul>
+    </div>
+    
+    <!-- 下段：コスト構造と収益の流れ -->
+    <div style="grid-column: span 2; background: #FEE2E2; border: 2px solid #FCA5A5; border-radius: 8px; padding: 15px;">
+      <h4 style="color: #EF4444; margin-bottom: 10px;">💰 コスト構造</h4>
+      <ul style="font-size: 0.9em; margin: 0; padding-left: 20px;">
+        <li>AIモデル利用料（変動費）</li>
+        <li>インフラコスト（サーバー、ストレージ）</li>
+        <li>開発・運用人件費</li>
+        <li>マーケティング費用</li>
+      </ul>
+    </div>
+    
+    <div style="grid-column: span 3; background: #D1FAE5; border: 2px solid #6EE7B7; border-radius: 8px; padding: 15px;">
+      <h4 style="color: #10B981; margin-bottom: 10px;">💵 収益の流れ</h4>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; font-size: 0.9em;">
+        <div>
+          <strong>フリーミアム</strong>
+          <ul style="margin: 5px 0; padding-left: 20px;">
+            <li>基本機能無料</li>
+            <li>有料アップグレード</li>
+          </ul>
+        </div>
+        <div>
+          <strong>従量課金</strong>
+          <ul style="margin: 5px 0; padding-left: 20px;">
+            <li>API利用量</li>
+            <li>原価+マージン</li>
+          </ul>
+        </div>
+        <div>
+          <strong>サブスクリプション</strong>
+          <ul style="margin: 5px 0; padding-left: 20px;">
+            <li>月額/年額プラン</li>
+            <li>Enterprise契約</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+      
     </section>
 
     
@@ -5213,6 +5214,29 @@
     
     <section class="req-section" id="req-architecture">
       <h3>アーキテクチャ</h3>
+      
+      <div style="margin-top: 12px;">
+
+  <div class="flow-wrapper" id="uiFlow">
+  <div class="flow-controls">
+    <strong>UI遷移図</strong>
+    <div class="spacer"></div>
+    <button class="view-btn" id="flowZoomOut">-</button>
+    <button class="view-btn" id="flowZoomReset">100%</button>
+    <button class="view-btn" id="flowZoomIn">+</button>
+  </div>
+  <div class="flow-viewport" id="flowViewport">
+    <div class="flow-inner" id="flowInner" style="width: 1600px; height: 900px;">
+      <svg class="flow-svg" id="flowSvg" width="1600" height="900"></svg>
+      <div class="nodes-layer" id="flowNodes"></div>
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+      
       
       <div class="grid-2">
         <div class="card">
@@ -5671,28 +5695,6 @@ flowchart LR
 </div>
       
       
-      <div style="margin-top: 12px;">
-
-  <div class="flow-wrapper" id="uiFlow">
-  <div class="flow-controls">
-    <strong>UI遷移図</strong>
-    <div class="spacer"></div>
-    <button class="view-btn" id="flowZoomOut">-</button>
-    <button class="view-btn" id="flowZoomReset">100%</button>
-    <button class="view-btn" id="flowZoomIn">+</button>
-  </div>
-  <div class="flow-viewport" id="flowViewport">
-    <div class="flow-inner" id="flowInner" style="width: 1600px; height: 900px;">
-      <svg class="flow-svg" id="flowSvg" width="1600" height="900"></svg>
-      <div class="nodes-layer" id="flowNodes"></div>
-    </div>
-  </div>
-</div>
-
-
-
-</div>
-      
       
       <div style="margin-top: 12px;"><div class="gantt-wrapper">
   <div class="mermaid" style="width: 1600px !important; min-width: 1600px !important; height: 500px !important;">
@@ -5852,9 +5854,7 @@ gantt
 </div>
       
       
-      <div style="margin-top: 12px;"><div class="section-image" style="max-width: 920px; margin-bottom: 10px;">
-  <img src="/images/kamui-white-2.png" alt="UI参考（ギャラリー風）" />
-</div>
+      <div style="margin-top: 12px;">
 <div class="view-options" style="margin: 8px 0 12px 0;">
   <span class="theme-label">種別:</span>
   <button class="view-btn" id="btnMcpPlaylist" aria-pressed="true">MCPプレイリスト</button>

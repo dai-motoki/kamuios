@@ -45,7 +45,8 @@
   .muted { color: var(--text-weak); }
   .table { width: 100%; border-collapse: collapse; }
   .table th, .table td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; }
-  .table th { background: var(--sidebar-bg); }
+  .table th { background: var(--sidebar-bg); color: var(--text); }
+  .table td { color: var(--text); }
   .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
 
   .persona { display: grid; grid-template-columns: 48px 1fr; gap: 10px; align-items: start; }
@@ -84,7 +85,7 @@
         {{ range . }}
           <div class="card">
             <h4>{{ .icon }} {{ .title }}</h4>
-            <div class="muted">{{ .content | markdownify }}</div>
+            <div>{{ .content | markdownify }}</div>
           </div>
         {{ end }}
       </div>
@@ -128,14 +129,6 @@
         {{ end }}
       </div>
       {{ end }}
-      {{ with .business_model_canvas }}
-      <div style="margin-top: 14px;">{{ partial "business-model-canvas" . }}</div>
-      {{ end }}
-
-      {{ with .user_voices }}
-      <div style="margin-top: 14px;">{{ partial "user-voices" . }}</div>
-      {{ end }}
-
       {{ with .journey_section }}
       <div class="card" style="margin-top: 14px;">
         <h4 style="margin:0 0 6px;">{{ .title }}</h4>
@@ -144,6 +137,14 @@
       {{ end }}
       {{ with .customer_journey }}
       <div style="margin-top: 12px;">{{ partial "customer-journey" . }}</div>
+      {{ end }}
+
+      {{ with .user_voices }}
+      <div style="margin-top: 14px;">{{ partial "user-voices" . }}</div>
+      {{ end }}
+
+      {{ with .business_model_canvas }}
+      <div style="margin-top: 14px;">{{ partial "business-model-canvas" . }}</div>
       {{ end }}
     </section>
 
@@ -197,6 +198,9 @@
     <!-- Architecture -->
     <section class="req-section" id="req-architecture">
       <h3>アーキテクチャ</h3>
+      {{ with .flow_diagram }}
+      <div style="margin-top: 12px;">{{ partial "ui-flow" $ }}</div>
+      {{ end }}
       {{ with .tech_stack }}
       <div class="grid-2">
         <div class="card">
@@ -240,9 +244,7 @@
       {{ with .code }}
       <div class="card">{{ partial "code" . }}</div>
       {{ end }}
-      {{ with .flow_diagram }}
-      <div style="margin-top: 12px;">{{ partial "ui-flow" $ }}</div>
-      {{ end }}
+      
       {{ with .gantt }}
       <div style="margin-top: 12px;">{{ partial "gantt" $ }}</div>
       {{ end }}
