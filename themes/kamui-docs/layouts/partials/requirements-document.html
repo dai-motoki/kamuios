@@ -43,6 +43,9 @@
   .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
   .card h4 { margin: 0 0 8px; font-size: 1rem; }
   .muted { color: var(--text-weak); }
+  /* 強制的にカード内のテキスト色を高コントラストに */
+  .req-doc .card, .req-doc .card * { color: var(--text) !important; }
+  .req-doc .card a { color: var(--link) !important; }
   .table { width: 100%; border-collapse: collapse; }
   .table th, .table td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; }
   .table th { background: var(--sidebar-bg); color: var(--text); }
