@@ -337,7 +337,7 @@
   
   customer_journey: |
     <div class="journey-map-container" style="background: #f8f9fa; padding: 20px; border-radius: 12px; margin: 20px 0;">
-      <style>
+    <style>
         .journey-map {
           background: white;
           border-radius: 8px;
@@ -373,7 +373,7 @@
         .phase.consideration { background: #3B82F6; }
         .phase.adoption { background: #10B981; }
         .journey-row {
-          display: flex;
+        display: flex;
           align-items: stretch;
           margin-bottom: 10px;
         }
@@ -437,9 +437,9 @@
         [data-theme="dark"] .canvas-container h3,
         [data-theme="dark"] .canvas-container h4 {
           color: #e5e7eb;
-        }
-      </style>
-      
+      }
+    </style>
+    
       <h3>ユーザージャーニーマップ</h3>
       <div class="journey-map">
         <!-- フェーズ -->
@@ -486,8 +486,8 @@
             <div class="journey-cell consideration">管理画面</div>
             <div class="journey-cell adoption">決済画面</div>
           </div>
-        </div>
-        
+      </div>
+      
         <!-- 思考 -->
         <div class="journey-row">
           <div class="journey-label">思考</div>
@@ -498,8 +498,8 @@
             <div class="journey-cell consideration">使いやすそう</div>
             <div class="journey-cell adoption">業務効率が上がりそう</div>
           </div>
-        </div>
-        
+      </div>
+      
         <!-- 感情 -->
         <div class="journey-row">
           <div class="journey-label">感情</div>
@@ -510,7 +510,7 @@
             <div class="journey-cell consideration">😄 満足</div>
             <div class="journey-cell adoption">🎉 確信</div>
           </div>
-        </div>
+      </div>
       </div>
     </div>
   
