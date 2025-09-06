@@ -1,0 +1,120 @@
+{{ define "main" }}
+  <h1 class="doc-title">{{ .Site.Title }}</h1>
+  <div class="doc-meta">{{ .Site.Params.description }}</div>
+  
+  <!-- ヒーロー画像 -->
+  {{ if .Params.hero_image }}
+  <div class="hero" id="docHero">
+    <img src="{{ .Params.hero_image }}" alt="{{ .Params.hero_alt | default "Hero Image" }}">
+  </div>
+  {{ end }}
+  
+  <!-- コンテンツセクション -->
+  {{/* 統合データ: sections.yaml + data/saas/*.yaml */}}
+  {{ $all := slice }}
+  {{ range .Site.Data.sections }}
+    {{ $all = $all | append . }}
+  {{ end }}
+  {{ with .Site.Data.saas }}
+    {{ range $k, $arr := . }}
+      {{ range $arr }}
+        {{ $all = $all | append . }}
+      {{ end }}
+    {{ end }}
+  {{ end }}
+
+  {{ range $all }}
+  <section class="doc-section" id="{{ .id }}" data-cat="{{ .category }}" data-cat-name="{{ .category_name }}">
+    <h2>{{ .title }}</h2>
+    
+    {{ if .content }}
+      {{ .content | markdownify }}
+    {{ end }}
+    
+    {{ if .markdown_file }}
+      <div class="markdown-body" data-path="{{ .markdown_file }}">
+        {{ readFile .markdown_file | markdownify }}
+      </div>
+    {{ end }}
+    {{ if .markdown_files }}
+      {{ range .markdown_files }}
+        <div class="markdown-body" data-path="{{ . }}">
+          {{ readFile . | markdownify }}
+        </div>
+      {{ end }}
+    {{ end }}
+    
+    {{ if .image }}
+    <div class="section-image">
+      <img src="{{ .image }}" alt="{{ .title }}">
+    </div>
+    {{ end }}
+    
+    {{ if .table }}
+      {{ partial "table" .table }}
+    {{ end }}
+    
+    {{ if .dynamic_table }}
+      {{ partial "dynamic-table" . }}
+    {{ end }}
+    
+    {{ if .flow_diagram }}
+      {{ partial "flow-diagram" . }}
+    {{ end }}
+    
+    {{ if .mcp_section }}
+      {{ partial "mcp-section" . }}
+    {{ end }}
+    
+    {{ if .dynamic_cards }}
+      {{ partial "dynamic-cards" . }}
+    {{ end }}
+    
+    {{ if .images }}
+      {{ partial "image-grid" .images }}
+    {{ end }}
+    
+    {{ if .mermaid }}
+      {{ partial "mermaid" .mermaid }}
+    {{ end }}
+    
+    {{ if .additional_content }}
+      {{ .additional_content | markdownify }}
+    {{ end }}
+    
+    {{ if .custom_html }}
+      {{ .custom_html | safeHTML }}
+    {{ end }}
+    
+    {{ if .gantt }}
+      {{ partial "gantt" . }}
+    {{ end }}
+    
+    {{ if .additional_mermaid }}
+      {{ range .additional_mermaid }}
+        {{ partial "mermaid-with-caption" . }}
+      {{ end }}
+    {{ end }}
+    
+    {{ if .code }}
+      {{ partial "code" .code }}
+    {{ end }}
+    
+    {{ if .cards }}
+      {{ partial "cards" .cards }}
+    {{ end }}
+    
+    {{ if .design_specs }}
+      {{ partial "design-specs" .design_specs }}
+    {{ end }}
+    
+    {{ if .additional_content }}
+      {{ .additional_content | markdownify }}
+    {{ end }}
+    
+    {{ if .client_samples }}
+      {{ partial "client-samples" .client_samples }}
+    {{ end }}
+  </section>
+  {{ end }}
+{{ end }}

@@ -1,0 +1,13 @@
+<div class="card-grid" id="clientSampleCards">
+  {{ range . }}
+  <div class="card pastel" data-sample-id="{{ .id }}">
+    <div class="card-title">{{ .title }}</div>
+    <div class="endpoint-box"><div class="endpoint">サーバー定義数: -</div></div>
+    <div style="display:flex;gap:8px;margin-top:8px;">
+      <button class="view-btn" data-open-client="{{ .id }}">サンプルを見る</button>
+      <button class="view-btn" data-copy-client="{{ .id }}">コピー</button>
+    </div>
+  </div>
+  <script type="application/json" id="{{ .id }}"></script>
+  {{ end }}
+</div>

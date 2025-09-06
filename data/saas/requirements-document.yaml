@@ -1,0 +1,241 @@
+# 要件定義書
+# メディアエディタプラットフォームの要件定義書
+
+- id: requirements-document
+  category: 2
+  category_name: 要件定義・開発
+  title: 要件定義書
+  content: ""
+  custom_html: |
+    <div style="margin-bottom: 20px;">
+      <button onclick="window.location.hash=''; location.reload();" style="padding: 8px 16px; background: #4a4a4a; border: none; border-radius: 6px; color: white; cursor: pointer; font-size: 14px;">
+        ← ダッシュボードに戻る
+      </button>
+    </div>
+    <style>
+      .requirement-doc {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 20px;
+      }
+      .requirement-header {
+        border-bottom: 2px solid var(--border);
+        padding-bottom: 16px;
+        margin-bottom: 24px;
+      }
+      .requirement-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 8px;
+      }
+      .requirement-meta {
+        display: flex;
+        gap: 20px;
+        font-size: 0.9rem;
+        color: var(--text-weak);
+      }
+      .requirement-section {
+        margin-bottom: 24px;
+      }
+      .requirement-section h3 {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--link);
+        margin-bottom: 12px;
+      }
+      .requirement-section h4 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 8px;
+      }
+      .requirement-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 12px;
+      }
+      .requirement-table th,
+      .requirement-table td {
+        border: 1px solid var(--border);
+        padding: 10px;
+        text-align: left;
+      }
+      .requirement-table th {
+        background: var(--sidebar-bg);
+        font-weight: 600;
+        color: var(--text);
+      }
+      .requirement-table td {
+        color: var(--text-weak);
+      }
+      .requirement-list {
+        list-style: none;
+        padding-left: 0;
+      }
+      .requirement-list li {
+        padding: 8px 0;
+        display: flex;
+        align-items: flex-start;
+      }
+      .requirement-list li::before {
+        content: "•";
+        color: var(--link);
+        font-weight: 700;
+        margin-right: 12px;
+        font-size: 1.2rem;
+      }
+    </style>
+    
+    <div class="requirement-doc">
+      <div class="requirement-header">
+        <h2 class="requirement-title">メディアエディタプラットフォーム 要件定義書</h2>
+        <div class="requirement-meta">
+          <span>バージョン: 1.0</span>
+          <span>更新日: 2025年1月</span>
+          <span>ステータス: ドラフト</span>
+        </div>
+      </div>
+      
+      <div class="requirement-section">
+        <h3>1. プロジェクト概要</h3>
+        <p>本プロジェクトは、Web上で動作する統合型メディアエディタプラットフォームの開発を目的とします。AIを活用した画像生成、ビデオ編集、ストーリーボード作成など、クリエイティブな作業を一つの環境で完結できるシステムを構築します。</p>
+      </div>
+      
+      <div class="requirement-section">
+        <h3>2. システム要件</h3>
+        
+        <h4>2.1 機能要件</h4>
+        <table class="requirement-table">
+          <thead>
+            <tr>
+              <th style="width: 20%">機能ID</th>
+              <th style="width: 30%">機能名</th>
+              <th style="width: 50%">説明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>FR-001</td>
+              <td>AI画像生成</td>
+              <td>手書きスケッチから高品質な画像を生成する機能</td>
+            </tr>
+            <tr>
+              <td>FR-002</td>
+              <td>ビデオビューアー</td>
+              <td>タイムライン管理とシーン別ナビゲーション機能</td>
+            </tr>
+            <tr>
+              <td>FR-003</td>
+              <td>ストーリーボード表示</td>
+              <td>見開き/縦スクロールの切替表示機能</td>
+            </tr>
+            <tr>
+              <td>FR-004</td>
+              <td>リアルタイムプレビュー</td>
+              <td>編集内容を即座に確認できるプレビュー機能</td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <h4>2.2 非機能要件</h4>
+        <ul class="requirement-list">
+          <li><strong>パフォーマンス:</strong> 画像生成は5秒以内、UI操作のレスポンスは100ms以内</li>
+          <li><strong>可用性:</strong> 99.9%以上のアップタイム</li>
+          <li><strong>セキュリティ:</strong> HTTPS通信、認証・認可機能の実装</li>
+          <li><strong>互換性:</strong> Chrome, Firefox, Safari, Edgeの最新版をサポート</li>
+          <li><strong>スケーラビリティ:</strong> 同時接続ユーザー1000人以上に対応</li>
+        </ul>
+      </div>
+      
+      <div class="requirement-section">
+        <h3>3. 技術スタック</h3>
+        <table class="requirement-table">
+          <thead>
+            <tr>
+              <th>カテゴリ</th>
+              <th>技術</th>
+              <th>用途</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>フロントエンド</td>
+              <td>React, TypeScript</td>
+              <td>UIコンポーネントの実装</td>
+            </tr>
+            <tr>
+              <td>スタイリング</td>
+              <td>CSS Modules, Tailwind CSS</td>
+              <td>レスポンシブデザインの実現</td>
+            </tr>
+            <tr>
+              <td>状態管理</td>
+              <td>Redux Toolkit</td>
+              <td>アプリケーション状態の管理</td>
+            </tr>
+            <tr>
+              <td>AI/ML</td>
+              <td>Stable Diffusion API</td>
+              <td>画像生成機能の実装</td>
+            </tr>
+            <tr>
+              <td>ビルドツール</td>
+              <td>Vite</td>
+              <td>高速な開発環境の構築</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <div class="requirement-section">
+        <h3>4. 開発スケジュール</h3>
+        <table class="requirement-table">
+          <thead>
+            <tr>
+              <th>フェーズ</th>
+              <th>期間</th>
+              <th>主な成果物</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>要件定義</td>
+              <td>2週間</td>
+              <td>要件定義書、画面設計書</td>
+            </tr>
+            <tr>
+              <td>基本設計</td>
+              <td>3週間</td>
+              <td>システム設計書、API仕様書</td>
+            </tr>
+            <tr>
+              <td>実装</td>
+              <td>8週間</td>
+              <td>ソースコード、単体テスト</td>
+            </tr>
+            <tr>
+              <td>テスト</td>
+              <td>3週間</td>
+              <td>結合テスト、受入テスト</td>
+            </tr>
+            <tr>
+              <td>リリース</td>
+              <td>1週間</td>
+              <td>本番環境構築、運用手順書</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <div class="requirement-section">
+        <h3>5. 制約事項</h3>
+        <ul class="requirement-list">
+          <li>AI画像生成のAPIには利用制限があるため、ユーザーごとに生成回数を制限する</li>
+          <li>動画ファイルのアップロードサイズは500MBまでとする</li>
+          <li>初期リリースでは日本語のみ対応とし、多言語対応は次期バージョンで検討</li>
+        </ul>
+      </div>
+    </div>

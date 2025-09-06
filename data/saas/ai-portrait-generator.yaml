@@ -1,0 +1,795 @@
+# AI Portrait Generator アプリケーション設計書
+# 1-1. AI Portrait Generator
+
+- id: saas-ai-portrait
+  category: 3
+  category_name: メディアエディタ
+  title: AI Portrait Generator
+  content: ""
+  custom_html: |
+    <div style="margin-bottom: 20px;">
+      <button onclick="window.location.hash=''; location.reload();" style="padding: 8px 16px; background: #4a4a4a; border: none; border-radius: 6px; color: white; cursor: pointer; font-size: 14px;">
+        ← SaaS一覧に戻る
+      </button>
+    </div>
+    <style>
+        .ai-portrait-interface {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 0;
+            margin: 20px 0;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        
+        .app-container {
+            display: flex;
+            height: 600px;
+            background: #1a1a1a;
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        
+        /* Left Sidebar - Reference Gallery */
+        .reference-panel {
+            width: 280px;
+            background: #2d2d2d;
+            padding: 20px;
+            overflow-y: auto;
+            border-right: 1px solid #3a3a3a;
+        }
+        
+        .reference-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .reference-title {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 0;
+            color: #ffffff;
+        }
+        
+        .reload-btn {
+            background: #3a3a3a;
+            border: 1px solid #505050;
+            border-radius: 6px;
+            padding: 6px 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #e0e0e0;
+            font-size: 16px;
+        }
+        
+        .reload-btn:hover {
+            background: #4a4a4a;
+            border-color: #606060;
+        }
+        
+        .reload-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .reload-btn.loading .reload-icon {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Context menu styles */
+        .context-menu {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            transition: opacity 0.2s;
+        }
+        
+        .context-menu:hover {
+            background: #3a3a3a !important;
+        }
+        
+        .reference-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 25px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .reference-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 6px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+            background: #666;
+        }
+        
+        .reference-item:hover {
+            border-color: #4a9eff;
+            transform: scale(1.02);
+        }
+        
+        .reference-item.selected {
+            border-color: #4a9eff;
+            box-shadow: 0 0 15px rgba(74, 158, 255, 0.3);
+        }
+        
+        .reference-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .reference-item .checkmark {
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            width: 18px;
+            height: 18px;
+            background: #4a9eff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        
+        .reference-item.selected .checkmark {
+            opacity: 1;
+        }
+        
+        
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #1a1a1a;
+            position: relative;
+        }
+        
+        /* Header */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            background: #2d2d2d;
+            border-bottom: 1px solid #3a3a3a;
+        }
+        
+        .header-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+        
+        .header-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .icon-button {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            background: #3a3a3a;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            transition: all 0.2s ease;
+        }
+        
+        .icon-button:hover {
+            background: #4a4a4a;
+            transform: translateY(-1px);
+        }
+        
+        .notification-badge {
+            position: relative;
+        }
+        
+        .notification-badge::after {
+            content: '1';
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 16px;
+            height: 16px;
+            background: #ff4757;
+            border-radius: 50%;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        /* Before/After Comparison */
+        .generation-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+        }
+        
+        .before-after-comparison {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+        
+        
+        .comparison-label {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 15px;
+        }
+        
+        .comparison-image {
+            width: 300px;
+            height: 300px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            background: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .before-item .comparison-image {
+            background: #f0f0f0;
+        }
+        
+        .after-item .comparison-image {
+            background: #333;
+        }
+        
+        .placeholder-sketch {
+            color: #666;
+            font-size: 16px;
+            text-align: center;
+        }
+        
+        .placeholder-result {
+            color: #999;
+            font-size: 16px;
+            text-align: center;
+        }
+        
+        .comparison-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            background: #4a4a4a;
+            border-radius: 50%;
+        }
+        
+        .arrow-large {
+            width: 0;
+            height: 0;
+            border-left: 15px solid #ffffff;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+        }
+        
+        /* Drawing and Controls */
+        .drawing-controls {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .control-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .control-btn {
+            padding: 8px 12px;
+            border-radius: 6px;
+            background: #3a3a3a;
+            border: none;
+            cursor: pointer;
+            color: #ffffff;
+            font-size: 12px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        
+        .control-btn:hover {
+            background: #4a4a4a;
+            transform: translateY(-1px);
+        }
+        
+        .comparison-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+        
+        #drawingCanvas {
+            display: none;
+            border: 2px solid #4a9eff;
+            border-radius: 12px;
+        }
+    </style>
+    
+    <div class="ai-portrait-interface">
+        <div class="app-container">
+            <!-- Left Sidebar - Reference Gallery -->
+            <div class="reference-panel">
+                <div class="reference-header">
+                    <h2 class="reference-title">Reference</h2>
+                    <button class="reload-btn" id="reloadImages" title="Reload Images">
+                        <span class="reload-icon">🔄</span>
+                    </button>
+                </div>
+                <div class="reference-grid" id="referenceGrid">
+                    <!-- Images will be loaded dynamically -->
+                </div>
+                
+            </div>
+            
+            <!-- Main Content Area -->
+            <div class="main-content">
+                <!-- Header -->
+                <div class="app-header">
+                    <h1 class="header-title">AI Generation</h1>
+                    <div class="header-controls">
+                        <button class="icon-button">🔍</button>
+                        <button class="icon-button">💾</button>
+                        <button class="icon-button notification-badge">🛒</button>
+                    </div>
+                </div>
+                
+                <!-- Before/After Comparison Area -->
+                <div class="generation-area">
+                    <div class="before-after-comparison">
+                        <div class="comparison-item before-item">
+                            <div class="comparison-label">Before</div>
+                            <div class="comparison-image" id="beforeImage">
+                                <img src="/images/fighting-line-art.png" alt="Fighting line art" style="width:100%;height:100%;object-fit:cover;">
+                                <canvas id="drawingCanvas" width="300" height="300" style="position: absolute; top: 0; left: 0; cursor: crosshair; z-index: 10; display: none; border-radius: 12px;"></canvas>
+                            </div>
+                        </div>
+                        <div class="comparison-arrow">
+                            <div class="arrow-large"></div>
+                        </div>
+                        <div class="comparison-item after-item">
+                            <div class="comparison-label">After</div>
+                            <div class="comparison-image" id="afterImage">
+                                <video src="/images/Nzf983xJ3tjGM8FIECfL9_video.mp4" alt="Generated Fighting Scene" style="width:100%;height:100%;object-fit:cover;" autoplay loop muted>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Drawing and Controls -->
+                <div class="drawing-controls">
+                    <div class="control-buttons">
+                        <button class="control-btn" id="clearCanvas">🗑️ Clear</button>
+                        <button class="control-btn" id="switchImages">⇄ Switch</button>
+                        <button class="control-btn" id="toggleDraw">✏️ Draw</button>
+                        <button class="control-btn" id="saveDrawing">💾 Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let allImages = []; // Will be populated from JSON file
+
+            // Function to load images into reference grid
+            function loadImages() {
+                const referenceGrid = document.getElementById('referenceGrid');
+                referenceGrid.innerHTML = ''; // Clear existing images
+                
+                allImages.forEach((imageName, index) => {
+                    const referenceItem = document.createElement('div');
+                    referenceItem.className = 'reference-item';
+                    
+                    // Select first few items by default for demo
+                    if (index % 3 === 0) {
+                        referenceItem.classList.add('selected');
+                    }
+                    
+                    // Create readable alt text from filename
+                    const altText = imageName
+                        .replace(/\.(png|jpg|jpeg|gif)$/i, '')
+                        .replace(/[-_]/g, ' ')
+                        .replace(/\b\w/g, char => char.toUpperCase());
+                    
+                    referenceItem.innerHTML = `
+                        <img src="/images/${imageName}" alt="${altText}">
+                        <div class="checkmark">✓</div>
+                    `;
+                    
+                    referenceGrid.appendChild(referenceItem);
+                });
+                
+                // Re-attach click event listeners
+                document.querySelectorAll('.reference-item').forEach(item => {
+                    // Left click - update Before image
+                    item.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        
+                        // Toggle selection
+                        this.classList.toggle('selected');
+                        
+                        // Update Before image
+                        const img = this.querySelector('img');
+                        if (img) {
+                            const beforeImg = document.querySelector('#beforeImage img');
+                            if (beforeImg) {
+                                beforeImg.src = img.src;
+                                beforeImg.alt = img.alt;
+                            }
+                        }
+                    });
+                    
+                    // Right click - show context menu with relative path
+                    item.addEventListener('contextmenu', function(e) {
+                        e.preventDefault();
+                        
+                        const img = this.querySelector('img');
+                        if (img) {
+                            // Get relative path from src
+                            const src = img.src;
+                            const relativePath = src.substring(src.indexOf('/images/'));
+                            
+                            // Remove existing context menu if any
+                            const existingMenu = document.querySelector('.context-menu');
+                            if (existingMenu) {
+                                existingMenu.remove();
+                            }
+                            
+                            // Create context menu
+                            const menu = document.createElement('div');
+                            menu.className = 'context-menu';
+                            menu.style.cssText = `
+                                position: fixed;
+                                left: ${e.clientX}px;
+                                top: ${e.clientY}px;
+                                background: #2a2a2a;
+                                border: 1px solid #444;
+                                border-radius: 4px;
+                                padding: 8px 12px;
+                                color: #e0e0e0;
+                                font-size: 12px;
+                                z-index: 1000;
+                                cursor: pointer;
+                                box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+                            `;
+                            menu.textContent = relativePath;
+                            menu.title = 'Click to copy';
+                            
+                            // Copy on click
+                            menu.addEventListener('click', function() {
+                                navigator.clipboard.writeText(relativePath).then(() => {
+                                    menu.textContent = '✅ Copied!';
+                                    setTimeout(() => {
+                                        menu.remove();
+                                    }, 1000);
+                                }).catch(err => {
+                                    console.error('Failed to copy:', err);
+                                    menu.textContent = '❌ Copy failed';
+                                });
+                            });
+                            
+                            document.body.appendChild(menu);
+                            
+                            // Remove menu when clicking elsewhere
+                            const removeMenu = (e) => {
+                                if (!menu.contains(e.target)) {
+                                    menu.remove();
+                                    document.removeEventListener('click', removeMenu);
+                                }
+                            };
+                            setTimeout(() => {
+                                document.addEventListener('click', removeMenu);
+                            }, 0);
+                        }
+                    });
+                });
+            }
+            
+            // Function to fetch images list from JSON
+            async function fetchImagesList(fromApi = false) {
+                try {
+                    // If fromApi is true, fetch from API endpoint which also updates the JSON
+                    const url = fromApi ? '/api/images' : '/data/images_list.json';
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch images list');
+                    }
+                    const data = await response.json();
+                    allImages = data.images || [];
+                    loadImages();
+                } catch (error) {
+                    console.error('Error fetching images:', error);
+                    // Fallback: try to load from static JSON if API fails
+                    if (fromApi) {
+                        fetchImagesList(false);
+                    } else {
+                        allImages = [];
+                        loadImages();
+                    }
+                }
+            }
+            
+            // Initial load
+            fetchImagesList();
+            
+            // Reload button functionality
+            document.getElementById('reloadImages').addEventListener('click', async function() {
+                const btn = this;
+                btn.classList.add('loading');
+                
+                // Re-fetch images list from API (which updates the JSON file)
+                try {
+                    await fetchImagesList(true); // true = use API endpoint
+                    btn.classList.remove('loading');
+                    
+                    // Show success feedback
+                    const originalText = btn.querySelector('.reload-icon').textContent;
+                    btn.querySelector('.reload-icon').textContent = '✅';
+                    setTimeout(() => {
+                        btn.querySelector('.reload-icon').textContent = originalText;
+                    }, 1000);
+                } catch (error) {
+                    btn.classList.remove('loading');
+                    console.error('Error reloading images:', error);
+                    
+                    // Show error feedback
+                    const originalText = btn.querySelector('.reload-icon').textContent;
+                    btn.querySelector('.reload-icon').textContent = '❌';
+                    setTimeout(() => {
+                        btn.querySelector('.reload-icon').textContent = originalText;
+                    }, 1000);
+                }
+            });
+
+
+            // Drawing functionality
+            const canvas = document.getElementById('drawingCanvas');
+            const ctx = canvas.getContext('2d');
+            let isDrawing = false;
+            let drawingEnabled = false;
+            let lastSavedDrawing = null;
+
+            // Set drawing style
+            ctx.strokeStyle = '#ff0000';
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+
+            // Toggle drawing mode
+            document.getElementById('toggleDraw').addEventListener('click', function() {
+                drawingEnabled = !drawingEnabled;
+                canvas.style.display = drawingEnabled ? 'block' : 'none';
+                this.textContent = drawingEnabled ? '🖊️ Drawing' : '✏️ Draw';
+                this.style.background = drawingEnabled ? '#4a9eff' : '#3a3a3a';
+            });
+
+            // Clear canvas
+            document.getElementById('clearCanvas').addEventListener('click', function() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            });
+
+            // Switch images
+            document.getElementById('switchImages').addEventListener('click', function() {
+                const beforeImg = document.querySelector('#beforeImage img');
+                const afterImg = document.querySelector('#afterImage img');
+                const tempSrc = beforeImg.src;
+                const tempAlt = beforeImg.alt;
+                
+                beforeImg.src = afterImg.src;
+                beforeImg.alt = afterImg.alt;
+                afterImg.src = tempSrc;
+                afterImg.alt = tempAlt;
+            });
+
+            // Save drawing combined with background image
+            document.getElementById('saveDrawing').addEventListener('click', function() {
+                const beforeImg = document.querySelector('#beforeImage img');
+                const canvas = document.getElementById('drawingCanvas');
+                
+                // Create a new canvas to combine image and drawing
+                const combinedCanvas = document.createElement('canvas');
+                const combinedCtx = combinedCanvas.getContext('2d');
+                
+                // Set canvas size to match the image display size
+                combinedCanvas.width = 300;
+                combinedCanvas.height = 300;
+                
+                // Create a new image to ensure it's loaded
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                
+                img.onload = function() {
+                    // Draw the background image
+                    combinedCtx.drawImage(img, 0, 0, 300, 300);
+                    
+                    // Draw the drawing on top
+                    combinedCtx.drawImage(canvas, 0, 0);
+                    
+                    // Convert to base64 data URL
+                    const dataURL = combinedCanvas.toDataURL('image/png');
+                    const timestamp = Date.now();
+                    const filename = 'hand-drawn-' + timestamp + '.png';
+                    
+                    // Add to reference gallery immediately
+                    const referenceGrid = document.querySelector('.reference-grid');
+                    const newReferenceItem = document.createElement('div');
+                    newReferenceItem.className = 'reference-item selected';
+                    newReferenceItem.innerHTML = `
+                        <img src="${dataURL}" alt="Hand Drawn">
+                        <div class="checkmark">✓</div>
+                    `;
+                    
+                    // Add click functionality - same as other reference items
+                    // Left click - update Before image
+                    newReferenceItem.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        
+                        // Toggle selection
+                        this.classList.toggle('selected');
+                        
+                        // Update Before image
+                        const img = this.querySelector('img');
+                        if (img) {
+                            const beforeImg = document.querySelector('#beforeImage img');
+                            if (beforeImg) {
+                                beforeImg.src = img.src;
+                                beforeImg.alt = img.alt;
+                            }
+                        }
+                    });
+                    
+                    // Right click - show context menu
+                    newReferenceItem.addEventListener('contextmenu', function(e) {
+                        e.preventDefault();
+                        
+                        const img = this.querySelector('img');
+                        if (img) {
+                            // For saved drawings, use the filename
+                            const relativePath = '/' + filename;
+                            
+                            // Remove existing context menu if any
+                            const existingMenu = document.querySelector('.context-menu');
+                            if (existingMenu) {
+                                existingMenu.remove();
+                            }
+                            
+                            // Create context menu
+                            const menu = document.createElement('div');
+                            menu.className = 'context-menu';
+                            menu.style.cssText = `
+                                position: fixed;
+                                left: ${e.clientX}px;
+                                top: ${e.clientY}px;
+                                background: #2a2a2a;
+                                border: 1px solid #444;
+                                border-radius: 4px;
+                                padding: 8px 12px;
+                                color: #e0e0e0;
+                                font-size: 12px;
+                                z-index: 1000;
+                                cursor: pointer;
+                                box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+                            `;
+                            menu.textContent = relativePath;
+                            menu.title = 'Click to copy';
+                            
+                            // Copy on click
+                            menu.addEventListener('click', function() {
+                                navigator.clipboard.writeText(relativePath).then(() => {
+                                    menu.textContent = '✅ Copied!';
+                                    setTimeout(() => {
+                                        menu.remove();
+                                    }, 1000);
+                                }).catch(err => {
+                                    console.error('Failed to copy:', err);
+                                    menu.textContent = '❌ Copy failed';
+                                });
+                            });
+                            
+                            document.body.appendChild(menu);
+                            
+                            // Remove menu when clicking elsewhere
+                            const removeMenu = (e) => {
+                                if (!menu.contains(e.target)) {
+                                    menu.remove();
+                                    document.removeEventListener('click', removeMenu);
+                                }
+                            };
+                            setTimeout(() => {
+                                document.addEventListener('click', removeMenu);
+                            }, 0);
+                        }
+                    });
+                    
+                    referenceGrid.appendChild(newReferenceItem);
+                    
+                    // Store the last saved drawing for AI generation
+                    lastSavedDrawing = dataURL;
+                    
+                    // Also download the file
+                    combinedCanvas.toBlob(function(blob) {
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = filename;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(url);
+                    }, 'image/png');
+                    
+                    // Show success message
+                    const saveBtn = document.getElementById('saveDrawing');
+                    const originalText = saveBtn.textContent;
+                    saveBtn.textContent = '✅ Saved & Added!';
+                    saveBtn.style.background = '#4CAF50';
+                    setTimeout(() => {
+                        saveBtn.textContent = originalText;
+                        saveBtn.style.background = '#3a3a3a';
+                    }, 2000);
+                };
+                
+                img.src = beforeImg.src;
+            });
+
+
+            // Drawing events
+            canvas.addEventListener('mousedown', function(e) {
+                if (!drawingEnabled) return;
+                isDrawing = true;
+                const rect = canvas.getBoundingClientRect();
+                ctx.beginPath();
+                ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+            });
+
+            canvas.addEventListener('mousemove', function(e) {
+                if (!drawingEnabled || !isDrawing) return;
+                const rect = canvas.getBoundingClientRect();
+                ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+                ctx.stroke();
+            });
+
+            canvas.addEventListener('mouseup', function() {
+                isDrawing = false;
+            });
+
+            canvas.addEventListener('mouseout', function() {
+                isDrawing = false;
+            });
+        });
+    </script>

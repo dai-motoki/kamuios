@@ -1,0 +1,48 @@
+baseURL: https://example.org/
+languageCode: ja
+title: SaaS Applications
+theme: kamui-docs
+
+params:
+  description: ""
+  
+menu:
+  main:
+    - name: イントロダクション
+      weight: 1
+      identifier: intro
+    - name: UI
+      weight: 2
+      identifier: ui
+    - name: 要件
+      weight: 3
+      identifier: requirements
+    - name: アーキテクチャ
+      weight: 4
+      identifier: architecture
+    - name: カタログ
+      weight: 5
+      identifier: catalog
+    - name: 利用
+      weight: 6
+      identifier: usage
+    - name: 運用
+      weight: 7
+      identifier: operations
+    - name: 付録
+      weight: 8
+      identifier: appendix
+
+markup:
+  goldmark:
+    renderer:
+      unsafe: true
+  highlight:
+    style: monokai
+    lineNos: false
+    
+outputs:
+  home:
+    - HTML
+    - RSS
+    - JSON

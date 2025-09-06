@@ -1,0 +1,204 @@
+{
+  "mcpServers": {
+    "file-upload-kamui-fal": {
+      "type": "http",
+      "url": "{BASE_URL}/uploader/fal",
+      "description": "File Upload to FAL via Kamui Code (Local Uploader) ⭐⭐⭐"
+    },
+    "train-kamui-flux-kontext": {
+      "type": "http",
+      "url": "{BASE_URL}/train/fal/flux/kontext",
+      "description": "Flux Kontext Trainer via Kamui Code ⭐"
+    },
+    "video-analysis-kamui": {
+      "type": "http",
+      "url": "{BASE_URL}/video-analysis/google/gemini",
+      "description": "Gemini Video Analysis via Kamui Code ⭐"
+    },
+    "t2i-kamui-dreamina-v31": {
+      "type": "http",
+      "url": "{BASE_URL}/t2i/fal/bytedance/dreamina/v3.1/text-to-image",
+      "description": "Bytedance Dreamina v3.1 Text-to-Image via Kamui Code ⭐"
+    },
+    "t2i-kamui-flux-krea-lora": {
+      "type": "http",
+      "url": "{BASE_URL}/t2i/fal/flux-krea-lora",
+      "description": "FLUX Krea LoRA Text-to-Image via Kamui Code ⭐"
+    },
+    "t2i-kamui-flux-schnell": {
+      "type": "http",
+      "url": "{BASE_URL}/t2i/fal/flux/schnell",
+      "description": "Flux-1 Schnell (Fast) via Kamui Code ⭐"
+    },
+    "t2i-kamui-ideogram-character-base": {
+      "type": "http",
+      "url": "{BASE_URL}/t2i/fal/ideogram/character-base",
+      "description": "Ideogram Character Base - Create consistent characters via Kamui Code ⭐"
+    },
+    "t2i-kamui-imagen3": {
+      "type": "http",
+      "url": "{BASE_URL}/t2i/google/imagen",
+      "description": "Google Imagen 3 via Kamui Code ⭐"
+    },
+    "t2i-kamui-imagen4-fast": {
+      "type": "http",
+      "url": "{BASE_URL}/t2i/fal/imagen4/fast",
+      "description": "Imagen4 Fast (Speed Optimized) via Kamui Code ⭐"
+    },
+    "t2i-kamui-imagen4-ultra": {
+      "type": "http",
+      "url": "{BASE_URL}/t2i/fal/imagen4/ultra",
+      "description": "Imagen4 Ultra (High Quality) via Kamui Code ⭐"
+    },
+    "t2i-kamui-qwen-image": {
+      "type": "http",
+      "url": "{BASE_URL}/t2i/fal/qwen-image",
+      "description": "Qwen-Image Text-to-Image via Kamui Code ⭐"
+    },
+    "t2i-kamui-wan-v2-2-a14b": {
+      "type": "http",
+      "url": "{BASE_URL}/t2i/fal/wan/v2.2-a14b/text-to-image",
+      "description": "WAN v2.2-a14b Text-to-Image via Kamui Code ⭐"
+    },
+    "i2i-kamui-aura-sr": {
+      "type": "http",
+      "url": "{BASE_URL}/i2i/fal/aura-sr",
+      "description": "AuraSR Image Upscaling via Kamui Code ⭐"
+    },
+    "i2i-kamui-flux-kontext-lora": {
+      "type": "http",
+      "url": "{BASE_URL}/i2i/fal/flux/kontext",
+      "description": "Flux Kontext LoRA via Kamui Code ⭐"
+    },
+    "i2i-kamui-flux-kontext-max": {
+      "type": "http",
+      "url": "{BASE_URL}/i2i/fal/flux/kontext/max",
+      "description": "Flux Kontext Max via Kamui Code ⭐"
+    },
+    "i2i-kamui-flux-krea-lora": {
+      "type": "http",
+      "url": "{BASE_URL}/i2i/fal/flux-krea-lora/image-to-image",
+      "description": "FLUX Krea LoRA Image-to-Image via Kamui Code ⭐"
+    },
+    "i2i-kamui-ideogram-character-remix": {
+      "type": "http",
+      "url": "{BASE_URL}/i2i/fal/ideogram/character-remix",
+      "description": "Ideogram Character Remix - Transform characters across styles via Kamui Code ⭐"
+    },
+    "i2i-kamui-qwen-image-edit": {
+      "type": "http",
+      "url": "{BASE_URL}/i2i/fal/qwen/image-edit",
+      "description": "Qwen Image Edit - AI-powered image editing with text prompts via Kamui Code ⭐"
+    },
+    "t2v-kamui-veo3-fast": {
+      "type": "http",
+      "url": "{BASE_URL}/t2v/fal/veo3/fast",
+      "description": "Veo3 Fast Text-to-Video via Kamui Code ⭐"
+    },
+    "t2v-kamui-wan-v2-2-5b-fast": {
+      "type": "http",
+      "url": "{BASE_URL}/t2v/fal/wan/v2.2-5b/text-to-video/fast-wan",
+      "description": "WAN v2.2-5b FastVideo via Kamui Code ⭐"
+    },
+    "t2v-kamui-wan-v2-2-a14b": {
+      "type": "http",
+      "url": "{BASE_URL}/t2v/fal/wan/v2-2-a14b",
+      "description": "WAN v2.2-a14b Text-to-Video via Kamui Code ⭐"
+    },
+    "i2v-kamui-hailuo-02-fast": {
+      "type": "http",
+      "url": "{BASE_URL}/i2v/fal/minimax/hailuo-02/fast",
+      "description": "Hailuo-02 Fast Image-to-Video via Kamui Code ⭐"
+    },
+    "i2v-kamui-hailuo-02-pro": {
+      "type": "http",
+      "url": "{BASE_URL}/i2v/fal/minimax/hailuo-02/pro",
+      "description": "Hailuo-02 Pro Image-to-Video via Kamui Code ⭐"
+    },
+    "i2v-kamui-omnihuman": {
+      "type": "http",
+      "url": "{BASE_URL}/i2v/fal/bytedance/omnihuman",
+      "description": "ByteDance OmniHuman I2V via Kamui Code ⭐"
+    },
+    "i2v-kamui-seedance-v1-lite": {
+      "type": "http",
+      "url": "{BASE_URL}/i2v/fal/bytedance/seedance-v1-lite",
+      "description": "ByteDance Seedance V1 Lite via Kamui Code ⭐"
+    },
+    "i2v-kamui-veo3-fast": {
+      "type": "http",
+      "url": "{BASE_URL}/i2v/fal/veo3/fast",
+      "description": "Veo3 Fast Image-to-Video via Kamui Code ⭐"
+    },
+    "i2v-kamui-wan-v2-2-a14b": {
+      "type": "http",
+      "url": "{BASE_URL}/i2v/fal/wan/v2.2-a14b",
+      "description": "WAN v2.2-a14b Image-to-Video via Kamui Code ⭐"
+    },
+    "v2v-kamui-bria-bg-removal": {
+      "type": "http",
+      "url": "{BASE_URL}/video/fal/bria/background-removal",
+      "description": "Bria Video Background Removal via Kamui Code ⭐"
+    },
+    "v2v-kamui-creatify-lipsync": {
+      "type": "http",
+      "url": "{BASE_URL}/v2v/fal/creatify/lipsync",
+      "description": "Creatify Lipsync via Kamui Code ⭐"
+    },
+    "v2v-kamui-luma-ray2": {
+      "type": "http",
+      "url": "{BASE_URL}/v2v/fal/luma/dream-machine/ray-2/modify",
+      "description": "Luma Ray-2 Video Modification via Kamui Code ⭐"
+    },
+    "v2v-kamui-minimax-voice": {
+      "type": "http",
+      "url": "{BASE_URL}/v2v/fal/minimax/voice-design",
+      "description": "Minimax Voice Design via Kamui Code ⭐"
+    },
+    "v2v-kamui-pixverse-extend": {
+      "type": "http",
+      "url": "{BASE_URL}/v2v/fal/pixverse/extend",
+      "description": "Pixverse Extend via Kamui Code ⭐"
+    },
+    "v2v-kamui-pixverse-lipsync": {
+      "type": "http",
+      "url": "{BASE_URL}/v2v/fal/pixverse/lipsync",
+      "description": "Pixverse Lipsync via Kamui Code ⭐"
+    },
+    "v2v-kamui-runway-aleph": {
+      "type": "http",
+      "url": "{BASE_URL}/v2v/runway/aleph",
+      "description": "Runway Gen4 Aleph via Kamui Code ⭐"
+    },
+    "v2v-kamui-topaz-upscale": {
+      "type": "http",
+      "url": "{BASE_URL}/v2v/fal/topaz/upscale-video",
+      "description": "Topaz Video AI Upscaling via Kamui Code ⭐"
+    },
+    "r2v-kamui-vidu-q1": {
+      "type": "http",
+      "url": "{BASE_URL}/r2v/fal/vidu/q1",
+      "description": "Vidu Q1 Reference-to-Video via Kamui Code ⭐"
+    },
+    "t2s-kamui-minimax-speech-02-turbo": {
+      "type": "http",
+      "url": "{BASE_URL}/t2s/fal/minimax/speech-02-turbo",
+      "description": "MiniMax Speech-02-Turbo via Kamui Code ⭐"
+    },
+    "t2s-kamui-minimax-speech-25-turbo-preview": {
+      "type": "http",
+      "url": "{BASE_URL}/t2s/minimax/speech-2-5-turbo-preview",
+      "description": "MiniMax Speech 2.5 Turbo Preview - Direct Async Long TTS (1M chars) via Kamui Code ⭐⭐⭐"
+    },
+    "t2m-kamui-lyria": {
+      "type": "http",
+      "url": "{BASE_URL}/t2m/google/lyria",
+      "description": "Google Lyria Text-to-Music via Kamui Code ⭐"
+    },
+    "v2a-kamui-thinksound": {
+      "type": "http",
+      "url": "{BASE_URL}/v2a/fal/thinksound/audio/standard",
+      "description": "ThinkSound Video-to-Audio via Kamui Code ⭐"
+    }
+  }
+}

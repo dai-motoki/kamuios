@@ -1,0 +1,2586 @@
+# SaaS Applications Dashboard
+# 全体のダッシュボード - 各セクションへのエントリーポイント
+
+- id: saas-applications-overview
+  category: 1
+  category_name: ダッシュボード
+  title: ダッシュボード
+  content: ""
+  custom_html: |
+    <style>
+      .dashboard-sections {
+        margin-bottom: 40px;
+      }
+      .dashboard-section-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid var(--border);
+      }
+      .dashboard-links {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+      }
+      
+      .saas-app-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 24px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        text-decoration: none;
+        color: var(--text);
+        display: block;
+      }
+      
+      /* ライトモードで白背景 */
+      [data-theme="light"] .saas-app-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+      }
+      
+      .saas-app-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        border-color: #4a9eff;
+      }
+      
+      .saas-app-title {
+        font-size: 1.3rem;
+        font-weight: bold;
+        margin-bottom: 12px;
+        color: #4a9eff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      
+      .saas-app-description {
+        font-size: 0.95rem;
+        color: var(--text-weak);
+        line-height: 1.6;
+        margin-bottom: 12px;
+      }
+      
+      .saas-app-features {
+        font-size: 0.85rem;
+        color: var(--text-weak);
+        line-height: 1.8;
+      }
+      
+      .saas-app-arrow {
+        color: #4a9eff;
+        font-size: 1.2rem;
+        display: inline-block;
+        margin-left: 8px;
+        transition: transform 0.3s ease;
+      }
+      
+      .saas-app-card:hover .saas-app-arrow {
+        transform: translateX(4px);
+      }
+    </style>
+    
+    <!-- 要件定義・開発セクション -->
+    <div class="dashboard-sections">
+      <h2 class="dashboard-section-title">要件定義・開発</h2>
+      <div class="dashboard-links">
+              <a href="#requirements-document" class="saas-app-card" onclick="showRequirements('document'); return false;">
+        <div class="saas-app-title">
+          要件定義書
+          <span class="saas-app-arrow">→</span>
+        </div>
+        <div class="saas-app-description">
+          メディアエディタプラットフォームの要件定義書
+        </div>
+        <div class="saas-app-features">
+          • プロジェクト概要<br>
+          • 機能要件・非機能要件<br>
+          • 技術スタック・開発スケジュール
+        </div>
+      </a>
+      
+      <a href="#ui-views" class="saas-app-card" onclick="showRequirements('views'); return false;">
+        <div class="saas-app-title">
+          UIビュー一覧
+          <span class="saas-app-arrow">→</span>
+        </div>
+        <div class="saas-app-description">
+          システムのUI画面一覧と設計仕様
+        </div>
+        <div class="saas-app-features">
+          • 画面構成図<br>
+          • コンポーネント一覧<br>
+          • デザインシステム
+        </div>
+      </a>
+    </div>
+    </div>
+    
+    <!-- メディアエディタセクション -->
+    <div class="dashboard-sections">
+      <h2 class="dashboard-section-title">メディアエディタ</h2>
+      <div class="dashboard-links">
+        <a href="#saas-ai-portrait" class="saas-app-card" onclick="showSaasApp('ai-portrait'); return false;">
+          <div class="saas-app-title">
+            1. AI Portrait Generator
+            <span class="saas-app-arrow">→</span>
+          </div>
+          <div class="saas-app-description">
+            手書きスケッチからAIで高品質な画像を生成するメディアエディタ
+          </div>
+          <div class="saas-app-features">
+            • リアルタイムプレビュー<br>
+            • 参照画像ギャラリー<br>
+            • 描画ツール内蔵
+          </div>
+        </a>
+        
+        <a href="#saas-storyboard" class="saas-app-card" onclick="showSaasApp('storyboard'); return false;">
+          <div class="saas-app-title">
+            2. ビデオビューアー
+            <span class="saas-app-arrow">→</span>
+          </div>
+          <div class="saas-app-description">
+            ストーリーボードビューアーとビデオコンテンツ管理
+          </div>
+          <div class="saas-app-features">
+            • タイムライン管理<br>
+            • シーン別ナビゲーション<br>
+            • ビデオプレイヤー統合
+          </div>
+        </a>
+        
+        <a href="#saas-storyboard-viewer" class="saas-app-card" onclick="showSaasApp('storyboard-viewer'); return false;">
+          <div class="saas-app-title">
+            3. ストーリーボードビューアー
+            <span class="saas-app-arrow">→</span>
+          </div>
+          <div class="saas-app-description">
+            絵コンテの見開きフローを美しく表示するビューアー
+          </div>
+          <div class="saas-app-features">
+            • 見開き/縦スクロール切替<br>
+            • 鉛筆画/実写切替<br>
+            • 静止画/動画対応
+          </div>
+        </a>
+      </div>
+    </div>
+    
+    <!-- 事業構築セクション（章6） -->
+    <div class="dashboard-sections">
+      <h2 class="dashboard-section-title">事業構築</h2>
+      <div class="dashboard-links">
+        <a href="#biz-strategy" class="saas-app-card" onclick="showSectionById('biz-strategy'); return false;">
+          <div class="saas-app-title">
+            戦略
+            <span class="saas-app-arrow">→</span>
+          </div>
+          <div class="saas-app-description">事業戦略の骨子と進め方</div>
+          <div class="saas-app-features">• ターゲット/価値• チャネル・価格• ロードマップ</div>
+        </a>
+        <a href="#biz-finance" class="saas-app-card" onclick="showSectionById('biz-finance'); return false;">
+          <div class="saas-app-title">
+            財務
+            <span class="saas-app-arrow">→</span>
+          </div>
+          <div class="saas-app-description">財務計画/KPI/投資計画の整理</div>
+          <div class="saas-app-features">• MRR• チャーン• CAC/LTV</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- ビジネスツールセクション -->
+    <div class="dashboard-sections">
+      <h2 class="dashboard-section-title">ビジネスツール</h2>
+      <div class="dashboard-links">
+        <a href="#slide-generator" class="saas-app-card" onclick="showBusinessTool('slide-generator'); return false;">
+          <div class="saas-app-title">
+            スライドエディタ
+            <span class="saas-app-arrow">→</span>
+          </div>
+          <div class="saas-app-description">
+            プレゼンテーション用スライドを表示・編集するエディタ
+          </div>
+          <div class="saas-app-features">
+            • スライド表示<br>
+            • ページナビゲーション<br>
+            • フルスクリーン対応
+          </div>
+        </a>
+      </div>
+    </div>
+    
+    <!-- プロンプト置き場セクション -->
+    <div class="dashboard-sections">
+      <h2 class="dashboard-section-title">プロンプト置き場</h2>
+      <div class="dashboard-links">
+        <a href="#prompts-repo" class="saas-app-card" onclick="showSectionById('prompts-repo'); return false;">
+          <div class="saas-app-title">
+            create-new-page.md
+            <span class="saas-app-arrow">→</span>
+          </div>
+          <div class="saas-app-description">新しいページ作成用のプロンプト手順書</div>
+          <div class="saas-app-features">• 外部YAML基準• 自動集約• Hugoビルド</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- SNS・マーケティングセクション -->
+    <div class="dashboard-sections">
+      <h2 class="dashboard-section-title">SNS・マーケティング</h2>
+      <div class="dashboard-links">
+        <a href="#sns-marketing" class="saas-app-card" onclick="showSectionById('sns-marketing'); return false;">
+          <div class="saas-app-title">
+            SNS・マーケティング
+            <span class="saas-app-arrow">→</span>
+          </div>
+          <div class="saas-app-description">主要チャネル/運用/KPIの整理ページ</div>
+          <div class="saas-app-features">• X/IG/YT/TikTok• KPI• 運用フロー</div>
+        </a>
+      </div>
+    </div>
+
+    <script>
+      // 汎用: 任意のセクションを表示
+      window.showSectionById = function(id) {
+        document.querySelectorAll('.doc-section').forEach(section => {
+          section.style.display = 'none';
+        });
+        const target = document.getElementById(id);
+        if (target) {
+          target.style.display = 'block';
+          window.history.pushState({ direct: id }, '', '#' + id);
+          window.scrollTo(0, 0);
+        }
+      }
+      // ビジネスツール表示用の関数
+      window.showBusinessTool = function(toolId) {
+        // 現在のセクションを全て非表示
+        document.querySelectorAll('.doc-section').forEach(section => {
+          section.style.display = 'none';
+        });
+        
+        const targetSection = document.getElementById(toolId);
+        if (targetSection) {
+          targetSection.style.display = 'block';
+          
+          // URLを更新
+          window.history.pushState({ businessTool: toolId }, '', '#' + toolId);
+          
+          // ページの一番上にスクロール
+          window.scrollTo(0, 0);
+        }
+      }
+      
+      // 要件定義書表示用の関数
+      window.showRequirements = function(docId) {
+        // 現在のセクションを全て非表示
+        document.querySelectorAll('.doc-section').forEach(section => {
+          section.style.display = 'none';
+        });
+        
+        // 対象セクションを決定
+        let targetId = '';
+        if (docId === 'document') {
+          targetId = 'requirements-document';
+        } else if (docId === 'views') {
+          targetId = 'ui-views';
+        }
+        
+        const targetSection = document.getElementById(targetId);
+        if (targetSection) {
+          targetSection.style.display = 'block';
+          
+          // URLを更新
+          window.history.pushState({ requirements: docId }, '', '#' + targetId);
+          
+          // ページの一番上にスクロール
+          window.scrollTo(0, 0);
+        }
+      }
+      
+      // SaaSメディアエディタ表示用の関数
+      window.showSaasApp = function(appId) {
+        // 現在のセクションを全て非表示
+        document.querySelectorAll('.doc-section').forEach(section => {
+          section.style.display = 'none';
+        });
+        
+        // SaaSメディアエディタセクションを表示
+        const targetSection = document.getElementById('saas-' + appId);
+        if (targetSection) {
+          targetSection.style.display = 'block';
+          
+          // URLを更新
+          window.history.pushState({ app: appId }, '', '#saas-' + appId);
+          
+          // ページの一番上にスクロール
+          window.scrollTo(0, 0);
+        }
+      }
+      
+      // ブラウザの戻る/進むボタン対応
+      window.addEventListener('popstate', function(event) {
+        if (event.state && event.state.app) {
+          showSaasApp(event.state.app);
+        } else if (event.state && event.state.requirements) {
+          showRequirements(event.state.requirements);
+        } else if (event.state && event.state.businessTool) {
+          showBusinessTool(event.state.businessTool);
+        } else if (event.state && event.state.direct) {
+          showSectionById(event.state.direct);
+        } else {
+          // ダッシュボードに戻す
+          document.querySelectorAll('.doc-section').forEach(section => {
+            if (section.id === 'saas-applications-overview') {
+              section.style.display = 'block';
+            } else {
+              section.style.display = 'none';
+            }
+          });
+        }
+      });
+      
+      // ページ読み込み時にURLをチェック
+      document.addEventListener('DOMContentLoaded', function() {
+        const hash = window.location.hash;
+        if (hash && hash.startsWith('#saas-')) {
+          const appId = hash.replace('#saas-', '');
+          setTimeout(() => showSaasApp(appId), 100);
+        } else if (hash && hash.startsWith('#requirements-')) {
+          const docId = hash.replace('#requirements-', '');
+          setTimeout(() => showRequirements(docId), 100);
+        } else if (hash === '#ui-views') {
+          setTimeout(() => showRequirements('views'), 100);
+        } else if (hash === '#slide-generator') {
+          setTimeout(() => showBusinessTool('slide-generator'), 100);
+        } else if (hash === '#biz-strategy' || hash === '#biz-finance' || hash === '#prompts-repo') {
+          setTimeout(() => showSectionById(hash.replace('#','')), 100);
+        } else {
+          // デフォルトはダッシュボードのみ表示
+          document.querySelectorAll('.doc-section').forEach(section => {
+            if (section.id === 'saas-applications-overview') {
+              section.style.display = 'block';
+            } else {
+              section.style.display = 'none';
+            }
+          });
+        }
+      });
+    </script>
+
+- id: saas-ai-portrait
+  category: 3
+  category_name: メディアエディタ
+  title: AI Portrait Generator
+  content: ""
+  custom_html: |
+    <div style="margin-bottom: 20px;">
+      <button onclick="window.location.hash=''; location.reload();" style="padding: 8px 16px; background: #4a4a4a; border: none; border-radius: 6px; color: white; cursor: pointer; font-size: 14px;">
+        ← SaaS一覧に戻る
+      </button>
+    </div>
+    <style>
+        .ai-portrait-interface {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 0;
+            margin: 20px 0;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        
+        .app-container {
+            display: flex;
+            height: 600px;
+            background: #1a1a1a;
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        
+        /* Left Sidebar - Reference Gallery */
+        .reference-panel {
+            width: 280px;
+            background: #2d2d2d;
+            padding: 20px;
+            overflow-y: auto;
+            border-right: 1px solid #3a3a3a;
+        }
+        
+        .reference-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .reference-title {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 0;
+            color: #ffffff;
+        }
+        
+        .reload-btn {
+            background: #3a3a3a;
+            border: 1px solid #505050;
+            border-radius: 6px;
+            padding: 6px 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #e0e0e0;
+            font-size: 16px;
+        }
+        
+        .reload-btn:hover {
+            background: #4a4a4a;
+            border-color: #606060;
+        }
+        
+        .reload-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .reload-btn.loading .reload-icon {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Context menu styles */
+        .context-menu {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            transition: opacity 0.2s;
+        }
+        
+        .context-menu:hover {
+            background: #3a3a3a !important;
+        }
+        
+        .reference-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 25px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .reference-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 6px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+            background: #666;
+        }
+        
+        .reference-item:hover {
+            border-color: #4a9eff;
+            transform: scale(1.02);
+        }
+        
+        .reference-item.selected {
+            border-color: #4a9eff;
+            box-shadow: 0 0 15px rgba(74, 158, 255, 0.3);
+        }
+        
+        .reference-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .reference-item .checkmark {
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            width: 18px;
+            height: 18px;
+            background: #4a9eff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        
+        .reference-item.selected .checkmark {
+            opacity: 1;
+        }
+        
+        
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #1a1a1a;
+            position: relative;
+        }
+        
+        /* Header */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            background: #2d2d2d;
+            border-bottom: 1px solid #3a3a3a;
+        }
+        
+        .header-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+        
+        .header-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .icon-button {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            background: #3a3a3a;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            transition: all 0.2s ease;
+        }
+        
+        .icon-button:hover {
+            background: #4a4a4a;
+            transform: translateY(-1px);
+        }
+        
+        .notification-badge {
+            position: relative;
+        }
+        
+        .notification-badge::after {
+            content: '1';
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 16px;
+            height: 16px;
+            background: #ff4757;
+            border-radius: 50%;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        /* Before/After Comparison */
+        .generation-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+        }
+        
+        .before-after-comparison {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+        
+        
+        .comparison-label {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 15px;
+        }
+        
+        .comparison-image {
+            width: 300px;
+            height: 300px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            background: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .before-item .comparison-image {
+            background: #f0f0f0;
+        }
+        
+        .after-item .comparison-image {
+            background: #333;
+        }
+        
+        .placeholder-sketch {
+            color: #666;
+            font-size: 16px;
+            text-align: center;
+        }
+        
+        .placeholder-result {
+            color: #999;
+            font-size: 16px;
+            text-align: center;
+        }
+        
+        .comparison-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            background: #4a4a4a;
+            border-radius: 50%;
+        }
+        
+        .arrow-large {
+            width: 0;
+            height: 0;
+            border-left: 15px solid #ffffff;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+        }
+        
+        /* Drawing and Controls */
+        .drawing-controls {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .control-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .control-btn {
+            padding: 8px 12px;
+            border-radius: 6px;
+            background: #3a3a3a;
+            border: none;
+            cursor: pointer;
+            color: #ffffff;
+            font-size: 12px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        
+        .control-btn:hover {
+            background: #4a4a4a;
+            transform: translateY(-1px);
+        }
+        
+        .comparison-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+        
+        #drawingCanvas {
+            display: none;
+            border: 2px solid #4a9eff;
+            border-radius: 12px;
+        }
+    </style>
+    
+    <div class="ai-portrait-interface">
+        <div class="app-container">
+            <!-- Left Sidebar - Reference Gallery -->
+            <div class="reference-panel">
+                <div class="reference-header">
+                    <h2 class="reference-title">Reference</h2>
+                    <button class="reload-btn" id="reloadImages" title="Reload Images">
+                        <span class="reload-icon">🔄</span>
+                    </button>
+                </div>
+                <div class="reference-grid" id="referenceGrid">
+                    <!-- Images will be loaded dynamically -->
+                </div>
+                
+            </div>
+            
+            <!-- Main Content Area -->
+            <div class="main-content">
+                <!-- Header -->
+                <div class="app-header">
+                    <h1 class="header-title">AI Generation</h1>
+                    <div class="header-controls">
+                        <button class="icon-button">🔍</button>
+                        <button class="icon-button">💾</button>
+                        <button class="icon-button notification-badge">🛒</button>
+                    </div>
+                </div>
+                
+                <!-- Before/After Comparison Area -->
+                <div class="generation-area">
+                    <div class="before-after-comparison">
+                        <div class="comparison-item before-item">
+                            <div class="comparison-label">Before</div>
+                            <div class="comparison-image" id="beforeImage">
+                                <img src="/images/fighting-line-art.png" alt="Fighting line art" style="width:100%;height:100%;object-fit:cover;">
+                                <canvas id="drawingCanvas" width="300" height="300" style="position: absolute; top: 0; left: 0; cursor: crosshair; z-index: 10; display: none; border-radius: 12px;"></canvas>
+                            </div>
+                        </div>
+                        <div class="comparison-arrow">
+                            <div class="arrow-large"></div>
+                        </div>
+                        <div class="comparison-item after-item">
+                            <div class="comparison-label">After</div>
+                            <div class="comparison-image" id="afterImage">
+                                <video src="/images/Nzf983xJ3tjGM8FIECfL9_video.mp4" alt="Generated Fighting Scene" style="width:100%;height:100%;object-fit:cover;" autoplay loop muted>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Drawing and Controls -->
+                <div class="drawing-controls">
+                    <div class="control-buttons">
+                        <button class="control-btn" id="clearCanvas">🗑️ Clear</button>
+                        <button class="control-btn" id="switchImages">⇄ Switch</button>
+                        <button class="control-btn" id="toggleDraw">✏️ Draw</button>
+                        <button class="control-btn" id="saveDrawing">💾 Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let allImages = []; // Will be populated from JSON file
+
+            // Function to load images into reference grid
+            function loadImages() {
+                const referenceGrid = document.getElementById('referenceGrid');
+                referenceGrid.innerHTML = ''; // Clear existing images
+                
+                allImages.forEach((imageName, index) => {
+                    const referenceItem = document.createElement('div');
+                    referenceItem.className = 'reference-item';
+                    
+                    // Select first few items by default for demo
+                    if (index % 3 === 0) {
+                        referenceItem.classList.add('selected');
+                    }
+                    
+                    // Create readable alt text from filename
+                    const altText = imageName
+                        .replace(/\.(png|jpg|jpeg|gif)$/i, '')
+                        .replace(/[-_]/g, ' ')
+                        .replace(/\b\w/g, char => char.toUpperCase());
+                    
+                    referenceItem.innerHTML = `
+                        <img src="/images/${imageName}" alt="${altText}">
+                        <div class="checkmark">✓</div>
+                    `;
+                    
+                    referenceGrid.appendChild(referenceItem);
+                });
+                
+                // Re-attach click event listeners
+                document.querySelectorAll('.reference-item').forEach(item => {
+                    // Left click - update Before image
+                    item.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        
+                        // Toggle selection
+                        this.classList.toggle('selected');
+                        
+                        // Update Before image
+                        const img = this.querySelector('img');
+                        if (img) {
+                            const beforeImg = document.querySelector('#beforeImage img');
+                            if (beforeImg) {
+                                beforeImg.src = img.src;
+                                beforeImg.alt = img.alt;
+                            }
+                        }
+                    });
+                    
+                    // Right click - show context menu with relative path
+                    item.addEventListener('contextmenu', function(e) {
+                        e.preventDefault();
+                        
+                        const img = this.querySelector('img');
+                        if (img) {
+                            // Get relative path from src
+                            const src = img.src;
+                            const relativePath = src.substring(src.indexOf('/images/'));
+                            
+                            // Remove existing context menu if any
+                            const existingMenu = document.querySelector('.context-menu');
+                            if (existingMenu) {
+                                existingMenu.remove();
+                            }
+                            
+                            // Create context menu
+                            const menu = document.createElement('div');
+                            menu.className = 'context-menu';
+                            menu.style.cssText = `
+                                position: fixed;
+                                left: ${e.clientX}px;
+                                top: ${e.clientY}px;
+                                background: #2a2a2a;
+                                border: 1px solid #444;
+                                border-radius: 4px;
+                                padding: 8px 12px;
+                                color: #e0e0e0;
+                                font-size: 12px;
+                                z-index: 1000;
+                                cursor: pointer;
+                                box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+                            `;
+                            menu.textContent = relativePath;
+                            menu.title = 'Click to copy';
+                            
+                            // Copy on click
+                            menu.addEventListener('click', function() {
+                                navigator.clipboard.writeText(relativePath).then(() => {
+                                    menu.textContent = '✅ Copied!';
+                                    setTimeout(() => {
+                                        menu.remove();
+                                    }, 1000);
+                                }).catch(err => {
+                                    console.error('Failed to copy:', err);
+                                    menu.textContent = '❌ Copy failed';
+                                });
+                            });
+                            
+                            document.body.appendChild(menu);
+                            
+                            // Remove menu when clicking elsewhere
+                            const removeMenu = (e) => {
+                                if (!menu.contains(e.target)) {
+                                    menu.remove();
+                                    document.removeEventListener('click', removeMenu);
+                                }
+                            };
+                            setTimeout(() => {
+                                document.addEventListener('click', removeMenu);
+                            }, 0);
+                        }
+                    });
+                });
+            }
+            
+            // Function to fetch images list from JSON
+            async function fetchImagesList(fromApi = false) {
+                try {
+                    // If fromApi is true, fetch from API endpoint which also updates the JSON
+                    const url = fromApi ? '/api/images' : '/data/images_list.json';
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch images list');
+                    }
+                    const data = await response.json();
+                    allImages = data.images || [];
+                    loadImages();
+                } catch (error) {
+                    console.error('Error fetching images:', error);
+                    // Fallback: try to load from static JSON if API fails
+                    if (fromApi) {
+                        fetchImagesList(false);
+                    } else {
+                        allImages = [];
+                        loadImages();
+                    }
+                }
+            }
+            
+            // Initial load
+            fetchImagesList();
+            
+            // Reload button functionality
+            document.getElementById('reloadImages').addEventListener('click', async function() {
+                const btn = this;
+                btn.classList.add('loading');
+                
+                // Re-fetch images list from API (which updates the JSON file)
+                try {
+                    await fetchImagesList(true); // true = use API endpoint
+                    btn.classList.remove('loading');
+                    
+                    // Show success feedback
+                    const originalText = btn.querySelector('.reload-icon').textContent;
+                    btn.querySelector('.reload-icon').textContent = '✅';
+                    setTimeout(() => {
+                        btn.querySelector('.reload-icon').textContent = originalText;
+                    }, 1000);
+                } catch (error) {
+                    btn.classList.remove('loading');
+                    console.error('Error reloading images:', error);
+                    
+                    // Show error feedback
+                    const originalText = btn.querySelector('.reload-icon').textContent;
+                    btn.querySelector('.reload-icon').textContent = '❌';
+                    setTimeout(() => {
+                        btn.querySelector('.reload-icon').textContent = originalText;
+                    }, 1000);
+                }
+            });
+
+
+            // Drawing functionality
+            const canvas = document.getElementById('drawingCanvas');
+            const ctx = canvas.getContext('2d');
+            let isDrawing = false;
+            let drawingEnabled = false;
+            let lastSavedDrawing = null;
+
+            // Set drawing style
+            ctx.strokeStyle = '#ff0000';
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+
+            // Toggle drawing mode
+            document.getElementById('toggleDraw').addEventListener('click', function() {
+                drawingEnabled = !drawingEnabled;
+                canvas.style.display = drawingEnabled ? 'block' : 'none';
+                this.textContent = drawingEnabled ? '🖊️ Drawing' : '✏️ Draw';
+                this.style.background = drawingEnabled ? '#4a9eff' : '#3a3a3a';
+            });
+
+            // Clear canvas
+            document.getElementById('clearCanvas').addEventListener('click', function() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            });
+
+            // Switch images
+            document.getElementById('switchImages').addEventListener('click', function() {
+                const beforeImg = document.querySelector('#beforeImage img');
+                const afterImg = document.querySelector('#afterImage img');
+                const tempSrc = beforeImg.src;
+                const tempAlt = beforeImg.alt;
+                
+                beforeImg.src = afterImg.src;
+                beforeImg.alt = afterImg.alt;
+                afterImg.src = tempSrc;
+                afterImg.alt = tempAlt;
+            });
+
+            // Save drawing combined with background image
+            document.getElementById('saveDrawing').addEventListener('click', function() {
+                const beforeImg = document.querySelector('#beforeImage img');
+                const canvas = document.getElementById('drawingCanvas');
+                
+                // Create a new canvas to combine image and drawing
+                const combinedCanvas = document.createElement('canvas');
+                const combinedCtx = combinedCanvas.getContext('2d');
+                
+                // Set canvas size to match the image display size
+                combinedCanvas.width = 300;
+                combinedCanvas.height = 300;
+                
+                // Create a new image to ensure it's loaded
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                
+                img.onload = function() {
+                    // Draw the background image
+                    combinedCtx.drawImage(img, 0, 0, 300, 300);
+                    
+                    // Draw the drawing on top
+                    combinedCtx.drawImage(canvas, 0, 0);
+                    
+                    // Convert to base64 data URL
+                    const dataURL = combinedCanvas.toDataURL('image/png');
+                    const timestamp = Date.now();
+                    const filename = 'hand-drawn-' + timestamp + '.png';
+                    
+                    // Add to reference gallery immediately
+                    const referenceGrid = document.querySelector('.reference-grid');
+                    const newReferenceItem = document.createElement('div');
+                    newReferenceItem.className = 'reference-item selected';
+                    newReferenceItem.innerHTML = `
+                        <img src="${dataURL}" alt="Hand Drawn">
+                        <div class="checkmark">✓</div>
+                    `;
+                    
+                    // Add click functionality - same as other reference items
+                    // Left click - update Before image
+                    newReferenceItem.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        
+                        // Toggle selection
+                        this.classList.toggle('selected');
+                        
+                        // Update Before image
+                        const img = this.querySelector('img');
+                        if (img) {
+                            const beforeImg = document.querySelector('#beforeImage img');
+                            if (beforeImg) {
+                                beforeImg.src = img.src;
+                                beforeImg.alt = img.alt;
+                            }
+                        }
+                    });
+                    
+                    // Right click - show context menu
+                    newReferenceItem.addEventListener('contextmenu', function(e) {
+                        e.preventDefault();
+                        
+                        const img = this.querySelector('img');
+                        if (img) {
+                            // For saved drawings, use the filename
+                            const relativePath = '/' + filename;
+                            
+                            // Remove existing context menu if any
+                            const existingMenu = document.querySelector('.context-menu');
+                            if (existingMenu) {
+                                existingMenu.remove();
+                            }
+                            
+                            // Create context menu
+                            const menu = document.createElement('div');
+                            menu.className = 'context-menu';
+                            menu.style.cssText = `
+                                position: fixed;
+                                left: ${e.clientX}px;
+                                top: ${e.clientY}px;
+                                background: #2a2a2a;
+                                border: 1px solid #444;
+                                border-radius: 4px;
+                                padding: 8px 12px;
+                                color: #e0e0e0;
+                                font-size: 12px;
+                                z-index: 1000;
+                                cursor: pointer;
+                                box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+                            `;
+                            menu.textContent = relativePath;
+                            menu.title = 'Click to copy';
+                            
+                            // Copy on click
+                            menu.addEventListener('click', function() {
+                                navigator.clipboard.writeText(relativePath).then(() => {
+                                    menu.textContent = '✅ Copied!';
+                                    setTimeout(() => {
+                                        menu.remove();
+                                    }, 1000);
+                                }).catch(err => {
+                                    console.error('Failed to copy:', err);
+                                    menu.textContent = '❌ Copy failed';
+                                });
+                            });
+                            
+                            document.body.appendChild(menu);
+                            
+                            // Remove menu when clicking elsewhere
+                            const removeMenu = (e) => {
+                                if (!menu.contains(e.target)) {
+                                    menu.remove();
+                                    document.removeEventListener('click', removeMenu);
+                                }
+                            };
+                            setTimeout(() => {
+                                document.addEventListener('click', removeMenu);
+                            }, 0);
+                        }
+                    });
+                    
+                    referenceGrid.appendChild(newReferenceItem);
+                    
+                    // Store the last saved drawing for AI generation
+                    lastSavedDrawing = dataURL;
+                    
+                    // Also download the file
+                    combinedCanvas.toBlob(function(blob) {
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = filename;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(url);
+                    }, 'image/png');
+                    
+                    // Show success message
+                    const saveBtn = document.getElementById('saveDrawing');
+                    const originalText = saveBtn.textContent;
+                    saveBtn.textContent = '✅ Saved & Added!';
+                    saveBtn.style.background = '#4CAF50';
+                    setTimeout(() => {
+                        saveBtn.textContent = originalText;
+                        saveBtn.style.background = '#3a3a3a';
+                    }, 2000);
+                };
+                
+                img.src = beforeImg.src;
+            });
+
+
+            // Drawing events
+            canvas.addEventListener('mousedown', function(e) {
+                if (!drawingEnabled) return;
+                isDrawing = true;
+                const rect = canvas.getBoundingClientRect();
+                ctx.beginPath();
+                ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+            });
+
+            canvas.addEventListener('mousemove', function(e) {
+                if (!drawingEnabled || !isDrawing) return;
+                const rect = canvas.getBoundingClientRect();
+                ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+                ctx.stroke();
+            });
+
+            canvas.addEventListener('mouseup', function() {
+                isDrawing = false;
+            });
+
+            canvas.addEventListener('mouseout', function() {
+                isDrawing = false;
+            });
+        });
+    </script>
+
+- id: saas-storyboard
+  category: 3
+  category_name: メディアエディタ
+  title: ビデオビューアー
+  content: ""
+  custom_html: |
+    <div style="margin-bottom: 20px;">
+      <button onclick="window.location.hash=''; location.reload();" style="padding: 8px 16px; background: #4a4a4a; border: none; border-radius: 6px; color: white; cursor: pointer; font-size: 14px;">
+        ← SaaS一覧に戻る
+      </button>
+    </div>
+    <!DOCTYPE html>
+    <html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>storyboard_flow</title>
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                font-family: Arial, sans-serif;
+                background: #1a1a1a;
+                overflow: hidden;
+            }
+            
+            .storyboard-viewer {
+                width: 100%;
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+            }
+            
+            /* Header */
+            .header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 20px 30px;
+                background: #2a2a2a;
+                color: white;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            }
+            
+            .header h1 {
+                margin: 0;
+                font-size: 24px;
+                font-weight: 600;
+            }
+            
+            .header-controls {
+                display: flex;
+                gap: 15px;
+                align-items: center;
+            }
+            
+            .export-btn, .settings-btn {
+                padding: 8px 16px;
+                background: #4a4a4a;
+                border: none;
+                border-radius: 6px;
+                color: white;
+                cursor: pointer;
+                font-size: 14px;
+                transition: all 0.3s ease;
+            }
+            
+            .export-btn:hover, .settings-btn:hover {
+                background: #5a5a5a;
+                transform: translateY(-1px);
+            }
+            
+            /* Main Content Area */
+            .main-content {
+                flex: 1;
+                display: flex;
+                overflow: hidden;
+            }
+            
+            /* Timeline */
+            .timeline {
+                width: 250px;
+                background: #2a2a2a;
+                padding: 20px;
+                overflow-y: auto;
+                border-right: 1px solid #3a3a3a;
+            }
+            
+            .timeline h3 {
+                color: white;
+                margin: 0 0 20px 0;
+                font-size: 18px;
+                font-weight: 600;
+            }
+            
+            .timeline-item {
+                background: #3a3a3a;
+                padding: 15px;
+                margin-bottom: 10px;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                position: relative;
+                overflow: hidden;
+            }
+            
+            .timeline-item:hover {
+                background: #4a4a4a;
+                transform: translateX(5px);
+            }
+            
+            .timeline-item.active {
+                background: #0066cc;
+                box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
+            }
+            
+            .timeline-item.active::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 4px;
+                height: 100%;
+                background: #00aaff;
+            }
+            
+            .scene-number {
+                color: #aaa;
+                font-size: 12px;
+                margin-bottom: 5px;
+            }
+            
+            .timeline-item.active .scene-number {
+                color: #cce6ff;
+            }
+            
+            .scene-title {
+                color: white;
+                font-weight: 500;
+                margin-bottom: 8px;
+            }
+            
+            .scene-duration {
+                color: #999;
+                font-size: 12px;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+            }
+            
+            .timeline-item.active .scene-duration {
+                color: #cce6ff;
+            }
+            
+            /* Viewer Area */
+            .viewer-area {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                background: #1a1a1a;
+            }
+            
+            /* Video Container */
+            .video-container {
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 40px;
+                position: relative;
+            }
+            
+            .video-wrapper {
+                position: relative;
+                width: 100%;
+                max-width: 1200px;
+                aspect-ratio: 16/9;
+                background: #000;
+                border-radius: 12px;
+                overflow: hidden;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            }
+            
+            video {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+            }
+            
+            /* Video Overlay Info */
+            .video-overlay {
+                position: absolute;
+                top: 20px;
+                left: 20px;
+                background: rgba(0, 0, 0, 0.7);
+                padding: 15px 20px;
+                border-radius: 8px;
+                color: white;
+                backdrop-filter: blur(10px);
+            }
+            
+            .current-scene {
+                font-size: 14px;
+                color: #00aaff;
+                margin-bottom: 5px;
+            }
+            
+            .scene-description {
+                font-size: 16px;
+                font-weight: 500;
+            }
+            
+            /* Controls Bar */
+            .controls-bar {
+                background: #2a2a2a;
+                padding: 20px 30px;
+                display: flex;
+                align-items: center;
+                gap: 20px;
+                box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+            }
+            
+            .play-controls {
+                display: flex;
+                gap: 10px;
+                align-items: center;
+            }
+            
+            .control-btn {
+                width: 40px;
+                height: 40px;
+                background: #4a4a4a;
+                border: none;
+                border-radius: 50%;
+                color: white;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.3s ease;
+                font-size: 18px;
+            }
+            
+            .control-btn:hover {
+                background: #5a5a5a;
+                transform: scale(1.1);
+            }
+            
+            .control-btn.play-pause {
+                width: 50px;
+                height: 50px;
+                background: #0066cc;
+            }
+            
+            .control-btn.play-pause:hover {
+                background: #0080ff;
+            }
+            
+            /* Progress Bar */
+            .progress-container {
+                flex: 1;
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+            
+            .progress-bar {
+                flex: 1;
+                height: 6px;
+                background: #3a3a3a;
+                border-radius: 3px;
+                position: relative;
+                cursor: pointer;
+                overflow: hidden;
+            }
+            
+            .progress-bar:hover {
+                height: 8px;
+            }
+            
+            .progress-fill {
+                height: 100%;
+                background: #0066cc;
+                width: 0%;
+                transition: width 0.1s linear;
+                position: relative;
+            }
+            
+            .progress-fill::after {
+                content: '';
+                position: absolute;
+                right: -8px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 16px;
+                height: 16px;
+                background: white;
+                border-radius: 50%;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+            
+            .progress-bar:hover .progress-fill::after {
+                opacity: 1;
+            }
+            
+            .time-display {
+                color: white;
+                font-size: 14px;
+                min-width: 100px;
+                text-align: center;
+            }
+            
+            /* Volume Control */
+            .volume-control {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            .volume-icon {
+                width: 30px;
+                height: 30px;
+                background: #4a4a4a;
+                border: none;
+                border-radius: 6px;
+                color: white;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .volume-slider {
+                width: 80px;
+                height: 6px;
+                background: #3a3a3a;
+                border-radius: 3px;
+                position: relative;
+                cursor: pointer;
+            }
+            
+            .volume-fill {
+                height: 100%;
+                background: #0066cc;
+                width: 70%;
+                border-radius: 3px;
+            }
+            
+            /* Fullscreen Button */
+            .fullscreen-btn {
+                width: 35px;
+                height: 35px;
+                background: #4a4a4a;
+                border: none;
+                border-radius: 6px;
+                color: white;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.3s ease;
+            }
+            
+            .fullscreen-btn:hover {
+                background: #5a5a5a;
+                transform: scale(1.1);
+            }
+            
+            /* Scene Markers on Progress Bar */
+            .scene-markers {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+            }
+            
+            .scene-marker {
+                position: absolute;
+                top: 0;
+                width: 2px;
+                height: 100%;
+                background: rgba(255, 255, 255, 0.3);
+            }
+            
+            /* Responsive Design */
+            @media (max-width: 768px) {
+                .timeline {
+                    width: 200px;
+                }
+                
+                .video-container {
+                    padding: 20px;
+                }
+                
+                .header {
+                    padding: 15px 20px;
+                }
+                
+                .controls-bar {
+                    padding: 15px 20px;
+                }
+                
+                .volume-control {
+                    display: none;
+                }
+            }
+            
+            /* Loading State */
+            .loading-spinner {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 50px;
+                height: 50px;
+                border: 3px solid #3a3a3a;
+                border-top-color: #0066cc;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+                display: none;
+            }
+            
+            @keyframes spin {
+                to {
+                    transform: translate(-50%, -50%) rotate(360deg);
+                }
+            }
+            
+            .loading .loading-spinner {
+                display: block;
+            }
+            
+            /* Tooltips */
+            .tooltip {
+                position: absolute;
+                background: rgba(0, 0, 0, 0.9);
+                color: white;
+                padding: 8px 12px;
+                border-radius: 6px;
+                font-size: 12px;
+                pointer-events: none;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                white-space: nowrap;
+                z-index: 1000;
+            }
+            
+            .tooltip.show {
+                opacity: 1;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="storyboard-viewer">
+            <!-- Header -->
+            <div class="header">
+                <h1>Storyboard Viewer</h1>
+                <div class="header-controls">
+                    <button class="export-btn">📥 Export</button>
+                    <button class="settings-btn">⚙️ Settings</button>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Timeline -->
+                <div class="timeline">
+                    <h3>Scenes</h3>
+                    <div class="timeline-item active">
+                        <div class="scene-number">Scene 01</div>
+                        <div class="scene-title">Opening Shot</div>
+                        <div class="scene-duration">⏱️ 0:00 - 0:15</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="scene-number">Scene 02</div>
+                        <div class="scene-title">Character Introduction</div>
+                        <div class="scene-duration">⏱️ 0:15 - 0:45</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="scene-number">Scene 03</div>
+                        <div class="scene-title">Action Sequence</div>
+                        <div class="scene-duration">⏱️ 0:45 - 1:30</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="scene-number">Scene 04</div>
+                        <div class="scene-title">Dialogue Scene</div>
+                        <div class="scene-duration">⏱️ 1:30 - 2:15</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="scene-number">Scene 05</div>
+                        <div class="scene-title">Climax</div>
+                        <div class="scene-duration">⏱️ 2:15 - 3:00</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="scene-number">Scene 06</div>
+                        <div class="scene-title">Resolution</div>
+                        <div class="scene-duration">⏱️ 3:00 - 3:30</div>
+                    </div>
+                </div>
+                
+                <!-- Viewer Area -->
+                <div class="viewer-area">
+                    <div class="video-container">
+                        <div class="video-wrapper">
+                            <video id="storyboardVideo" src="/images/karate-woman-man-v2.mp4"></video>
+                            <div class="loading-spinner"></div>
+                            <div class="video-overlay">
+                                <div class="current-scene">Scene 01</div>
+                                <div class="scene-description">Opening Shot</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Controls Bar -->
+                    <div class="controls-bar">
+                        <div class="play-controls">
+                            <button class="control-btn" id="prevBtn">⏮️</button>
+                            <button class="control-btn play-pause" id="playPauseBtn">▶️</button>
+                            <button class="control-btn" id="nextBtn">⏭️</button>
+                        </div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-bar" id="progressBar">
+                                <div class="progress-fill" id="progressFill"></div>
+                                <div class="scene-markers">
+                                    <div class="scene-marker" style="left: 8.3%"></div>
+                                    <div class="scene-marker" style="left: 25%"></div>
+                                    <div class="scene-marker" style="left: 41.7%"></div>
+                                    <div class="scene-marker" style="left: 62.5%"></div>
+                                    <div class="scene-marker" style="left: 83.3%"></div>
+                                </div>
+                            </div>
+                            <div class="time-display">
+                                <span id="currentTime">0:00</span> / <span id="totalTime">3:30</span>
+                            </div>
+                        </div>
+                        
+                        <div class="volume-control">
+                            <button class="volume-icon">🔊</button>
+                            <div class="volume-slider">
+                                <div class="volume-fill"></div>
+                            </div>
+                        </div>
+                        
+                        <button class="fullscreen-btn" id="fullscreenBtn">⛶</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+            // Video element and controls
+            const video = document.getElementById('storyboardVideo');
+            const playPauseBtn = document.getElementById('playPauseBtn');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+            const currentTimeEl = document.getElementById('currentTime');
+            const totalTimeEl = document.getElementById('totalTime');
+            const fullscreenBtn = document.getElementById('fullscreenBtn');
+            
+            // Scene data
+            const scenes = [
+                { id: 1, title: 'Opening Shot', start: 0, end: 15 },
+                { id: 2, title: 'Character Introduction', start: 15, end: 45 },
+                { id: 3, title: 'Action Sequence', start: 45, end: 90 },
+                { id: 4, title: 'Dialogue Scene', start: 90, end: 135 },
+                { id: 5, title: 'Climax', start: 135, end: 180 },
+                { id: 6, title: 'Resolution', start: 180, end: 210 }
+            ];
+            
+            let currentSceneIndex = 0;
+            
+            // Format time helper
+            function formatTime(seconds) {
+                const mins = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${mins}:${secs.toString().padStart(2, '0')}`;
+            }
+            
+            // Update time display
+            function updateTimeDisplay() {
+                currentTimeEl.textContent = formatTime(video.currentTime);
+                totalTimeEl.textContent = formatTime(video.duration || 210);
+            }
+            
+            // Update progress bar
+            function updateProgress() {
+                const progress = (video.currentTime / video.duration) * 100;
+                progressFill.style.width = progress + '%';
+                updateTimeDisplay();
+                updateActiveScene();
+            }
+            
+            // Update active scene
+            function updateActiveScene() {
+                const currentTime = video.currentTime;
+                let activeIndex = 0;
+                
+                for (let i = 0; i < scenes.length; i++) {
+                    if (currentTime >= scenes[i].start && currentTime < scenes[i].end) {
+                        activeIndex = i;
+                        break;
+                    }
+                }
+                
+                if (activeIndex !== currentSceneIndex) {
+                    currentSceneIndex = activeIndex;
+                    updateSceneUI();
+                }
+            }
+            
+            // Update scene UI
+            function updateSceneUI() {
+                // Update timeline items
+                const timelineItems = document.querySelectorAll('.timeline-item');
+                timelineItems.forEach((item, index) => {
+                    if (index === currentSceneIndex) {
+                        item.classList.add('active');
+                    } else {
+                        item.classList.remove('active');
+                    }
+                });
+                
+                // Update overlay
+                const currentScene = scenes[currentSceneIndex];
+                document.querySelector('.current-scene').textContent = `Scene 0${currentScene.id}`;
+                document.querySelector('.scene-description').textContent = currentScene.title;
+            }
+            
+            // Play/Pause functionality
+            playPauseBtn.addEventListener('click', () => {
+                if (video.paused) {
+                    video.play();
+                    playPauseBtn.textContent = '⏸️';
+                } else {
+                    video.pause();
+                    playPauseBtn.textContent = '▶️';
+                }
+            });
+            
+            // Previous scene
+            prevBtn.addEventListener('click', () => {
+                if (currentSceneIndex > 0) {
+                    currentSceneIndex--;
+                    video.currentTime = scenes[currentSceneIndex].start;
+                    updateSceneUI();
+                }
+            });
+            
+            // Next scene
+            nextBtn.addEventListener('click', () => {
+                if (currentSceneIndex < scenes.length - 1) {
+                    currentSceneIndex++;
+                    video.currentTime = scenes[currentSceneIndex].start;
+                    updateSceneUI();
+                }
+            });
+            
+            // Progress bar click
+            progressBar.addEventListener('click', (e) => {
+                const rect = progressBar.getBoundingClientRect();
+                const pos = (e.clientX - rect.left) / rect.width;
+                video.currentTime = pos * video.duration;
+            });
+            
+            // Timeline item click
+            document.querySelectorAll('.timeline-item').forEach((item, index) => {
+                item.addEventListener('click', () => {
+                    currentSceneIndex = index;
+                    video.currentTime = scenes[index].start;
+                    updateSceneUI();
+                });
+            });
+            
+            // Fullscreen
+            fullscreenBtn.addEventListener('click', () => {
+                if (!document.fullscreenElement) {
+                    document.querySelector('.storyboard-viewer').requestFullscreen();
+                } else {
+                    document.exitFullscreen();
+                }
+            });
+            
+            // Video events
+            video.addEventListener('timeupdate', updateProgress);
+            video.addEventListener('loadedmetadata', updateTimeDisplay);
+            
+            // Initialize
+            updateSceneUI();
+            updateTimeDisplay();
+        </script>
+    </body>
+    </html>
+# ストーリーボードビューアー メディアエディタ
+# Source: https://github.com/dai-motoki/storyboard-viewer/blob/main/storyboard_flow.html
+
+- id: saas-storyboard-viewer
+  category: 3
+  category_name: メディアエディタ
+  title: ストーリーボードビューアー
+  content: ""
+  custom_html: |
+    <div style="margin-bottom: 20px;">
+      <button onclick="window.location.hash=''; location.reload();" style="padding: 8px 16px; background: #4a4a4a; border: none; border-radius: 6px; color: white; cursor: pointer; font-size: 14px;">
+        ← SaaS一覧に戻る
+      </button>
+    </div>
+    <style>
+        :root {
+          --page-bg: #fdfcf8;
+          --paper-line: rgba(60, 100, 160, 0.08);
+          --ring: #c3c3c3;
+          --shadow: rgba(0,0,0,0.15);
+          --seam: rgba(0,0,0,0.18);
+          --scale: 0.5; /* 見開き時の縮小率（50%） */
+          --header-h: 44px; /* 固定ヘッダー高さ */
+        }
+
+        * { box-sizing: border-box; }
+        html, body { height: 100%; width: 100%; }
+        body {
+          margin: 0;
+          background: #2c2c2c;
+          font-family: system-ui, -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", Arial, sans-serif;
+          color: #222;
+          padding: 0; /* 固定ヘッダー採用のため本文の上余白は不要 */
+          overflow-x: hidden;
+        }
+
+        .header {
+          background: white;
+          border-radius: 0;
+          box-shadow: none;
+          padding: 4px 12px;
+          width: 100%;
+          max-width: none;
+          margin: 0;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 16px;
+          position: relative;
+          z-index: 10;
+        }
+
+        /* 全体をヘッダー行 + コンテンツ行の2段グリッドで構成 */
+        .storyboard-app {
+          position: relative;
+          display: grid;
+          grid-template-rows: auto 1fr;
+          height: 90vh;
+          width: 100%;
+          overflow: hidden;
+          border-radius: 8px;
+          background: #2c2c2c;
+          max-width: 100%;
+        }
+        .views { position: relative; height: 100%; width: 100%; overflow-y: auto; overflow-x: hidden; }
+        .title { font-size: 18px; font-weight: 700; color: #333; }
+        .meta { color: #666; font-size: 12px; }
+        .meta span + span { margin-left: 10px; }
+        .links a { color: #0a6cff; text-decoration: none; font-size: 12px; }
+
+        /* 見開き本体 */
+        .spread {
+          position: relative;
+          width: 100%;
+          max-width: none;
+          margin: 0;
+          background: white;
+          border-radius: 0;
+          box-shadow: none;
+          padding: 0;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 0;
+        }
+
+        /* 見開きスケール用のラッパーと中身 */
+        .view-spread { position: absolute; inset: 0; width: 100%; overflow: auto; }
+        /* スケール調整 - コンテナに収まるサイズに */
+        .spread-inner { transform: scale(0.5); transform-origin: top left; width: 200%; max-width: none; margin: 0; }
+
+        /* 中央の綴じ目 */
+        .spread::after {
+          content: "";
+          position: absolute;
+          top: 20px; bottom: 20px; left: 50%; width: 2px;
+          transform: translateX(-50%);
+          background: linear-gradient(to bottom, transparent 0, var(--seam) 8%, var(--seam) 92%, transparent 100%);
+        }
+
+        /* ノート風のページ */
+        .page {
+          position: relative;
+          background: var(--page-bg);
+          border-radius: 0;
+          overflow: hidden;
+          box-shadow: inset 0 0 0 1px rgba(0,0,0,0.04);
+        }
+        /* 罫線（横線） */
+        .page::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background: repeating-linear-gradient(
+            to bottom,
+            transparent 0 26px,
+            var(--paper-line) 26px 27px
+          );
+          pointer-events: none;
+        }
+        /* 綴じリングの穴（内側余白側に表示） */
+        .page::after {
+          content: "";
+          position: absolute;
+          top: 22px; bottom: 22px;
+          width: 14px;
+          background:
+            radial-gradient(circle 4px at 50% 16px, rgba(0,0,0,0.08) 0 70%, transparent 72%) repeat-y,
+            radial-gradient(circle 3.5px at 50% 16px, var(--ring) 0 60%, transparent 62%) repeat-y;
+          background-size: 14px 44px, 14px 44px;
+          background-position: center top, center top;
+          opacity: 0.9;
+          pointer-events: none;
+        }
+        .page.left::after { left: 8px; }
+        .page.right::after { right: 8px; }
+
+        .page-inner { position: relative; padding: 0 8px 8px; }
+
+        .page-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 10px;
+          position: sticky; top: 0; z-index: 3;
+          background: linear-gradient(var(--page-bg), var(--page-bg));
+          padding: 4px 6px; /* 上の詰め */
+          border-radius: 6px;
+          box-shadow: 0 1px 0 rgba(0,0,0,0.04);
+        }
+        .badge { background:#ffd84d; padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 12px; }
+        .scene { color:#555; font-weight:700; font-size: 12px; }
+
+        /* 画像＋テキストの縦フロー（上下連結） */
+        .stack { display: flex; flex-direction: column; gap: 0; }
+        .row {
+          display: grid;
+          grid-template-columns: 56px 3fr 1.6fr 1.6fr 64px; /* CUT | PICTURE | text | script | TIME */
+          align-items: stretch;
+          background: var(--page-bg);
+        }
+        .row + .row { border-top: 1px solid rgba(0,0,0,0.06); }
+        .cell { position: relative; background: transparent; }
+        .cell + .cell { border-left: 2px solid rgba(0,0,0,0.12); }
+
+        /* 列ヘッダー */
+        .row.header { position: static; z-index: 1; background: linear-gradient(var(--page-bg), var(--page-bg)); }
+        .row.header .cell { 
+          font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em;
+          color: #333; display: flex; align-items: center; justify-content: center;
+          background: #eceff7; border-left-color: rgba(0,0,0,0.14);
+          padding: 6px 4px;
+        }
+
+        /* 画像セル */
+        .frame { position: relative; overflow: hidden; }
+        /* どのアスペクト比でも全体が見えるように contain + 自然高さ */
+        .img { width: 100%; height: auto; object-fit: contain; display: block; background: #fff; }
+        /* オーバーレイ（CUT・TIME） */
+        .overlay {
+          position: absolute; left: 8px; top: 8px;
+          background: rgba(255,255,255,0.92);
+          border: 1px solid rgba(0,0,0,0.2);
+          border-radius: 4px; padding: 2px 8px;
+          font-size: 12px; font-weight: 700; color: #111;
+        }
+        .time { position: absolute; right: 8px; bottom: 8px; background: rgba(0,0,0,0.65); color: #fff; font-size: 11px; font-weight: 700; padding: 2px 6px; border-radius: 4px; }
+
+        /* 画像上のCUT/秒数は非表示（列側に表示するため） */
+        .frame .overlay, .frame .time { display: none !important; }
+
+        /* テキスト/スクリプト/時間セル */
+        .text, .script { padding: 10px; font-size: 14px; line-height: 1.5; color: #222; white-space: pre-wrap; }
+        .timecell { display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; background: #fff; }
+
+        /* 常に左右2カラム表示（小さい画面でも崩さない） */
+        @media (max-width: 700px) {
+          /* 700px 未満では綴じ目の演出だけ抑える */
+          .spread::after { display: none; }
+        }
+
+        /* トグルボタン */
+        .view-toggle { display: inline-flex; background: #f1f5f9; border-radius: 8px; padding: 4px; gap: 4px; }
+        .toggle-btn { appearance: none; border: 1px solid #cbd5e1; background: white; color: #0f172a; padding: 6px 10px; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer; }
+        .toggle-btn.active { background: #0a6cff; border-color: #0a6cff; color: white; }
+        /* 動画タグ */
+        .vid { width: 100%; height: auto; object-fit: contain; display: none; background: #000; }
+
+        /* メディアトグル */
+        .media-toggle { display: inline-flex; gap: 4px; margin-left: 6px; background: #e2e8f0; border-radius: 6px; padding: 2px; }
+        .media-btn { appearance: none; border: 1px solid #cbd5e1; background: white; color: #0f172a; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 10px; cursor: pointer; }
+        .media-btn.active { background: #0a6cff; border-color: #0a6cff; color: white; }
+
+        /* 画像モードトグル */
+        .image-toggle { display: inline-flex; gap: 4px; margin-left: 8px; background: #e2e8f0; border-radius: 6px; padding: 2px; }
+        .img-toggle-btn { appearance: none; border: 1px solid #cbd5e1; background: white; color: #0f172a; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 10px; cursor: pointer; }
+        .img-toggle-btn.active { background: #0a6cff; border-color: #0a6cff; color: white; }
+        /* 縦ビューも固定配置でヘッダー直下から開始し、左右いっぱい */
+        .view-vertical {
+          position: static; /* フローに参加して .views を押し広げる */
+          width: 100%; max-width: none; margin: 0;
+          background: transparent;
+          display: block;
+        }
+      </style>
+      <!-- 画像は docs/pencil_drawings/scene1.png ... scene10.png を使用 -->
+      <!-- 実写は docs/storyboard_images/scene1_realistic.jpg ... を参照 -->
+      <div class="storyboard-app" data-mode="spread" data-image-mode="sketch" data-media-mode="image">
+      <div class="header">
+        <div>
+          <div class="title">🎞️ 絵コンテ 見開きフロー（連結）</div>
+          <div class="meta">
+            <span>プロジェクト: サンプル</span>
+            <span>日付: 2025-08-23</span>
+            <span>カット: 10</span>
+          </div>
+        </div>
+        <div class="view-toggle" role="group" aria-label="表示切り替え">
+          <button class="toggle-btn" data-mode="vertical">上から下</button>
+          <button class="toggle-btn active" data-mode="spread">見開き</button>
+        </div>
+      </div>
+
+      <div class="views">
+      <!-- 見開きビュー -->
+      <div class="view-spread">
+        <div class="spread spread-inner">
+        <!-- 左ページ -->
+        <section class="page left">
+          <div class="page-inner">
+            <div class="page-header">
+              <div class="badge">Left 1/1</div>
+              <div class="scene">シーン: 左列（1-5）</div>
+            </div>
+            <div class="stack">
+              <div class="row header">
+                <div class="cell">CUT</div>
+                <div class="cell"><span>PICTURE</span>
+                  <span class="image-toggle" title="画像切替 (鉛筆/実写)">
+                    <button class="img-toggle-btn active" data-image="sketch">鉛筆</button>
+                    <button class="img-toggle-btn" data-image="live">実写</button>
+                  </span>
+                  <span class="media-toggle" title="メディア切替 (静止画/動画)">
+                    <button class="media-btn active" data-media="image">静止画</button>
+                    <button class="media-btn" data-media="video">動画</button>
+                  </span>
+                </div>
+                <div class="cell">TEXT</div>
+                <div class="cell">SCRIPT</div>
+                <div class="cell">TIME</div>
+              </div>
+
+              <div class="row">
+                <div class="cell timecell">001</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene1.png" data-live-src="storyboard_images/scene1_sparkle.png" src="pencil_drawings/scene1.png" alt="Scene 1" />
+                    <video class="vid" data-video-src="storyboard_videos/scene1_video.mp4" muted playsinline loop preload="metadata"></video>
+                    <figcaption class="overlay">CUT 001</figcaption>
+                    <div class="time">3秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">暗闇の中から巨大なモンスターがゆっくりと姿を現す。<br>全身に鱗が光り、鋭い牙を見せながら威嚇のポーズ。<br>口を大きく開けて火を噴く準備をしている。<br>カメラはローアングルから見上げる構図で、<br>モンスターの巨大さと恐ろしさを強調。<br>背景には荒廃した大地が広がっている。</div>
+                <div class="cell script">BGM: 低音の弦楽器による緊迫感のある音楽がフェードイン<br>SE: 地響きのような低い唸り声が徐々に大きくなる<br>SE: 火花が散る音、金属がきしむような音<br>環境音: 遠くで風が吹く音、小石が転がる音</div>
+                <div class="cell timecell">3秒</div>
+              </div>
+
+              <div class="row">
+                <div class="cell timecell">002</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene2.png" data-live-src="storyboard_images/scene2_realistic.jpg" src="pencil_drawings/scene2.png" alt="Scene 2" />
+                    <video class="vid" data-video-src="storyboard_videos/scene2_video.mp4" muted playsinline loop preload="metadata"></video>
+                    <figcaption class="overlay">CUT 002</figcaption>
+                    <div class="time">2秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">草原の真ん中に立つ小さな丸い生き物。<br>その大きな瞳には不安と好奇心が混じり合っている。<br>ゆっくりと首を傾けながら空を見上げる仕草。<br>耳がピクピクと動き、何かを感じ取っている様子。<br>足元の草が風に揺れ、生き物の小さな影が揺らめく。<br>表情はクローズアップで、瞳に空が映り込んでいる。</div>
+                <div class="cell script">BGM: ピアノソロの静かで神秘的なメロディー<br>SE: 優しい風の音が吹き抜ける<br>SE: 遠くで鳥のさえずり、草がそよぐ音<br>環境音: 静寂の中に響く心臓の鼓動音（かすかに）</div>
+                <div class="cell timecell">2秒</div>
+              </div>
+
+              <div class="row">
+                <div class="cell timecell">003</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene3.png" data-live-src="storyboard_images/scene3_realistic.jpg" src="pencil_drawings/scene3.png" alt="Scene 3" />
+                    <figcaption class="overlay">CUT 003</figcaption>
+                    <div class="time">3秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">色とりどりの動物たちが一斉にジャンプ！<br>ウサギ、リス、小鳥たちが喜びを全身で表現。<br>紙吹雪が舞い散る中、みんなで輪になって踊る。<br>それぞれのキャラクターが個性的な動きで喜びを表現。<br>背景には虹がかかり、お祝いムード満点の演出。<br>カメラは引きの構図で全体の賑やかさを捉える。</div>
+                <div class="cell script">BGM: オーケストラによる祝祭的な明るい音楽<br>SE: 動物たちの歓声、笑い声が重なり合う<br>SE: 紙吹雪がひらひらと舞う音<br>SE: 拍手、口笛、タンバリンの音<br>環境音: 祭りの太鼓の音が遠くから聞こえる</div>
+                <div class="cell timecell">3秒</div>
+              </div>
+
+              <div class="row">
+                <div class="cell timecell">004</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene4.png" data-live-src="storyboard_images/scene4_realistic.jpg" src="pencil_drawings/scene4.png" alt="Scene 4" />
+                    <figcaption class="overlay">CUT 004</figcaption>
+                    <div class="time">2秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">主人公が木漏れ日の差す森の小道をゆっくり歩く。<br>時々立ち止まっては周りを見回し、道を確認する仕草。<br>大きな木の根を慎重にまたぎ、苔むした石を避ける。<br>蝶々が主人公の周りを飛び回り、道案内をするかのよう。<br>背景には巨大な古木と緑豊かな下草が描かれる。<br>光と影のコントラストが美しい雰囲気を演出。</div>
+                <div class="cell script">BGM: アコースティックギターの穏やかなメロディー<br>SE: 落ち葉を踏む柔らかい足音のリズム<br>SE: 様々な鳥のさえずりが森にこだまする<br>SE: 小川のせせらぎ、風で木々が揺れる音<br>環境音: 虫の羽音、遠くでキツツキが木を叩く音</div>
+                <div class="cell timecell">2秒</div>
+              </div>
+
+              <div class="row">
+                <div class="cell timecell">005</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene5.png" data-live-src="storyboard_images/scene5_realistic.jpg" src="pencil_drawings/scene5.png" alt="Scene 5" />
+                    <figcaption class="overlay">CUT 005</figcaption>
+                    <div class="time">1秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">超クローズアップで主人公の顔がフレームいっぱいに。<br>瞳孔が徐々に開いていく様子をスローモーションで描写。<br>額に汗が一筋流れ、口が少し開く。<br>眉毛が上がり、顔全体に驚愕の表情が広がる。<br>瞳には何か信じられないものが映り込んでいる。<br>時間が止まったかのような一瞬を切り取る。</div>
+                <div class="cell script">BGM: 完全に音楽が止まり、無音状態に<br>SE: 「ハッ」という短い息を呑む音<br>SE: 心臓の鼓動音が徐々に速くなる<br>環境音: 周りの音も全て消え、静寂が支配<br>※この無音が次のシーンへの緊張感を高める</div>
+                <div class="cell timecell">1秒</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 右ページ -->
+        <section class="page right">
+          <div class="page-inner">
+            <div class="page-header">
+              <div class="badge">Right 1/1</div>
+              <div class="scene">シーン: 右列（6-10）</div>
+            </div>
+            <div class="stack">
+              <div class="row header">
+                <div class="cell">CUT</div>
+                <div class="cell"><span>PICTURE</span>
+                  <span class="image-toggle" title="画像切替 (鉛筆/実写)">
+                    <button class="img-toggle-btn active" data-image="sketch">鉛筆</button>
+                    <button class="img-toggle-btn" data-image="live">実写</button>
+                  </span>
+                  <span class="media-toggle" title="メディア切替 (静止画/動画)">
+                    <button class="media-btn active" data-media="image">静止画</button>
+                    <button class="media-btn" data-media="video">動画</button>
+                  </span>
+                </div>
+                <div class="cell">TEXT</div>
+                <div class="cell">SCRIPT</div>
+                <div class="cell">TIME</div>
+              </div>
+
+              <div class="row">
+                <div class="cell timecell">006</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene6.png" data-live-src="storyboard_images/scene6_realistic.jpg" src="pencil_drawings/scene6.png" alt="Scene 6" />
+                    <figcaption class="overlay">CUT 006</figcaption>
+                    <div class="time">4秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">二人のキャラクターが向かい合って真剣な表情で会話。<br>一人が地図を広げて指差しながら説明している。<br>もう一人は腕を組んで考え込む仕草を見せる。<br>吹き出しには「この先に伝説の宝が...」という文字。<br>背景の夕日が二人のシルエットを美しく照らす。<br>緊迫感と期待感が入り混じる重要な場面。</div>
+                <div class="cell script">BGM: チェロとバイオリンの静かで緊張感のある旋律<br>SE: 紙の地図を広げる音、指で地図をなぞる音<br>SE: 低い声での真剣な会話のトーン<br>SE: 時々聞こえる深いため息<br>環境音: 夕暮れの虫の音、遠くの鐘の音</div>
+                <div class="cell timecell">4秒</div>
+              </div>
+
+              <div class="row">
+                <div class="cell timecell">007</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene7.png" data-live-src="storyboard_images/scene7_realistic.jpg" src="pencil_drawings/scene7.png" alt="Scene 7" />
+                    <figcaption class="overlay">CUT 007</figcaption>
+                    <div class="time">2秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">主人公が助走をつけて大ジャンプ！<br>倒木、岩、川を次々と華麗に飛び越えていく。<br>空中で体をひねり、アクロバティックな動きを披露。<br>着地の瞬間、土煙が舞い上がるダイナミックな演出。<br>スピード線と残像効果で疾走感を表現。<br>カメラは横移動でキャラクターを追いかける。</div>
+                <div class="cell script">BGM: ドラムとエレキギターの激しいロック調<br>SE: 「ヒュッ」という風を切る音<br>SE: 着地時の「ドスン」という重い音<br>SE: 石が転がる音、水しぶきの音<br>SE: 主人公の力強い呼吸音と掛け声</div>
+                <div class="cell timecell">2秒</div>
+              </div>
+
+              <div class="row">
+                <div class="cell timecell">008</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene8.png" data-live-src="storyboard_images/scene8_realistic.jpg" src="pencil_drawings/scene8.png" alt="Scene 8" />
+                    <figcaption class="overlay">CUT 008</figcaption>
+                    <div class="time">3秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">壮大な山脈のパノラマショット。<br>雲がゆっくりと山の頂を流れていく様子。<br>朝日が山肌を黄金色に染め上げる美しい瞬間。<br>鷲が優雅に空を舞い、遠くに小さく見える。<br>手前には野花が風に揺れ、奥行きを演出。<br>時間の流れを感じさせる叙情的なシーン。</div>
+                <div class="cell script">BGM: オーケストラによる壮大で感動的な楽曲<br>SE: 高山を吹き抜ける風の音<br>SE: 遠くで鷲の鳴き声がこだまする<br>環境音: 小川のせせらぎ、草花が揺れる音<br>※自然の雄大さを音で表現する重要なシーン</div>
+                <div class="cell timecell">3秒</div>
+              </div>
+
+              <div class="row">
+                <div class="cell timecell">009</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene9.png" data-live-src="storyboard_images/scene9_realistic.jpg" src="pencil_drawings/scene9.png" alt="Scene 9" />
+                    <figcaption class="overlay">CUT 009</figcaption>
+                    <div class="time">2秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">洞窟の奥で光る謎の物体を発見する主人公。<br>そっと腰を落とし、警戒しながら一歩ずつ近づく。<br>物体から発せられる不思議な光が顔を照らす。<br>手を伸ばしかけて、一度ためらう仕草を見せる。<br>周りを見回し、誰もいないことを確認。<br>緊張の面持ちで、ついに物体に手を伸ばす瞬間。</div>
+                <div class="cell script">BGM: シンセサイザーによる神秘的で不気味な音楽<br>SE: 「キラキラ」という幻想的な輝きの音<br>SE: 洞窟内で響く水滴の音<br>SE: 主人公の緊張した呼吸音<br>環境音: 低周波の振動音が徐々に強くなる</div>
+                <div class="cell timecell">2秒</div>
+              </div>
+
+              <div class="row">
+                <div class="cell timecell">010</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene10.png" data-live-src="storyboard_images/scene10_realistic.jpg" src="pencil_drawings/scene10.png" alt="Scene 10" />
+                    <figcaption class="overlay">CUT 010</figcaption>
+                    <div class="time">5秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">丘の上で全員が集まり、大きく手を振る感動のフィナーレ。<br>オレンジ色の夕日が地平線に沈みかけている。<br>それぞれのキャラクターが笑顔で別れを惜しむ。<br>主人公は振り返りながら、ゆっくりと歩き始める。<br>仲間たちの姿が徐々に小さくなっていく。<br>最後は夕日のシルエットとなり、画面が暗転。<br>「また会おう」という文字がフェードイン。</div>
+                <div class="cell script">BGM: フルオーケストラによる感動的なエンディングテーマ<br>SE: 優しい夕暮れの風が吹く音<br>SE: 遠くで響く別れの言葉の余韻<br>SE: 足音が徐々に遠ざかっていく<br>環境音: 夕暮れの虫の合唱、波の音<br>※音楽は最後まで続き、余韻を残してフェードアウト</div>
+                <div class="cell timecell">5秒</div>
+              </div>
+            </div>
+          </div>
+        </section>
+        </div>
+      </div>
+
+      <!-- 上から下ビュー（単ページ縦並び） -->
+      <div class="view-vertical" style="display:none;">
+        <section class="page left" style="margin: 0 0 24px 0;">
+          <div class="page-inner">
+            <div class="page-header">
+              <div class="badge">Vertical</div>
+              <div class="scene">シーン: 連結ビュー（1-10）</div>
+            </div>
+            <div class="stack">
+              <div class="row header">
+                <div class="cell">CUT</div>
+                <div class="cell"><span>PICTURE</span>
+                  <span class="image-toggle" title="画像切替 (鉛筆/実写)">
+                    <button class="img-toggle-btn active" data-image="sketch">鉛筆</button>
+                    <button class="img-toggle-btn" data-image="live">実写</button>
+                  </span>
+                  <span class="media-toggle" title="メディア切替 (静止画/動画)">
+                    <button class="media-btn active" data-media="image">静止画</button>
+                    <button class="media-btn" data-media="video">動画</button>
+                  </span>
+                </div>
+                <div class="cell">TEXT</div>
+                <div class="cell">SCRIPT</div>
+                <div class="cell">TIME</div>
+              </div>
+
+              <!-- CUT 001 → 010 を縦に通しで表示 -->
+              <!-- 001 -->
+              <div class="row">
+                <div class="cell timecell">001</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene1.png" data-live-src="storyboard_images/scene1_sparkle.png" src="pencil_drawings/scene1.png" alt="Scene 1" />
+                    <video class="vid" data-video-src="storyboard_videos/scene1_video.mp4" muted playsinline loop preload="metadata"></video>
+                    <figcaption class="overlay">CUT 001</figcaption>
+                    <div class="time">3秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">暗闇の中から巨大なモンスターがゆっくりと姿を現す。<br>全身に鱗が光り、鋭い牙を見せながら威嚇のポーズ。<br>口を大きく開けて火を噴く準備をしている。<br>カメラはローアングルから見上げる構図で、<br>モンスターの巨大さと恐ろしさを強調。<br>背景には荒廃した大地が広がっている。</div>
+                <div class="cell script">BGM: 低音の弦楽器による緊迫感のある音楽がフェードイン<br>SE: 地響きのような低い唸り声が徐々に大きくなる<br>SE: 火花が散る音、金属がきしむような音<br>環境音: 遠くで風が吹く音、小石が転がる音</div>
+                <div class="cell timecell">3秒</div>
+              </div>
+
+              <!-- 002 -->
+              <div class="row">
+                <div class="cell timecell">002</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene2.png" data-live-src="storyboard_images/scene2_realistic.jpg" src="pencil_drawings/scene2.png" alt="Scene 2" />
+                    <video class="vid" data-video-src="storyboard_videos/scene2_video.mp4" muted playsinline loop preload="metadata"></video>
+                    <figcaption class="overlay">CUT 002</figcaption>
+                    <div class="time">2秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">草原の真ん中に立つ小さな丸い生き物。<br>その大きな瞳には不安と好奇心が混じり合っている。<br>ゆっくりと首を傾けながら空を見上げる仕草。<br>耳がピクピクと動き、何かを感じ取っている様子。<br>足元の草が風に揺れ、生き物の小さな影が揺らめく。<br>表情はクローズアップで、瞳に空が映り込んでいる。</div>
+                <div class="cell script">BGM: ピアノソロの静かで神秘的なメロディー<br>SE: 優しい風の音が吹き抜ける<br>SE: 遠くで鳥のさえずり、草がそよぐ音<br>環境音: 静寂の中に響く心臓の鼓動音（かすかに）</div>
+                <div class="cell timecell">2秒</div>
+              </div>
+
+              <!-- 003 -->
+              <div class="row">
+                <div class="cell timecell">003</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene3.png" data-live-src="storyboard_images/scene3_realistic.jpg" src="pencil_drawings/scene3.png" alt="Scene 3" />
+                    <figcaption class="overlay">CUT 003</figcaption>
+                    <div class="time">3秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">色とりどりの動物たちが一斉にジャンプ！<br>ウサギ、リス、小鳥たちが喜びを全身で表現。<br>紙吹雪が舞い散る中、みんなで輪になって踊る。<br>それぞれのキャラクターが個性的な動きで喜びを表現。<br>背景には虹がかかり、お祝いムード満点の演出。<br>カメラは引きの構図で全体の賑やかさを捉える。</div>
+                <div class="cell script">BGM: オーケストラによる祝祭的な明るい音楽<br>SE: 動物たちの歓声、笑い声が重なり合う<br>SE: 紙吹雪がひらひらと舞う音<br>SE: 拍手、口笛、タンバリンの音<br>環境音: 祭りの太鼓の音が遠くから聞こえる</div>
+                <div class="cell timecell">3秒</div>
+              </div>
+
+              <!-- 004 -->
+              <div class="row">
+                <div class="cell timecell">004</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene4.png" data-live-src="storyboard_images/scene4_realistic.jpg" src="pencil_drawings/scene4.png" alt="Scene 4" />
+                    <figcaption class="overlay">CUT 004</figcaption>
+                    <div class="time">2秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">主人公が木漏れ日の差す森の小道をゆっくり歩く。<br>時々立ち止まっては周りを見回し、道を確認する仕姿。<br>大きな木の根を慎重にまたぎ、苔むした石を避ける。<br>蝶々が主人公の周りを飛び回り、道案内をするかのよう。<br>背景には巨大な古木と緑豊かな下草が描かれる。<br>光と影のコントラストが美しい雰囲気を演出。</div>
+                <div class="cell script">BGM: アコースティックギターの穏やかなメロディー<br>SE: 落ち葉を踏む柔らかい足音のリズム<br>SE: 様々な鳥のさえずりが森にこだまする<br>SE: 小川のせせらぎ、風で木々が揺れる音<br>環境音: 虫の羽音、遠くでキツツキが木を叩く音</div>
+                <div class="cell timecell">2秒</div>
+              </div>
+
+              <!-- 005 -->
+              <div class="row">
+                <div class="cell timecell">005</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene5.png" data-live-src="storyboard_images/scene5_realistic.jpg" src="pencil_drawings/scene5.png" alt="Scene 5" />
+                    <figcaption class="overlay">CUT 005</figcaption>
+                    <div class="time">1秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">超クローズアップで主人公の顔がフレームいっぱいに。<br>瞳孔が徐々に開いていく様子をスローモーションで描写。<br>額に汗が一筋流れ、口が少し開く。<br>眉毛が上がり、顔全体に驚愕の表情が広がる。<br>瞳には何か信じられないものが映り込んでいる。<br>時間が止まったかのような一瞬を切り取る。</div>
+                <div class="cell script">BGM: 完全に音楽が止まり、無音状態に<br>SE: 「ハッ」という短い息を呑む音<br>SE: 心臓の鼓動音が徐々に速くなる<br>環境音: 周りの音も全て消え、静寂が支配<br>※この無音が次のシーンへの緊張感を高める</div>
+                <div class="cell timecell">1秒</div>
+              </div>
+
+              <!-- 006 -->
+              <div class="row">
+                <div class="cell timecell">006</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene6.png" data-live-src="storyboard_images/scene6_realistic.jpg" src="pencil_drawings/scene6.png" alt="Scene 6" />
+                    <figcaption class="overlay">CUT 006</figcaption>
+                    <div class="time">4秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">二人のキャラクターが向かい合って真剣な表情で会話。<br>一人が地図を広げて指差しながら説明している。<br>もう一人は腕を組んで考え込む仕草を見せる。<br>吹き出しには「この先に伝説の宝が...」という文字。<br>背景の夕日が二人のシルエットを美しく照らす。<br>緊迫感と期待感が入り混じる重要な場面。</div>
+                <div class="cell script">BGM: チェロとバイオリンの静かで緊張感のある旋律<br>SE: 紙の地図を広げる音、指で地図をなぞる音<br>SE: 低い声での真剣な会話のトーン<br>SE: 時々聞こえる深いため息<br>環境音: 夕暮れの虫の音、遠くの鐘の音</div>
+                <div class="cell timecell">4秒</div>
+              </div>
+
+              <!-- 007 -->
+              <div class="row">
+                <div class="cell timecell">007</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene7.png" data-live-src="storyboard_images/scene7_realistic.jpg" src="pencil_drawings/scene7.png" alt="Scene 7" />
+                    <figcaption class="overlay">CUT 007</figcaption>
+                    <div class="time">2秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">主人公が助走をつけて大ジャンプ！<br>倒木、岩、川を次々と華麗に飛び越えていく。<br>空中で体をひねり、アクロバティックな動きを披露。<br>着地の瞬間、土煙が舞い上がるダイナミックな演出。<br>スピード線と残像効果で疾走感を表現。<br>カメラは横移動でキャラクターを追いかける。</div>
+                <div class="cell script">BGM: ドラムとエレキギターの激しいロック調<br>SE: 「ヒュッ」という風を切る音<br>SE: 着地時の「ドスン」という重い音<br>SE: 石が転がる音、水しぶきの音<br>SE: 主人公の力強い呼吸音と掛け声</div>
+                <div class="cell timecell">2秒</div>
+              </div>
+
+              <!-- 008 -->
+              <div class="row">
+                <div class="cell timecell">008</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene8.png" data-live-src="storyboard_images/scene8_realistic.jpg" src="pencil_drawings/scene8.png" alt="Scene 8" />
+                    <figcaption class="overlay">CUT 008</figcaption>
+                    <div class="time">3秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">壮大な山脈のパノラマショット。<br>雲がゆっくりと山の頂を流れていく様子。<br>朝日が山肌を黄金色に染め上げる美しい瞬間。<br>鷲が優雅に空を舞い、遠くに小さく見える。<br>手前には野花が風に揺れ、奥行きを演出。<br>時間の流れを感じさせる叙情的なシーン。</div>
+                <div class="cell script">BGM: オーケストラによる壮大で感動的な楽曲<br>SE: 高山を吹き抜ける風の音<br>SE: 遠くで鷲の鳴き声がこだまする<br>環境音: 小川のせせらぎ、草花が揺れる音<br>※自然の雄大さを音で表現する重要なシーン</div>
+                <div class="cell timecell">3秒</div>
+              </div>
+
+              <!-- 009 -->
+              <div class="row">
+                <div class="cell timecell">009</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene9.png" data-live-src="storyboard_images/scene9_realistic.jpg" src="pencil_drawings/scene9.png" alt="Scene 9" />
+                    <figcaption class="overlay">CUT 009</figcaption>
+                    <div class="time">2秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">洞窟の奥で光る謎の物体を発見する主人公。<br>そっと腰を落とし、警戒しながら一歩ずつ近づく。<br>物体から発せられる不思議な光が顔を照らす。<br>手を伸ばしかけて、一度ためらう仕草を見せる。<br>周りを見回し、誰もいないことを確認。<br>緊張の面持ちで、ついに物体に手を伸ばす瞬間。</div>
+                <div class="cell script">BGM: シンセサイザーによる神秘的で不気味な音楽<br>SE: 「キラキラ」という幻想的な輝きの音<br>SE: 洞窟内で響く水滴の音<br>SE: 主人公の緊張した呼吸音<br>環境音: 低周波の振動音が徐々に強くなる</div>
+                <div class="cell timecell">2秒</div>
+              </div>
+
+              <!-- 010 -->
+              <div class="row">
+                <div class="cell timecell">010</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene10.png" data-live-src="storyboard_images/scene10_realistic.jpg" src="pencil_drawings/scene10.png" alt="Scene 10" />
+                    <figcaption class="overlay">CUT 010</figcaption>
+                    <div class="time">5秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">丘の上で全員が集まり、大きく手を振る感動のフィナーレ。<br>オレンジ色の夕日が地平線に沈みかけている。<br>それぞれのキャラクターが笑顔で別れを惜しむ。<br>主人公は振り返りながら、ゆっくりと歩き始める。<br>仲間たちの姿が徐々に小さくなっていく。<br>最後は夕日のシルエットとなり、画面が暗転。<br>「また会おう」という文字がフェードイン。</div>
+                <div class="cell script">BGM: フルオーケストラによる感動的なエンディングテーマ<br>SE: 優しい夕暮れの風が吹く音<br>SE: 遠くで響く別れの言葉の余韻<br>SE: 足音が徐々に遠ざかっていく<br>環境音: 夕暮れの虫の合唱、波の音<br>※音楽は最後まで続き、余韻を残してフェードアウト</div>
+                <div class="cell timecell">5秒</div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+              </div> <!-- /views -->
+        </div> <!-- /app -->
+
+        <script>
+          // トグル切り替え
+          const buttons = document.querySelectorAll('.toggle-btn');
+          buttons.forEach(btn => btn.addEventListener('click', () => {
+            const mode = btn.dataset.mode;
+            const app = document.querySelector('.storyboard-app');
+            if (app) app.setAttribute('data-mode', mode);
+          document.querySelector('.view-spread').style.display = (mode === 'spread') ? 'block' : 'none';
+          document.querySelector('.view-vertical').style.display = (mode === 'spread') ? 'none' : 'block';
+          buttons.forEach(b => b.classList.toggle('active', b === btn));
+        }));
+
+        // 画像モード（鉛筆/実写）切替
+        const imgBtns = document.querySelectorAll('.img-toggle-btn');
+        function applyImageMode(mode) {
+          const app = document.querySelector('.storyboard-app');
+          if (app) app.setAttribute('data-image-mode', mode);
+          document.querySelectorAll('.frame img[data-sketch-src]').forEach(img => {
+            const sketch = img.getAttribute('data-sketch-src');
+            const live = img.getAttribute('data-live-src') || sketch;
+            img.src = (mode === 'live') ? live : sketch;
+          });
+          imgBtns.forEach(b => b.classList.toggle('active', b.dataset.image === mode));
+        }
+        imgBtns.forEach(btn => btn.addEventListener('click', () => applyImageMode(btn.dataset.image)));
+        // メディアモード切替（静止画/動画）
+        const mediaBtns = document.querySelectorAll('.media-btn');
+        function applyMediaMode(mode) {
+          const app = document.querySelector('.storyboard-app');
+          if (app) app.setAttribute('data-media-mode', mode);
+          document.querySelectorAll('.frame').forEach(frame => {
+            const img = frame.querySelector('img');
+            const vid = frame.querySelector('video.vid');
+            if (!img && !vid) return;
+            if (mode === 'image') {
+              if (vid) {
+                try { vid.pause(); } catch (e) {}
+                vid.removeAttribute('src');
+                vid.load();
+                vid.style.display = 'none';
+              }
+              if (img) img.style.display = 'block';
+            } else {
+              // video
+              if (img) img.style.display = 'none';
+              if (vid) {
+                const src = vid.getAttribute('data-video-src');
+                if (!src) { vid.style.display = 'none'; return; }
+                // セットしてロード
+                if (vid.getAttribute('src') !== src) {
+                  vid.setAttribute('src', src);
+                }
+                vid.load();
+                vid.onloadedmetadata = () => {
+                  vid.style.display = 'block';
+                  const p = vid.play(); if (p && p.catch) p.catch(() => {});
+                };
+                vid.onerror = () => { vid.style.display = 'none'; };
+              }
+            }
+          });
+          mediaBtns.forEach(b => b.classList.toggle('active', b.dataset.media === mode));
+        }
+        mediaBtns.forEach(btn => btn.addEventListener('click', () => applyMediaMode(btn.dataset.media)));
+
+        // 初期モード適用
+        const app = document.querySelector('.storyboard-app');
+        if (app) {
+          applyImageMode(app.getAttribute('data-image-mode') || 'sketch');
+          applyMediaMode(app.getAttribute('data-media-mode') || 'image');
+        }
+
+        // グリッドレイアウトに統一したため、上下位置の補正処理は不要
+      </script>
+
+# 要件定義書詳細セクション（外部YAMLに移動: data/saas/requirements-document.yaml）
+
+# UIビュー一覧セクション（外部YAMLに移動: data/saas/ui-views.yaml）
+
+# スライドエディタセクション（外部YAMLファイルから参照）
+# {{ range .Site.Data.saas }}
+# {{ if eq .id "slide-generator" }}
+# - {{ . | jsonify }}
+# {{ end }}
+# {{ end }}

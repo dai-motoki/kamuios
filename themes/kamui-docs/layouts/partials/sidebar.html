@@ -1,0 +1,47 @@
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-title">{{ .Site.Title }}</div>
+    <div class="sidebar-subtitle" id="tocCount">目次</div>
+  </div>
+
+  <div class="folder-tree" id="folderTree">
+    <div class="tree-item">
+      <div class="tree-label selected" data-toggle="root">
+        <span class="tree-toggle expanded">▼</span>
+        <span class="tree-name">章構成</span>
+        <span class="tree-count" id="sectionCount">--</span>
+      </div>
+      <div class="tree-children expanded" id="tocList">
+        <!-- TOCは JavaScriptで動的生成 -->
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar-tags">
+    <div class="tags-title">クイックリンク</div>
+    <div class="tag-list">
+      <span class="tag" data-jump="#ui-flow">UI遷移</span>
+      <span class="tag" data-jump="#ui">UI/画面</span>
+      <span class="tag" data-jump="#functional">機能</span>
+      <span class="tag" data-jump="#nonfunctional">非機能</span>
+      <span class="tag" data-jump="#packaging">パッケージ</span>
+      <span class="tag" data-jump="#schedule">スケジュール</span>
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="sidebar-tags">
+      <div class="tags-title">テーマ</div>
+      <div class="view-options">
+        <button class="view-btn icon-btn active" id="themeDark">
+          <span class="btn-icon">🌙</span>
+          <span class="btn-label">ダーク</span>
+        </button>
+        <button class="view-btn icon-btn" id="themeLight">
+          <span class="btn-icon">☀️</span>
+          <span class="btn-label">ライト</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

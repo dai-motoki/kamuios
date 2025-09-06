@@ -1,0 +1,359 @@
+# UIビュー一覧
+# システムのUI画面一覧と設計仕様
+
+- id: ui-views
+  category: 2
+  category_name: 要件定義・開発
+  title: UIビュー一覧
+  content: ""
+  custom_html: |
+    <div style="margin-bottom: 20px;">
+      <button onclick="window.location.hash=''; location.reload();" style="padding: 8px 16px; background: #4a4a4a; border: none; border-radius: 6px; color: white; cursor: pointer; font-size: 14px;">
+        ← ダッシュボードに戻る
+      </button>
+    </div>
+    <style>
+      .ui-views-doc {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 20px;
+      }
+      .ui-views-header {
+        border-bottom: 2px solid var(--border);
+        padding-bottom: 16px;
+        margin-bottom: 24px;
+      }
+      .ui-views-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 8px;
+      }
+      .ui-views-meta {
+        display: flex;
+        gap: 20px;
+        font-size: 0.9rem;
+        color: var(--text-weak);
+      }
+      .ui-view-section {
+        margin-bottom: 32px;
+      }
+      .ui-view-section h3 {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--link);
+        margin-bottom: 16px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--border);
+      }
+      .ui-view-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+        margin-top: 16px;
+      }
+      .ui-view-card {
+        background: var(--sidebar-bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 16px;
+        transition: all 0.3s ease;
+      }
+      .ui-view-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        border-color: var(--link);
+      }
+      .ui-view-name {
+        font-weight: 600;
+        color: var(--link);
+        margin-bottom: 8px;
+      }
+      .ui-view-description {
+        font-size: 0.9rem;
+        color: var(--text-weak);
+        margin-bottom: 12px;
+      }
+      .ui-view-specs {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .ui-view-specs li {
+        font-size: 0.85rem;
+        color: var(--text-weak);
+        padding: 4px 0;
+        display: flex;
+        align-items: flex-start;
+      }
+      .ui-view-specs li::before {
+        content: "•";
+        color: var(--link);
+        margin-right: 8px;
+        font-weight: 700;
+      }
+      .ui-view-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 16px;
+      }
+      .ui-view-table th,
+      .ui-view-table td {
+        border: 1px solid var(--border);
+        padding: 10px;
+        text-align: left;
+      }
+      .ui-view-table th {
+        background: var(--sidebar-bg);
+        font-weight: 600;
+        color: var(--text);
+      }
+      .ui-view-table td {
+        color: var(--text-weak);
+      }
+      .status-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+      .status-complete {
+        background: #22c55e20;
+        color: #22c55e;
+      }
+      .status-progress {
+        background: #3b82f620;
+        color: #3b82f6;
+      }
+      .status-planned {
+        background: #f5971520;
+        color: #f59715;
+      }
+    </style>
+    
+    <div class="ui-views-doc">
+      <div class="ui-views-header">
+        <h2 class="ui-views-title">UIビュー一覧</h2>
+        <div class="ui-views-meta">
+          <span>バージョン: 1.0</span>
+          <span>更新日: 2025年1月</span>
+          <span>総画面数: 12</span>
+        </div>
+      </div>
+      
+      <!-- 参考デザイン画像（最上部ギャラリー） -->
+      <div class="ui-view-section">
+        <h3>参考デザイン画像（ギャラリー）</h3>
+        <div class="media-grid" id="uiViewGallery"></div>
+        <div style="margin-top:8px; color: var(--text-weak); font-size: 12px;">右クリックで相対パスをコピーできます。</div>
+        <script>
+          (async function(){
+            const wrap = document.getElementById('uiViewGallery');
+            if (!wrap) return;
+            let list = [];
+            try {
+              const res = await fetch('/data/images_list.json', { cache: 'no-cache' });
+              if (res.ok) {
+                const j = await res.json();
+                list = Array.isArray(j.images) ? j.images : [];
+              }
+            } catch (_) {}
+            // UI関連のみ（ファイル名に `ui` を含むもの）
+            let uiList = list.filter(name => /ui/i.test(name));
+            if (!uiList.length) {
+              // フォールバック（UI系ファイルの既知リスト）
+              uiList = [
+                'whiteboard_saas_ui_1_full.png',
+                'advanced_whiteboard_saas_ui_5_full.png',
+                'collaborative_whiteboard_saas_ui_3_full.png',
+                'educational_blackboard_saas_ui_4_full.png',
+                'interactive_presentation_maker_ui_3_full.png',
+                'lecture_recording_interface_ui_4_full.png',
+                'educational_video_dashboard_ui_2_full.png',
+                'advanced_educational_platform_ui_5_full.png'
+              ];
+            }
+            // すべて表示（UI画像のみ）
+            uiList.forEach(name => {
+              const path = `/images/${name}`;
+              const card = document.createElement('div');
+              card.className = 'media-item';
+              card.setAttribute('data-path', path);
+              card.innerHTML = `
+                <img class="media-thumbnail" src="${path}" alt="${name}">
+                <div class=\"media-info\">
+                  <div class=\"media-name\">${name}</div>
+                </div>`;
+              wrap.appendChild(card);
+            });
+          })();
+        </script>
+      </div>
+      
+      <div class="ui-view-section">
+        <h3>1. ダッシュボード画面</h3>
+        <div class="ui-view-grid">
+          <div class="ui-view-card">
+            <div class="ui-view-name">メインダッシュボード</div>
+            <div class="ui-view-description">アプリケーション全体の入り口となる画面</div>
+            <ul class="ui-view-specs">
+              <li>レスポンシブ対応</li>
+              <li>ダークモード対応</li>
+              <li>カード型UI</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <div class="ui-view-section">
+        <h3>2. メディアエディタ画面</h3>
+        <div class="ui-view-grid">
+          <div class="ui-view-card">
+            <div class="ui-view-name">AI Portrait Generator</div>
+            <div class="ui-view-description">手書きスケッチからAI画像を生成する画面</div>
+            <ul class="ui-view-specs">
+              <li>キャンバス描画機能</li>
+              <li>リアルタイムプレビュー</li>
+              <li>参照画像ギャラリー</li>
+              <li>生成パラメータ設定</li>
+            </ul>
+          </div>
+          
+          <div class="ui-view-card">
+            <div class="ui-view-name">ビデオビューアー</div>
+            <div class="ui-view-description">ストーリーボードとビデオコンテンツ管理画面</div>
+            <ul class="ui-view-specs">
+              <li>タイムライン表示</li>
+              <li>シーンナビゲーション</li>
+              <li>動画プレイヤー</li>
+              <li>メタデータ編集</li>
+            </ul>
+          </div>
+          
+          <div class="ui-view-card">
+            <div class="ui-view-name">ストーリーボードビューアー</div>
+            <div class="ui-view-description">絵コンテの見開き表示画面</div>
+            <ul class="ui-view-specs">
+              <li>見開き/縦スクロール切替</li>
+              <li>鉛筆画/実写切替</li>
+              <li>静止画/動画対応</li>
+              <li>ページめくりアニメーション</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <div class="ui-view-section">
+        <h3>3. 管理画面</h3>
+        <table class="ui-view-table">
+          <thead>
+            <tr>
+              <th style="width: 25%">画面名</th>
+              <th style="width: 35%">機能概要</th>
+              <th style="width: 25%">主要コンポーネント</th>
+              <th style="width: 15%">ステータス</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>プロジェクト管理</td>
+              <td>プロジェクトの作成・編集・削除</td>
+              <td>テーブル、フォーム、モーダル</td>
+              <td><span class="status-badge status-planned">計画中</span></td>
+            </tr>
+            <tr>
+              <td>ユーザー管理</td>
+              <td>ユーザーアカウントと権限管理</td>
+              <td>ユーザーリスト、権限設定</td>
+              <td><span class="status-badge status-planned">計画中</span></td>
+            </tr>
+            <tr>
+              <td>アセット管理</td>
+              <td>画像・動画ファイルの管理</td>
+              <td>ファイルブラウザ、アップローダー</td>
+              <td><span class="status-badge status-progress">開発中</span></td>
+            </tr>
+            <tr>
+              <td>設定画面</td>
+              <td>システム設定とカスタマイズ</td>
+              <td>設定フォーム、プレビュー</td>
+              <td><span class="status-badge status-planned">計画中</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <div class="ui-view-section">
+        <h3>4. 共通コンポーネント</h3>
+        <div class="ui-view-grid">
+          <div class="ui-view-card">
+            <div class="ui-view-name">ナビゲーション</div>
+            <div class="ui-view-description">サイドバーとヘッダーナビゲーション</div>
+            <ul class="ui-view-specs">
+              <li>折りたたみ可能なサイドメニュー</li>
+              <li>パンくずリスト</li>
+              <li>検索バー</li>
+            </ul>
+          </div>
+          
+          <div class="ui-view-card">
+            <div class="ui-view-name">モーダル・ダイアログ</div>
+            <div class="ui-view-description">各種確認・入力ダイアログ</div>
+            <ul class="ui-view-specs">
+              <li>確認ダイアログ</li>
+              <li>フォームモーダル</li>
+              <li>画像プレビューモーダル</li>
+            </ul>
+          </div>
+          
+          <div class="ui-view-card">
+            <div class="ui-view-name">通知・アラート</div>
+            <div class="ui-view-description">システム通知とエラー表示</div>
+            <ul class="ui-view-specs">
+              <li>トースト通知</li>
+              <li>エラーメッセージ</li>
+              <li>プログレスバー</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <div class="ui-view-section">
+        <h3>5. デザインシステム</h3>
+        <table class="ui-view-table">
+          <thead>
+            <tr>
+              <th>要素</th>
+              <th>仕様</th>
+              <th>使用箇所</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>カラーパレット</td>
+              <td>ダーク/ライトテーマ対応、CSS変数で管理</td>
+              <td>全画面共通</td>
+            </tr>
+            <tr>
+              <td>タイポグラフィ</td>
+              <td>システムフォント優先、レスポンシブ対応</td>
+              <td>全画面共通</td>
+            </tr>
+            <tr>
+              <td>スペーシング</td>
+              <td>8pxグリッドシステム</td>
+              <td>全画面共通</td>
+            </tr>
+            <tr>
+              <td>アニメーション</td>
+              <td>CSS Transition、300ms標準</td>
+              <td>ホバー効果、画面遷移</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>

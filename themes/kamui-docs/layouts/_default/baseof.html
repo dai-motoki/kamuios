@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="{{ .Site.LanguageCode | default "ja" }}">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} - {{ .Site.Title }}{{ end }}</title>
+  <meta name="description" content="{{ .Description | default .Site.Params.description }}">
+  
+  <link rel="stylesheet" href="{{ "css/main.css" | relURL }}">
+  
+  <!-- Mermaid.js -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({ 
+      startOnLoad: true,
+      theme: 'dark',
+      themeVariables: {
+        darkMode: true,
+        primaryColor: '#4a9eff',
+        primaryTextColor: '#ffffff',
+        primaryBorderColor: '#2a2a2a',
+        lineColor: '#ffffff',
+        textColor: '#ffffff',
+        taskTextColor: '#ffffff',
+        taskTextLightColor: '#ffffff',
+        taskFillColor: '#4a9eff',
+        taskBorderColor: '#93c5fd',
+        activeTaskBorderColor: '#93c5fd',
+        activeTaskColor: '#4a9eff',
+        doneTaskColor: '#4a9eff',
+        doneTaskBorderColor: '#93c5fd',
+        critBorderColor: '#93c5fd',
+        critColor: '#4a9eff',
+        todayLineColor: '#93c5fd',
+        gridColor: '#64748b',
+        tertiaryColor: '#2d2d2d',
+        sequenceNumberColor: '#ffffff',
+        signalColor: '#ffffff',
+        actorBorder: '#ffffff',
+        actorTextColor: '#ffffff',
+        noteTextColor: '#ffffff',
+        noteBorderColor: '#cbd5e1',
+        activationTextColor: '#ffffff',
+        edgeLabelBackground: '#0f172a',
+        secondaryColor: '#2d2d2d',
+        background: '#1a1a1a',
+        mainBkg: '#0f0f0f',
+        secondBkg: '#1a1a1a',
+        tertiaryColor: '#2d2d2d'
+      },
+      themeCSS: `
+        /* Ensure Gantt bars use unified blue tone inside SVG */
+        .gantt .task rect,
+        .gantt .task .task-bar,
+        .gantt .task-bar rect { fill: #4a9eff; stroke: #93c5fd; }
+        .gantt .task.active rect,
+        .gantt .task.done rect,
+        .gantt .task.crit rect { fill: #4a9eff; stroke: #93c5fd; }
+        .gantt .today { stroke: #93c5fd; stroke-width: 1.5px; }
+        .gantt .label text, .gantt text, .gantt .title text { fill: #ffffff; }
+      `,
+      gantt: {
+        numberSectionStyles: 6,
+        leftPadding: 200,
+        gridLineStartPadding: 400,
+        fontSize: 13,
+        sectionFontSize: 15,
+        fontFamily: '"Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif',
+        barHeight: 22,
+        barGap: 6,
+        topPadding: 50,
+        rightPadding: 150
+      }
+    });
+  </script>
+</head>
+<body>
+  {{ partial "sidebar" . }}
+  
+  <div class="main-content">
+    {{ partial "header" . }}
+    
+    <div class="doc-container" id="docContainer">
+      {{ block "main" . }}{{ end }}
+    </div>
+  </div>
+  
+  {{ partial "modals" . }}
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+  
+  <script>
+    // Expose all known pages for sidebar navigation to individual pages
+    window.DOC_PAGES = [
+      {{/* Dashboard (optional) */}}
+      {{ range .Site.Data.sections }}
+        { id: {{ .id | jsonify }}, title: {{ .title | jsonify }}, category: {{ .category }}, category_name: {{ .category_name | jsonify }} },
+      {{ end }}
+      {{ with .Site.Data.saas }}
+        {{ range $k, $arr := . }}
+          {{ range $arr }}
+            { id: {{ .id | jsonify }}, title: {{ .title | jsonify }}, category: {{ .category }}, category_name: {{ .category_name | jsonify }} },
+          {{ end }}
+        {{ end }}
+      {{ end }}
+    ];
+  </script>
+  
+  <script src="{{ "js/main.js" | relURL }}"></script>
+</body>
+</html>

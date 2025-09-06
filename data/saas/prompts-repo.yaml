@@ -1,0 +1,99 @@
+# サブエージェント
+- id: prompts-repo
+  category: 5
+  category_name: エージェント
+  title: エージェント
+  content: ""
+  markdown_file: static/data/prompts/create-new-page.v2.md
+  markdown_files:
+    - static/data/prompts/media-assets-guidelines.md
+  custom_html: |
+    <div style="margin-bottom: 20px;">
+      <button onclick="window.location.hash=''; location.reload();" style="padding: 8px 16px; background: #4a4a4a; border: none; border-radius: 6px; color: white; cursor: pointer; font-size: 14px;">
+        ← ダッシュボードに戻る
+      </button>
+    </div>
+    <style>
+      .prompt-md { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
+      .prompt-md pre, .prompt-md code { background: var(--code-bg); border: 1px solid var(--code-border); }
+      /* カード切替UI */
+      .prompt-cards-wrap { margin-bottom: 16px; }
+      .prompt-viewer { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
+      .card-grid .card.active { border-color: var(--link); box-shadow: 0 0 0 1px color-mix(in srgb, var(--link) 30%, transparent); }
+      .card .card-desc { color: var(--text-weak); font-size: .9rem; margin-top: 4px; }
+      /* ダークテーマで読めるよう強制カラー */
+      .prompt-cards-wrap .card { background: var(--card); color: var(--text); border: 1px solid var(--border); }
+      .prompt-cards-wrap .card-title { color: var(--text); font-weight: 800; }
+      .prompt-cards-wrap .card:hover { border-color: var(--link); }
+      .prompt-cards-wrap .card-img, .prompt-cards-wrap .card-video { width: 100%; height: auto; display: block; margin-top: 8px; border-radius: 8px; background: var(--media-bg); border: 1px solid var(--border); }
+      .prompt-cards-wrap .card-name { position: absolute; right: 10px; bottom: 10px; padding: 4px 8px; border-radius: 999px; font-size: 12px; font-weight: 700; background: rgba(17, 24, 39, .7); color: #e5e7eb; border: 1px solid rgba(148, 163, 184, .4); }
+      .prompt-cards-wrap .card { position: relative; }
+    </style>
+    <div class="prompt-cards-wrap">
+      <div class="card-grid" id="promptCardGrid"></div>
+    </div>
+    <div class="prompt-viewer" id="promptDocViewer"></div>
+    <script>
+      (function(){
+        const sec = document.getElementById('prompts-repo');
+        const grid = sec.querySelector('#promptCardGrid');
+        const viewer = sec.querySelector('#promptDocViewer');
+        if (!grid || !viewer) return;
+        const docs = Array.from(sec.querySelectorAll('.markdown-body'));
+        if (!docs.length) return;
+        const items = docs.map((el, i) => {
+          const title = (el.querySelector('h1,h2')?.textContent || `ドキュメント ${i+1}`).trim();
+          const id = `prompt-doc-${i}`;
+          const path = el.getAttribute('data-path') || '';
+          el.dataset.docId = id;
+          return { id, title, path, el };
+        });
+        // ビューア初期化
+        function showDoc(id){
+          viewer.innerHTML = '';
+          items.forEach(it => {
+            const card = grid.querySelector(`[data-id="${it.id}"]`);
+            card?.classList.toggle('active', it.id === id);
+          });
+          const target = items.find(it => it.id === id);
+          if (target){ viewer.appendChild(target.el); target.el.style.display = 'block'; }
+        }
+        // カード生成
+        items.forEach((it, idx) => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.setAttribute('data-id', it.id);
+          let img = '';
+          if (/media-assets-guidelines\.md$/.test(it.path||'')) {
+            img = '<video class="card-video" src="/images/agent-female-hero-video.mp4" autoplay loop muted playsinline></video>'+
+                  '<span class="card-name">ミナ</span>';
+          }
+          if (/create-new-page\.v2\.md$/.test(it.path||'')) {
+            img = '<video class="card-video" src="/images/agent-male-hero-video.mp4" autoplay loop muted playsinline></video>'+
+                  '<span class="card-name">拓海</span>';
+          }
+          card.innerHTML = `<div class="card-title">${it.title}</div>${img}`;
+          card.addEventListener('click', () => showDoc(it.id));
+          // 右クリックで相対パスをクリップボードへコピー
+          card.addEventListener('contextmenu', async (e) => {
+            e.preventDefault();
+            const p = it.path || '';
+            if (!p) return;
+            try {
+              await navigator.clipboard.writeText(p);
+              const t = card.querySelector('.card-title');
+              const org = t.textContent;
+              t.textContent = '✅ パスをコピーしました';
+              setTimeout(()=>{ t.textContent = org; }, 1200);
+            } catch(err) {
+              console.error('Copy failed', err);
+            }
+          });
+          grid.appendChild(card);
+          // いったん隠しておく（選択時にviewerへ移動）
+          it.el.style.display = 'none';
+        });
+        // 先頭を表示
+        showDoc(items[0].id);
+      })();
+    </script>

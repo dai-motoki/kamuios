@@ -1,0 +1,10 @@
+<div class="media-grid">
+  {{ range . }}
+  <div class="media-item clickable-img" data-path="{{ .path }}">
+    <img class="media-thumbnail" src="{{ .path }}" alt="{{ .alt | default .name }}" />
+    <div class="media-info">
+      <div class="media-name">{{ .name }}</div>
+    </div>
+  </div>
+  {{ end }}
+</div>

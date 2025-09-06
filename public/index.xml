@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>KAMUI CODE ドキュメント 要件定義 on SaaS Applications</title>
+    <link>http://localhost:1313/</link>
+    <description>Recent content in KAMUI CODE ドキュメント 要件定義 on SaaS Applications</description>
+    <generator>Hugo</generator>
+    <language>ja</language>
+    <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>ストーリーボードビューアー</title>
+      <link>http://localhost:1313/pages/saas-storyboard-viewer/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/pages/saas-storyboard-viewer/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>ビデオビューアー</title>
+      <link>http://localhost:1313/pages/saas-storyboard/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/pages/saas-storyboard/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>要件定義書</title>
+      <link>http://localhost:1313/pages/requirements-document/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>http://localhost:1313/pages/requirements-document/</guid>
+      <description></description>
+    </item>
+  </channel>
+</rss>

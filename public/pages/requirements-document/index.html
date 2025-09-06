@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>要件定義書 - SaaS Applications</title>
+  <meta name="description" content="">
+  
+  <link rel="stylesheet" href="/css/main.css">
+  
+  
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({ 
+      startOnLoad: true,
+      theme: 'dark',
+      themeVariables: {
+        darkMode: true,
+        primaryColor: '#4a9eff',
+        primaryTextColor: '#ffffff',
+        primaryBorderColor: '#2a2a2a',
+        lineColor: '#ffffff',
+        textColor: '#ffffff',
+        taskTextColor: '#ffffff',
+        taskTextLightColor: '#ffffff',
+        taskFillColor: '#4a9eff',
+        taskBorderColor: '#93c5fd',
+        activeTaskBorderColor: '#93c5fd',
+        activeTaskColor: '#4a9eff',
+        doneTaskColor: '#4a9eff',
+        doneTaskBorderColor: '#93c5fd',
+        critBorderColor: '#93c5fd',
+        critColor: '#4a9eff',
+        todayLineColor: '#93c5fd',
+        gridColor: '#64748b',
+        tertiaryColor: '#2d2d2d',
+        sequenceNumberColor: '#ffffff',
+        signalColor: '#ffffff',
+        actorBorder: '#ffffff',
+        actorTextColor: '#ffffff',
+        noteTextColor: '#ffffff',
+        noteBorderColor: '#cbd5e1',
+        activationTextColor: '#ffffff',
+        edgeLabelBackground: '#0f172a',
+        secondaryColor: '#2d2d2d',
+        background: '#1a1a1a',
+        mainBkg: '#0f0f0f',
+        secondBkg: '#1a1a1a',
+        tertiaryColor: '#2d2d2d'
+      },
+      themeCSS: `
+        /* Ensure Gantt bars use unified blue tone inside SVG */
+        .gantt .task rect,
+        .gantt .task .task-bar,
+        .gantt .task-bar rect { fill: #4a9eff; stroke: #93c5fd; }
+        .gantt .task.active rect,
+        .gantt .task.done rect,
+        .gantt .task.crit rect { fill: #4a9eff; stroke: #93c5fd; }
+        .gantt .today { stroke: #93c5fd; stroke-width: 1.5px; }
+        .gantt .label text, .gantt text, .gantt .title text { fill: #ffffff; }
+      `,
+      gantt: {
+        numberSectionStyles: 6,
+        leftPadding: 200,
+        gridLineStartPadding: 400,
+        fontSize: 13,
+        sectionFontSize: 15,
+        fontFamily: '"Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif',
+        barHeight: 22,
+        barGap: 6,
+        topPadding: 50,
+        rightPadding: 150
+      }
+    });
+  </script>
+</head>
+<body>
+  <div class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-title">SaaS Applications</div>
+    <div class="sidebar-subtitle" id="tocCount">目次</div>
+  </div>
+
+  <div class="folder-tree" id="folderTree">
+    <div class="tree-item">
+      <div class="tree-label selected" data-toggle="root">
+        <span class="tree-toggle expanded">▼</span>
+        <span class="tree-name">章構成</span>
+        <span class="tree-count" id="sectionCount">--</span>
+      </div>
+      <div class="tree-children expanded" id="tocList">
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar-tags">
+    <div class="tags-title">クイックリンク</div>
+    <div class="tag-list">
+      <span class="tag" data-jump="#ui-flow">UI遷移</span>
+      <span class="tag" data-jump="#ui">UI/画面</span>
+      <span class="tag" data-jump="#functional">機能</span>
+      <span class="tag" data-jump="#nonfunctional">非機能</span>
+      <span class="tag" data-jump="#packaging">パッケージ</span>
+      <span class="tag" data-jump="#schedule">スケジュール</span>
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="sidebar-tags">
+      <div class="tags-title">テーマ</div>
+      <div class="view-options">
+        <button class="view-btn icon-btn active" id="themeDark">
+          <span class="btn-icon">🌙</span>
+          <span class="btn-label">ダーク</span>
+        </button>
+        <button class="view-btn icon-btn" id="themeLight">
+          <span class="btn-icon">☀️</span>
+          <span class="btn-label">ライト</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+  
+  <div class="main-content">
+    <div class="header-bar">
+  <button class="menu-btn icon-btn" id="toggleSidebar">
+    <span class="btn-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </span>
+  </button>
+  
+  <input type="text" class="search-bar" id="searchInput" placeholder="検索..." />
+  
+  <div class="view-options">
+    <span class="theme-label">表示:</span>
+    <button class="view-btn" id="viewCards">カード</button>
+    <button class="view-btn active" id="viewList">リスト</button>
+  </div>
+</div>
+
+    
+    <div class="doc-container" id="docContainer">
+      
+  
+  
+  
+    
+  
+    
+  
+    
+  
+    
+  
+  
+    
+      
+        
+      
+    
+      
+        
+      
+    
+      
+        
+      
+    
+      
+        
+      
+    
+      
+        
+      
+    
+      
+        
+      
+    
+      
+        
+      
+    
+      
+        
+      
+    
+  
+
+  
+  
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+  <script>window.SECTIONS = "[{\"category\":1,\"category_name\":\"ダッシュボード\",\"id\":\"saas-applications-overview\",\"title\":\"ダッシュボード\"},{\"category\":3,\"category_name\":\"メディアエディタ\",\"id\":\"saas-ai-portrait\",\"title\":\"AI Portrait Generator\"},{\"category\":3,\"category_name\":\"メディアエディタ\",\"id\":\"saas-storyboard\",\"title\":\"ビデオビューアー\"},{\"category\":3,\"category_name\":\"メディアエディタ\",\"id\":\"saas-storyboard-viewer\",\"title\":\"ストーリーボードビューアー\"},{\"category\":1,\"category_name\":\"アプリケーション\",\"id\":\"saas-ai-portrait\",\"title\":\"AI Portrait Generator\"},{\"category\":3,\"category_name\":\"事業構築\",\"id\":\"biz-finance\",\"title\":\"財務\"},{\"category\":3,\"category_name\":\"事業構築\",\"id\":\"biz-strategy\",\"title\":\"戦略\"},{\"category\":5,\"category_name\":\"プロンプト置き場\",\"id\":\"prompts-repo\",\"title\":\"プロンプト置き場\"},{\"category\":2,\"category_name\":\"要件定義・開発\",\"id\":\"requirements-document\",\"title\":\"要件定義書\"},{\"category\":4,\"category_name\":\"ビジネスツール\",\"id\":\"slide-generator\",\"title\":\"スライドエディタ\"},{\"category\":1,\"category_name\":\"アプリケーション\",\"id\":\"saas-storyboard-viewer\",\"title\":\"ストーリーボードビューアー\"},{\"category\":2,\"category_name\":\"要件定義・開発\",\"id\":\"ui-views\",\"title\":\"UIビュー一覧\"}]";</script>
+
+  
+  
+  
+
+  
+  <section class="doc-section" id="requirements-document" data-cat="2" data-cat-name="要件定義・開発">
+    <h2>要件定義書</h2>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+      <div style="margin-bottom: 20px;">
+  <button onclick="window.location.hash=''; location.reload();" style="padding: 8px 16px; background: #4a4a4a; border: none; border-radius: 6px; color: white; cursor: pointer; font-size: 14px;">
+    ← ダッシュボードに戻る
+  </button>
+</div>
+<style>
+  .requirement-doc {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .requirement-header {
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 16px;
+    margin-bottom: 24px;
+  }
+  .requirement-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  .requirement-meta {
+    display: flex;
+    gap: 20px;
+    font-size: 0.9rem;
+    color: var(--text-weak);
+  }
+  .requirement-section {
+    margin-bottom: 24px;
+  }
+  .requirement-section h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--link);
+    margin-bottom: 12px;
+  }
+  .requirement-section h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  .requirement-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+  }
+  .requirement-table th,
+  .requirement-table td {
+    border: 1px solid var(--border);
+    padding: 10px;
+    text-align: left;
+  }
+  .requirement-table th {
+    background: var(--sidebar-bg);
+    font-weight: 600;
+    color: var(--text);
+  }
+  .requirement-table td {
+    color: var(--text-weak);
+  }
+  .requirement-list {
+    list-style: none;
+    padding-left: 0;
+  }
+  .requirement-list li {
+    padding: 8px 0;
+    display: flex;
+    align-items: flex-start;
+  }
+  .requirement-list li::before {
+    content: "•";
+    color: var(--link);
+    font-weight: 700;
+    margin-right: 12px;
+    font-size: 1.2rem;
+  }
+</style>
+
+<div class="requirement-doc">
+  <div class="requirement-header">
+    <h2 class="requirement-title">メディアエディタプラットフォーム 要件定義書</h2>
+    <div class="requirement-meta">
+      <span>バージョン: 1.0</span>
+      <span>更新日: 2025年1月</span>
+      <span>ステータス: ドラフト</span>
+    </div>
+  </div>
+  
+  <div class="requirement-section">
+    <h3>1. プロジェクト概要</h3>
+    <p>本プロジェクトは、Web上で動作する統合型メディアエディタプラットフォームの開発を目的とします。AIを活用した画像生成、ビデオ編集、ストーリーボード作成など、クリエイティブな作業を一つの環境で完結できるシステムを構築します。</p>
+  </div>
+  
+  <div class="requirement-section">
+    <h3>2. システム要件</h3>
+    
+    <h4>2.1 機能要件</h4>
+    <table class="requirement-table">
+      <thead>
+        <tr>
+          <th style="width: 20%">機能ID</th>
+          <th style="width: 30%">機能名</th>
+          <th style="width: 50%">説明</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>FR-001</td>
+          <td>AI画像生成</td>
+          <td>手書きスケッチから高品質な画像を生成する機能</td>
+        </tr>
+        <tr>
+          <td>FR-002</td>
+          <td>ビデオビューアー</td>
+          <td>タイムライン管理とシーン別ナビゲーション機能</td>
+        </tr>
+        <tr>
+          <td>FR-003</td>
+          <td>ストーリーボード表示</td>
+          <td>見開き/縦スクロールの切替表示機能</td>
+        </tr>
+        <tr>
+          <td>FR-004</td>
+          <td>リアルタイムプレビュー</td>
+          <td>編集内容を即座に確認できるプレビュー機能</td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <h4>2.2 非機能要件</h4>
+    <ul class="requirement-list">
+      <li><strong>パフォーマンス:</strong> 画像生成は5秒以内、UI操作のレスポンスは100ms以内</li>
+      <li><strong>可用性:</strong> 99.9%以上のアップタイム</li>
+      <li><strong>セキュリティ:</strong> HTTPS通信、認証・認可機能の実装</li>
+      <li><strong>互換性:</strong> Chrome, Firefox, Safari, Edgeの最新版をサポート</li>
+      <li><strong>スケーラビリティ:</strong> 同時接続ユーザー1000人以上に対応</li>
+    </ul>
+  </div>
+  
+  <div class="requirement-section">
+    <h3>3. 技術スタック</h3>
+    <table class="requirement-table">
+      <thead>
+        <tr>
+          <th>カテゴリ</th>
+          <th>技術</th>
+          <th>用途</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>フロントエンド</td>
+          <td>React, TypeScript</td>
+          <td>UIコンポーネントの実装</td>
+        </tr>
+        <tr>
+          <td>スタイリング</td>
+          <td>CSS Modules, Tailwind CSS</td>
+          <td>レスポンシブデザインの実現</td>
+        </tr>
+        <tr>
+          <td>状態管理</td>
+          <td>Redux Toolkit</td>
+          <td>アプリケーション状態の管理</td>
+        </tr>
+        <tr>
+          <td>AI/ML</td>
+          <td>Stable Diffusion API</td>
+          <td>画像生成機能の実装</td>
+        </tr>
+        <tr>
+          <td>ビルドツール</td>
+          <td>Vite</td>
+          <td>高速な開発環境の構築</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <div class="requirement-section">
+    <h3>4. 開発スケジュール</h3>
+    <table class="requirement-table">
+      <thead>
+        <tr>
+          <th>フェーズ</th>
+          <th>期間</th>
+          <th>主な成果物</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>要件定義</td>
+          <td>2週間</td>
+          <td>要件定義書、画面設計書</td>
+        </tr>
+        <tr>
+          <td>基本設計</td>
+          <td>3週間</td>
+          <td>システム設計書、API仕様書</td>
+        </tr>
+        <tr>
+          <td>実装</td>
+          <td>8週間</td>
+          <td>ソースコード、単体テスト</td>
+        </tr>
+        <tr>
+          <td>テスト</td>
+          <td>3週間</td>
+          <td>結合テスト、受入テスト</td>
+        </tr>
+        <tr>
+          <td>リリース</td>
+          <td>1週間</td>
+          <td>本番環境構築、運用手順書</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <div class="requirement-section">
+    <h3>5. 制約事項</h3>
+    <ul class="requirement-list">
+      <li>AI画像生成のAPIには利用制限があるため、ユーザーごとに生成回数を制限する</li>
+      <li>動画ファイルのアップロードサイズは500MBまでとする</li>
+      <li>初期リリースでは日本語のみ対応とし、多言語対応は次期バージョンで検討</li>
+    </ul>
+  </div>
+</div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+  </section>
+  
+
+    </div>
+  </div>
+  
+  
+<div class="modal-backdrop" id="jsonModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="jsonModalTitle">JSONプレビュー</span>
+    </div>
+    <div class="modal-body">
+      <pre class="code" id="jsonContent"></pre>
+    </div>
+    <div class="modal-actions">
+      <button class="view-btn" id="jsonCopyBtn">コピー</button>
+      <button class="view-btn" id="jsonCloseBtn">閉じる</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal-backdrop" id="imgModal">
+  <div class="modal" style="max-width:90%; width:auto;">
+    <div class="modal-header">
+      <span class="modal-title" id="imgModalTitle">画像プレビュー</span>
+    </div>
+    <div class="modal-body" style="padding:0; background:var(--media-bg);">
+      <img id="imgModalImage" src="" alt="" style="width:100%; height:auto; display:block;">
+    </div>
+    <div class="modal-actions">
+      <button class="view-btn" id="imgCloseBtn">閉じる</button>
+    </div>
+  </div>
+</div>
+
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+  
+  <script src="/js/main.js"></script>
+</body>
+</html>

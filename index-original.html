@@ -1,0 +1,2713 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KAMUI CODE ドキュメント 要件定義</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    /* テーマ変数 */
+    :root {
+      --bg: #1a1a1a;
+      --text: #ffffff;
+      --text-weak: #b8b8b8;
+      --sidebar-bg: #0f0f0f;
+      --border: #2a2a2a;
+      --hover: #1e1e1e;
+      --selected: #2d2d2d;
+      --link: #4a9eff;
+      --card: #0f0f0f;
+      --chip: #2d2d2d;
+      --chip-hover: #3d3d3d;
+      --input-bg: #1a1a1a;
+      --thumb: #3a3a3a;
+      --thumb-hover: #4a4a4a;
+      --media-bg: #1a1a1a;
+      --code-bg: #111318;
+      --code-border: #2a2f3a;
+      /* white-2系カード配色（ダークテーマ側） */
+      --w2-top: #15181d;
+      --w2-bottom: #101317;
+      --w2-border: #262b33;
+    }
+    [data-theme="light"] {
+      --bg: #f7f7f8;
+      --text: #1a1a1a;
+      --text-weak: #4a4a4a;
+      --sidebar-bg: #ffffff;
+      --border: #e4e4e7;
+      --hover: #f3f4f6;
+      --selected: #eef2ff;
+      --link: #2563eb;
+      --card: #ffffff;
+      --chip: #eef0f4;
+      --chip-hover: #e2e8f0;
+      --input-bg: #ffffff;
+      --thumb: #c8cbd2;
+      --thumb-hover: #b8bbc6;
+      --media-bg: #f2f3f7;
+      --code-bg: #f6f8fa;
+      --code-border: #e5e7eb;
+      /* white-2系カード配色（ライトテーマ側） */
+      --w2-top: #ffffff;
+      --w2-bottom: #f5f7fb;
+      --w2-border: #e6e9f0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* サイドバー（元UIを踏襲） */
+    .sidebar { width: 280px; background: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+    .sidebar-tags { flex-shrink: 0; background: var(--sidebar-bg); }
+    /* クイックリンク: フレックスの最下部に固定（スクロール非連動） */
+    .sidebar-footer { margin-top: auto; background: var(--sidebar-bg); border-top: 1px solid var(--border); }
+    .sidebar-header { padding: 20px; border-bottom: 1px solid var(--border); }
+    .sidebar-title { font-size: 1.3rem; font-weight: 600; margin-bottom: 5px; }
+    .sidebar-subtitle { font-size: 0.85rem; color: var(--text-weak); }
+
+    /* ツリー（元UIを踏襲） */
+    .folder-tree { flex: 1; overflow-y: auto; padding: 10px; }
+    .tree-item { user-select: none; }
+    .tree-label { display: flex; align-items: center; padding: 6px 8px; border-radius: 6px; transition: all 0.2s; color: var(--text-weak); cursor: pointer; }
+    .tree-label:hover { background: var(--hover); color: var(--text); }
+    .tree-label.selected { background: var(--selected); color: var(--text); }
+    .tree-toggle { width: 16px; height: 16px; margin-right: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: var(--text-weak); transition: transform 0.2s; }
+    .tree-toggle.expanded { transform: rotate(90deg); }
+    .tree-name { flex: 1; font-size: 0.95rem; }
+    .tree-count { font-size: 0.75rem; color: var(--text-weak); margin-left: 8px; }
+    .tree-children { margin-left: 20px; display: none; }
+    .tree-children.expanded { display: block; }
+
+    /* タグ（簡易ショートカット） */
+    .sidebar-tags { padding: 15px; border-top: 1px solid var(--border); }
+    .tags-title { font-size: 0.85rem; color: var(--text-weak); margin-bottom: 10px; letter-spacing: 0.5px; }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag { padding: 4px 10px; background: var(--chip); border-radius: 12px; font-size: 0.8rem; color: var(--text-weak); cursor: pointer; transition: all 0.2s; }
+    .tag:hover { background: var(--chip-hover); color: var(--text); }
+    .tag.active { background: var(--link); color: #fff; }
+
+    /* メイン領域（ヘッダ＋本文） */
+    .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .header-bar { display: flex; align-items: center; gap: 10px; padding: 15px 20px; background: var(--sidebar-bg); border-bottom: 1px solid var(--border); }
+    .menu-btn { display: none; padding: 8px 10px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text-weak); cursor: pointer; }
+    .search-bar { flex: 1; max-width: 520px; padding: 8px 15px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 20px; color: var(--text); font-size: 0.9rem; outline: none; transition: all 0.2s; }
+    .search-bar:focus { border-color: var(--link); box-shadow: 0 0 0 2px color-mix(in srgb, var(--link) 20%, transparent); }
+    .view-options { display: flex; gap: 10px; margin-left: auto; align-items: center; }
+    .view-btn { padding: 8px 12px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text-weak); cursor: pointer; transition: all 0.2s; font-size: 0.9rem; }
+    .view-btn:hover { border-color: color-mix(in srgb, var(--border) 60%, var(--text) 40%); color: var(--text); }
+    .view-btn.active { background: var(--selected); border-color: var(--link); color: var(--link); }
+    .theme-label { color: var(--text-weak); font-size: 0.85rem; margin-right: -4px; }
+
+    /* Iconic buttons */
+    .icon-btn { display: inline-flex; align-items: center; gap: 6px; }
+    .btn-icon { display: inline-flex; width: 18px; height: 18px; color: currentColor; }
+    .btn-icon svg { width: 100%; height: 100%; display: block; }
+    .btn-label { display: inline-block; }
+
+    /* ドキュメント本文 */
+    .doc-container { flex: 1; overflow-y: auto; padding: 24px; }
+    .doc-title { font-size: 1.6rem; font-weight: 700; margin-bottom: 16px; }
+    .doc-meta { color: var(--text-weak); font-size: 0.9rem; margin-bottom: 18px; }
+    .doc-section { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px; margin-bottom: 16px; }
+    .doc-section h2 { font-size: 1.1rem; margin-bottom: 10px; }
+    .doc-section p, .doc-section li { color: var(--text-weak); line-height: 1.7; font-size: 0.95rem; }
+    .doc-section ul { margin-left: 1.2em; }
+    /* simple table for definitions */
+    table.menu-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    .menu-table th, .menu-table td { border: 1px solid var(--border); padding: 8px 10px; font-size: 0.9rem; vertical-align: top; }
+    .menu-table th { background: var(--sidebar-bg); color: var(--text); text-align: left; position: sticky; top: 0; }
+    .menu-table code { background: var(--code-bg); border: 1px solid var(--code-border); padding: 1px 4px; border-radius: 4px; }
+
+    /* セクション内画像ボックス */
+    .section-image { margin-top: 12px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--media-bg); }
+    .section-image img { width: 100%; height: auto; display: block; cursor: zoom-in; }
+
+    /* トップ画像（ヒーロー） */
+    .hero { margin-bottom: 16px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--media-bg); }
+    .hero img { width: 100%; display: block; }
+
+    /* 画像グリッド（元UIのグリッドを流用） */
+    .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; }
+    .media-item { background: var(--card); border-radius: 8px; overflow: hidden; transition: all 0.2s; border: 1px solid var(--border); }
+    .media-item:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    .media-thumbnail { width: 100%; height: 160px; object-fit: cover; background: var(--media-bg); display: block; }
+    .media-info { padding: 10px; }
+    .media-name { font-size: 0.85rem; color: var(--text-weak); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .media-details { font-size: 0.75rem; color: var(--text-weak); margin-top: 4px; }
+
+    /* UI遷移（Figma風） */
+    .flow-wrapper { margin-top: 18px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; }
+    .flow-controls { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+    .flow-controls .spacer { margin-left: auto; }
+    .view-options .spacer { margin-left: auto; }
+    .flow-viewport { position: relative; height: 560px; overflow: auto; background: repeating-linear-gradient(90deg, rgba(127,127,127,0.08) 0, rgba(127,127,127,0.08) 1px, transparent 1px, transparent 24px),
+                                   repeating-linear-gradient(0deg, rgba(127,127,127,0.08) 0, rgba(127,127,127,0.08) 1px, transparent 1px, transparent 24px); }
+    .flow-inner { position: relative; transform-origin: 0 0; }
+    .flow-svg { position: absolute; inset: 0; pointer-events: none; }
+    .nodes-layer { position: absolute; inset: 0; }
+    .flow-node { position: absolute; width: 220px; background: var(--sidebar-bg); border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 6px 12px rgba(0,0,0,0.15); cursor: move; user-select: none; }
+    .flow-node img { width: 100%; height: 140px; object-fit: cover; display: block; background: var(--media-bg); border-bottom: 1px solid var(--border); }
+    .flow-node .title { padding: 8px 10px; font-size: 0.92rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .flow-label { font-size: 0.85rem; fill: var(--text); font-weight: 600; }
+
+    /* コード表示 */
+    pre.code { background: var(--code-bg); border: 1px solid var(--code-border); border-radius: 8px; padding: 12px; overflow: auto; font-size: 0.85rem; line-height: 1.6; }
+    pre.code code { color: var(--text); }
+
+    /* カード（サーバーカタログ） */
+    .card-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+    .card { position: relative; background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 16px; transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; box-shadow: 0 8px 24px rgba(0,0,0,0.16); display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
+    .card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.22); border-color: color-mix(in srgb, var(--border) 40%, var(--text) 60%); }
+    .card::after { content: ""; position: absolute; inset: 0; border-radius: 16px; pointer-events: none; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04); }
+    .card-title { font-weight: 800; font-size: 1rem; letter-spacing: 0.2px; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 0.75rem; color: var(--text); border: 1px solid var(--border); margin-right: 6px; }
+    .endpoint { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.82rem; color: var(--text-weak); }
+    .endpoint-box { background: color-mix(in srgb, var(--input-bg) 70%, transparent); border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px; }
+    .card ul { margin-left: 1.1em; }
+    /* チェック付きリスト（料金比較用） */
+    .checks { list-style: none; padding-left: 0; margin: 8px 0 0; }
+    .checks li { display: flex; gap: 10px; align-items: flex-start; padding: 6px 0; }
+    .checks li::before { content: '✔'; color: #22c55e; font-weight: 700; line-height: 1.2; }
+    .price-badge { display:inline-block; font-weight:700; font-size:.85rem; padding:4px 8px; border-radius:999px; border:1px solid var(--border); margin-bottom:6px; }
+    .pastel { background: linear-gradient(180deg, var(--w2-top), var(--w2-bottom)); border: 1px solid var(--w2-border); }
+    .pastel::before { content: ""; position: absolute; inset: -24px; background: url('./kamui-white-2.png') center/cover no-repeat; filter: blur(28px) saturate(1.05); opacity: 0.35; z-index: 0; }
+    /* 個別色のティント（各カードに --card-hue を付与） */
+    .pastel::after { content: ""; position: absolute; inset: 0; z-index: 0; border-radius: 16px;
+      background:
+        /* 右下を強く明るくするハイライト */
+        radial-gradient(
+          600px 420px at 100% 100%,
+          hsl(var(--card-hue-b, 230) calc(var(--card-sat-b, 68%) + 6%) 97% / 0.80) 0%,
+          hsl(var(--card-hue-b, 230) var(--card-sat-b, 68%) 92% / 0.55) 35%,
+          transparent 65%
+        ),
+        /* 全体の基調グラデーション（右下が明るく） */
+        linear-gradient(135deg,
+          hsl(var(--card-hue-a, 210) var(--card-sat-a, 70%) var(--card-light-a, 92%) / var(--card-alpha-a, 0.65)) 0%,
+          hsl(var(--card-hue-b, 230) var(--card-sat-b, 68%) var(--card-light-b, 88%) / var(--card-alpha-b, 0.65)) 100%
+        );
+      mix-blend-mode: normal;
+    }
+    .pastel > * { position: relative; z-index: 1; }
+    .pastel .card-title { color: var(--text); }
+    .pastel .badge { background: color-mix(in srgb, var(--w2-top) 40%, transparent); border-color: var(--w2-border); }
+    .pastel .endpoint-box { background: color-mix(in srgb, var(--w2-bottom) 70%, transparent); border-color: var(--w2-border); }
+
+    /* モーダル（JSONプレビュー） */
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 2000; }
+    .modal-backdrop.active { display: flex; }
+    .modal { width: min(900px, 90%); max-height: 80vh; background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; }
+    .modal-header { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+    .modal-title { font-weight: 700; font-size: 1rem; }
+    .modal-body { padding: 0; overflow: auto; background: var(--code-bg); }
+    .modal-body pre { margin: 0; padding: 16px; border: none; }
+    .modal-actions { padding: 10px 12px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; }
+    .pastel { border: 1px solid color-mix(in srgb, var(--border) 60%, var(--text) 40%); }
+
+    /* スクロールバー */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--sidebar-bg); }
+    ::-webkit-scrollbar-thumb { background: var(--thumb); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--thumb-hover); }
+    
+    /* Mermaid図のスタイル */
+    .mermaid-wrapper { margin: 20px 0; padding: 20px; background: var(--code-bg); border: 1px solid var(--code-border); border-radius: 8px; overflow-x: auto; }
+    .mermaid { display: flex; justify-content: center; min-height: 200px; }
+    .mermaid-caption { text-align: center; margin-top: 10px; font-size: 0.9rem; color: var(--text-weak); }
+    /* Mermaid 図の矢印とラベルを濃くする（flowchart/sequence両対応の広め指定） */
+    .mermaid svg .edgePath path,
+    .mermaid svg path[marker-end],
+    .mermaid svg path[class*="messageLine"],
+    .mermaid svg line { stroke: var(--text) !important; stroke-width: 3 !important; opacity: 1 !important; }
+    .mermaid svg marker path,
+    .mermaid svg .arrowheadPath { fill: var(--text) !important; opacity: 1 !important; }
+    .mermaid svg .edgeLabel, .mermaid svg .label, .mermaid svg text { fill: var(--text) !important; font-weight: 800; }
+    .mermaid svg .edgeLabel rect, .mermaid svg .label rect { stroke: var(--border) !important; }
+
+    /* Gantt contrast overrides (reverted to theme-based) */
+    .mermaid svg text { fill: var(--text) !important; font-weight: 800 !important; }
+    .mermaid svg .grid .tick line { stroke: #64748b !important; opacity: 0.9 !important; }
+    .mermaid svg .task rect { fill: #4a9eff !important; stroke: #93c5fd !important; }
+    .mermaid svg .task .taskText, .mermaid svg .taskText { fill: #ffffff !important; }
+    /* Unify Gantt bar colors to match other diagrams (single blue tone) */
+    .mermaid svg .task.active rect { fill: #4a9eff !important; stroke: #93c5fd !important; }
+    .mermaid svg .task.done rect { fill: #4a9eff !important; stroke: #93c5fd !important; }
+    .mermaid svg .task.crit rect { fill: #4a9eff !important; stroke: #93c5fd !important; }
+    .mermaid svg .today { stroke: #93c5fd !important; stroke-width: 1.5px !important; }
+    .mermaid svg .label text { fill: var(--text) !important; }
+
+    /* ガントチャート専用 */
+    .gantt-wrapper { margin: 20px 0; padding: 20px; background: var(--code-bg); border: 1px solid var(--code-border); border-radius: 8px; overflow-x: auto; min-width: 100%; }
+    .gantt-wrapper .mermaid { display: block; min-width: 1600px !important; width: 1600px !important; min-height: 500px; }
+
+    /* モバイル最適化 */
+    /* デザイン要件定義用スタイル */
+    .color-palette { margin: 20px 0; }
+    .color-group { margin-bottom: 30px; }
+    .color-group h4 { font-size: 1rem; margin-bottom: 15px; color: var(--text); }
+    .color-swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+    .color-swatch { 
+      border-radius: 8px; 
+      padding: 20px 12px; 
+      text-align: center; 
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transition: transform 0.2s;
+    }
+    .color-swatch:hover { transform: scale(1.05); }
+    .color-swatch.light { box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .color-label { 
+      font-size: 0.75rem; 
+      font-weight: 600; 
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .color-code { 
+      font-family: ui-monospace, monospace; 
+      font-size: 0.85rem;
+      opacity: 0.8;
+    }
+    
+    .typography-samples { margin: 20px 0; }
+    .typo-item { 
+      padding: 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+    .typo-label { 
+      display: block;
+      font-size: 0.75rem;
+      color: var(--text-weak);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    .typo-sample { 
+      margin: 12px 0;
+      color: var(--text);
+    }
+    .typo-spec { 
+      display: block;
+      font-family: ui-monospace, monospace;
+      font-size: 0.8rem;
+      color: var(--text-weak);
+      margin-top: 8px;
+    }
+    
+    .layout-specs h4,
+    .interaction-specs h4,
+    .responsive-specs h4 {
+      font-size: 1rem;
+      margin: 20px 0 10px;
+      color: var(--text);
+    }
+    
+    .layout-specs ul,
+    .interaction-specs ul,
+    .responsive-specs ul {
+      margin-left: 1.5em;
+    }
+    
+    /* カテゴリー別カラー */
+    .category-colors {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin: 20px 0;
+    }
+    
+    .category-card {
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      transition: transform 0.3s ease;
+    }
+    
+    .category-card:hover {
+      transform: translateY(-4px);
+    }
+    
+    .category-gradient {
+      position: relative;
+      padding: 40px 20px;
+      color: white;
+      text-align: center;
+      min-height: 180px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .category-card.creative .category-gradient {
+      background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 50%, #FB923C 100%);
+    }
+    
+    .category-card.development .category-gradient {
+      background: linear-gradient(135deg, #3B82F6 0%, #06B6D4 50%, #10B981 100%);
+    }
+    
+    .category-card.business .category-gradient {
+      background: linear-gradient(135deg, #10B981 0%, #14B8A6 50%, #06B6D4 100%);
+    }
+    
+    .category-gradient h4 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin: 0;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .category-gradient p {
+      font-size: 0.9rem;
+      margin: 8px 0;
+      opacity: 0.95;
+    }
+    
+    .category-specs {
+      padding: 16px;
+      background: var(--card);
+    }
+    
+    .gradient-spec {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--text-weak);
+      margin-bottom: 12px;
+    }
+    
+    .color-values {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    
+    .color-val {
+      font-family: ui-monospace, monospace;
+      font-size: 0.8rem;
+      padding: 4px 8px;
+      background: var(--chip);
+      border-radius: 4px;
+      color: var(--text);
+    }
+
+    @media (max-width: 768px) {
+      body { flex-direction: column; height: 100dvh; }
+      .sidebar { position: fixed; inset: 0 auto 0 0; width: min(82vw, 320px); transform: translateX(-100%); transition: transform .2s ease; z-index: 1000; box-shadow: 6px 0 24px rgba(0,0,0,0.4); }
+      .sidebar.open { transform: translateX(0); }
+      .sidebar-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 900; display: none; }
+      .sidebar-backdrop.show { display: block; }
+      .menu-btn { display: inline-block; }
+      .search-bar { max-width: none; }
+      .doc-container { padding: 14px; }
+      .media-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+      .media-thumbnail { height: 120px; }
+      /* 横幅を絞っても3列を維持 */
+      .card-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .flow-viewport { height: 60vh; }
+      .view-options { gap: 6px; }
+      .btn-label, .theme-label { display: none; }
+      .menu-btn { padding: 8px; }
+      .btn-icon { width: 20px; height: 20px; }
+      
+      /* デザイン要件定義モバイル対応 */
+      .color-swatches { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; }
+      .color-swatch { padding: 12px 8px; }
+      .typo-item { padding: 12px; }
+    }
+    /* さらに狭い幅では2列へ */
+    @media (max-width: 640px) {
+      .card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    /* ごく狭い幅では1列へ */
+    @media (max-width: 420px) {
+      .card-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+  <!-- Mermaid.js -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({ 
+      startOnLoad: true,
+      theme: 'dark',
+      themeVariables: {
+        darkMode: true,
+        primaryColor: '#4a9eff',
+        primaryTextColor: '#ffffff',
+        primaryBorderColor: '#2a2a2a',
+        lineColor: '#ffffff',
+        textColor: '#ffffff',
+        taskTextColor: '#ffffff',
+        taskTextLightColor: '#ffffff',
+        taskFillColor: '#4a9eff',
+        taskBorderColor: '#93c5fd',
+        activeTaskBorderColor: '#93c5fd',
+        activeTaskColor: '#4a9eff',
+        doneTaskColor: '#4a9eff',
+        doneTaskBorderColor: '#93c5fd',
+        critBorderColor: '#93c5fd',
+        critColor: '#4a9eff',
+        todayLineColor: '#93c5fd',
+        gridColor: '#64748b',
+        tertiaryColor: '#2d2d2d',
+        sequenceNumberColor: '#ffffff',
+        signalColor: '#ffffff',
+        actorBorder: '#ffffff',
+        actorTextColor: '#ffffff',
+        noteTextColor: '#ffffff',
+        noteBorderColor: '#cbd5e1',
+        activationTextColor: '#ffffff',
+        edgeLabelBackground: '#0f172a',
+        secondaryColor: '#2d2d2d',
+        background: '#1a1a1a',
+        mainBkg: '#0f0f0f',
+        secondBkg: '#1a1a1a',
+        tertiaryColor: '#2d2d2d'
+      },
+      themeCSS: `
+        /* Ensure Gantt bars use unified blue tone inside SVG */
+        .gantt .task rect,
+        .gantt .task .task-bar,
+        .gantt .task-bar rect { fill: #4a9eff; stroke: #93c5fd; }
+        .gantt .task.active rect,
+        .gantt .task.done rect,
+        .gantt .task.crit rect { fill: #4a9eff; stroke: #93c5fd; }
+        .gantt .today { stroke: #93c5fd; stroke-width: 1.5px; }
+        .gantt .label text, .gantt text, .gantt .title text { fill: #ffffff; }
+      `,
+      gantt: {
+        numberSectionStyles: 6,
+        leftPadding: 200,
+        gridLineStartPadding: 400,
+        fontSize: 13,
+        sectionFontSize: 15,
+        fontFamily: '"Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif',
+        barHeight: 22,
+        barGap: 6,
+        topPadding: 50,
+        rightPadding: 150
+      }
+    });
+  </script>
+</head>
+<body>
+  <!-- サイドバー（UIは踏襲しつつ、目次に変更） -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-title">KAMUI CODE</div>
+      <div class="sidebar-subtitle" id="tocCount">目次</div>
+    </div>
+
+    <div class="folder-tree" id="folderTree">
+      <div class="tree-item">
+        <div class="tree-label selected" data-toggle="root">
+          <span class="tree-toggle expanded">▼</span>
+          <span class="tree-name">章構成</span>
+          <span class="tree-count" id="sectionCount">--</span>
+        </div>
+        <div class="tree-children expanded" id="tocList"></div>
+      </div>
+    </div>
+
+    <!-- サイドバーの固定フッター: スクロールに追随しないクイックリンク -->
+    <div class="sidebar-tags sidebar-footer">
+      <div class="tags-title">クイックリンク</div>
+      <div class="tag-list">
+        <span class="tag" data-jump="#ui-flow">UI遷移</span>
+        <span class="tag" data-jump="#ui">UI/画面</span>
+        <span class="tag" data-jump="#functional">機能</span>
+        <span class="tag" data-jump="#nonfunctional">非機能</span>
+        <span class="tag" data-jump="#packaging">パッケージ</span>
+        <span class="tag" data-jump="#schedule">スケジュール</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <!-- メインコンテンツ（本文を要件定義スタイルへ） -->
+  <div class="main-content">
+    <div class="header-bar">
+      <button class="menu-btn icon-btn" id="toggleSidebar" aria-label="メニュー" title="メニュー">
+        <span class="btn-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M3 6h18M3 12h18M3 18h18" />
+          </svg>
+        </span>
+        <span class="btn-label">メニュー</span>
+      </button>
+      <input type="text" class="search-bar" placeholder="セクションや本文を検索..." id="searchInput" />
+      <div class="view-options">
+        <span class="theme-label">テーマ:</span>
+        <button class="view-btn icon-btn" id="themeDark" aria-label="黒テーマ" title="黒テーマ">
+          <span class="btn-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+            </svg>
+          </span>
+          <span class="btn-label">黒</span>
+        </button>
+        <button class="view-btn icon-btn" id="themeLight" aria-label="白テーマ" title="白テーマ">
+          <span class="btn-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <circle cx="12" cy="12" r="4" />
+              <path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12" />
+            </svg>
+          </span>
+          <span class="btn-label">白</span>
+        </button>
+        <button class="view-btn icon-btn" id="reloadBtn" aria-label="リロード" title="ページを再読み込み" onclick="location.reload()">
+          <span class="btn-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0118.8-4.3M22 12.5a10 10 0 01-18.8 4.3"/>
+            </svg>
+          </span>
+          <span class="btn-label">リロード</span>
+        </button>
+        <button class="view-btn icon-btn" id="expandAll" aria-label="目次を展開" title="目次を展開">
+          <span class="btn-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+          </span>
+          <span class="btn-label">展開</span>
+        </button>
+        <button class="view-btn icon-btn" id="collapseAll" aria-label="目次を折りたたみ" title="目次を折りたたみ">
+          <span class="btn-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M5 12h14" />
+            </svg>
+          </span>
+          <span class="btn-label">折りたたみ</span>
+        </button>
+        <button class="view-btn icon-btn" id="toTop" aria-label="先頭へ" title="先頭へ">
+          <span class="btn-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M12 19V5M5 12l7-7 7 7" />
+            </svg>
+          </span>
+          <span class="btn-label">先頭</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="doc-container" id="docContainer">
+      <div class="doc-title">KAMUI CODE ドキュメント 要件定義</div>
+      <div class="doc-meta">バージョン: 1.0 / 更新日: 2025-08-24 / 公開形態: GitHub Pages（静的HTML）</div>
+      <div class="hero" id="docHero">
+        <img src="./kamui-docs-ui-pattern2-gradient.png" alt="KAMUI CODE トップ" />
+      </div>
+      <div class="media-grid" style="margin-top: 20px;">
+        <div class="media-item clickable-img" data-path="./kamui-gradient-soft-1.png"><img class="media-thumbnail" src="./kamui-gradient-soft-1.png" alt="kamui-gradient-soft-1" /><div class="media-info"><div class="media-name">淡い色調＋ノートPC版1</div></div></div>
+        <div class="media-item clickable-img" data-path="./kamui-gradient-soft-2.png"><img class="media-thumbnail" src="./kamui-gradient-soft-2.png" alt="kamui-gradient-soft-2" /><div class="media-info"><div class="media-name">淡い色調＋ノートPC版2</div></div></div>
+      </div>
+
+      <section class="doc-section" id="overview" data-cat="1" data-cat-name="イントロダクション">
+        <h2>1. 概要</h2>
+        <p>KAMUI CODE は、MCP（Model Context Protocol）に準拠した複数のサーバー群を統合的に提供するソリューションです。クリエイティブ、開発、ビジネスの3領域を横断し、上位のベースURL配下に各サーバーのエンドポイントを階層的に配置します。本書は、KAMUI CODE のコンセプト、エンドポイント設計、サーバーカタログ、使い方、および設定ファイル（mcp/config.json）とパッケージング方針を整理し、GitHub Pages で公開できる単一HTMLのドキュメントとしてまとめたものです。</p>
+      </section>
+
+      <section class="doc-section" id="pricing" data-cat="6" data-cat-name="利用">
+        <h2>料金モデル比較</h2>
+        <p>代表的なプランの比較です。用途と負荷に応じて選択してください。</p>
+        <div class="card-grid">
+          <div class="card pastel">
+            <div class="card-title">フリープラン</div>
+            <span class="price-badge">無料</span>
+            <ul class="checks">
+              <li>画像生成: 月30回まで</li>
+              <li>動画生成: 月10回まで</li>
+              <li>基本モデルのみアクセス</li>
+              <li>低優先度処理（待ち時間あり）</li>
+              <li>コミュニティサポート</li>
+            </ul>
+          </div>
+          <div class="card pastel">
+            <div class="card-title">従量課金</div>
+            <span class="price-badge">使った分だけ</span>
+            <ul class="checks">
+              <li>全て従量課金（原価+20%マージン）</li>
+              <li>中優先度処理（標準的な待ち時間）</li>
+              <li>メールサポート（48時間以内）</li>
+              <li>個人・小規模チーム利用向け</li>
+              <li>使った分だけの公平な料金システム</li>
+            </ul>
+          </div>
+          <div class="card pastel">
+            <div class="card-title">エンタープライズ</div>
+            <span class="price-badge">お問い合わせ</span>
+            <ul class="checks">
+              <li>全モデル無制限利用</li>
+              <li>最新モデル早期アクセス</li>
+              <li>最優先処理（即時）</li>
+              <li>専用Discordサポート</li>
+              <li>API使用量分析ダッシュボード</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2-3. メニュー一覧（KAMUI CODE ドキュメント） -->
+      <section class="doc-section" id="menu" data-cat="2" data-cat-name="UI">
+        <h2>メニュー一覧</h2>
+        <p>KAMUI CODE ドキュメントのメニュー構造をJSON（data/kamui-doc-menus.json）で管理し、下表に自動展開します。</p>
+        <div id="docMenuMessage" class="doc-meta"></div>
+        <div style="overflow:auto; max-height: 420px; border: 1px solid var(--border); border-radius: 8px;">
+          <table class="menu-table" id="docMenuTable">
+            <thead>
+              <tr>
+                <th>ラベル</th>
+                <th>ID</th>
+                <th>種別</th>
+                <th>パス</th>
+                <th>親ID</th>
+                <th>並び順</th>
+                <th>説明</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <!-- ローカル閲覧(file://)フォールバック -->
+        <script type="application/json" id="kamuiMenusInline"></script>
+      </section>
+
+      <section class="doc-section" id="domains" data-cat="1" data-cat-name="イントロダクション">
+        <h2>2. コンセプトと対象領域</h2>
+        <ul>
+          <li>クリエイティブ領域: 生成・編集・評価（画像/テキスト/ドキュメント等）。</li>
+          <li>開発領域: コード生成/解析、リファクタリング、レビュー、ドキュメント化。</li>
+          <li>ビジネス領域: 翻訳、要約、レポーティング、データ分析補助。</li>
+        </ul>
+        <p>上記領域を共通のプロトコルと設計原則で統一し、サーバー追加・差し替え・組合せを安定して行えることを目指します。</p>
+        
+        <div class="section-image">
+          <img src="./kamui-white-2.png" alt="コンセプト図" />
+        </div>
+        <div class="media-grid" style="margin-top: 20px;">
+          <div class="media-item clickable-img" data-path="./kamui-white-2-fullscreen-1.png"><img class="media-thumbnail" src="./kamui-white-2-fullscreen-1.png" alt="kamui-white-2-fullscreen-1" /><div class="media-info"><div class="media-name">フルスクリーンUI版1</div></div></div>
+          <div class="media-item clickable-img" data-path="./kamui-white-2-fullscreen-2.png"><img class="media-thumbnail" src="./kamui-white-2-fullscreen-2.png" alt="kamui-white-2-fullscreen-2" /><div class="media-info"><div class="media-name">フルスクリーンUI版2</div></div></div>
+          <div class="media-item clickable-img" data-path="./creative-tools-ui-1.png"><img class="media-thumbnail" src="./creative-tools-ui-1.png" alt="creative-tools-ui-1" /><div class="media-info"><div class="media-name">Creative Toolsクリック後UI版1</div></div></div>
+          <div class="media-item clickable-img" data-path="./creative-tools-ui-2.png"><img class="media-thumbnail" src="./creative-tools-ui-2.png" alt="creative-tools-ui-2" /><div class="media-info"><div class="media-name">Creative Toolsクリック後UI版2</div></div></div>
+        </div>
+      </section>
+
+      <section class="doc-section" id="ui-flow" data-cat="2" data-cat-name="UI">
+        <h2>3. UI遷移図</h2>
+        <div class="flow-wrapper" id="uiFlow">
+          <div class="flow-controls">
+            <strong>UI遷移図</strong>
+            <div class="spacer"></div>
+            <button class="view-btn" id="flowZoomOut">-</button>
+            <button class="view-btn" id="flowZoomReset">100%</button>
+            <button class="view-btn" id="flowZoomIn">+</button>
+          </div>
+          <div class="flow-viewport" id="flowViewport">
+            <div class="flow-inner" id="flowInner" style="width: 1600px; height: 900px;">
+              <svg class="flow-svg" id="flowSvg" width="1600" height="900"></svg>
+              <div class="nodes-layer" id="flowNodes"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      
+
+      
+
+      <section class="doc-section" id="ui" data-cat="2" data-cat-name="UI">
+        <h2>4. UI/画面（参考デザイン画像）</h2>
+        <p>以下は同梱の参考デザイン画像です（画像を右クリックして相対パスをコピーできます）。</p>
+        <div class="media-grid">
+          <!-- 画像はリポジトリ直下のPNGを相対パスで参照 -->
+          <div class="media-item" data-path="./kamui-docs-ui-pattern1-dark.png"><img class="media-thumbnail" src="./kamui-docs-ui-pattern1-dark.png" alt="kamui-docs-ui-pattern1-dark" /><div class="media-info"><div class="media-name">kamui-docs-ui-pattern1-dark.png</div></div></div>
+          <div class="media-item" data-path="./kamui-docs-ui-pattern2-gradient.png"><img class="media-thumbnail" src="./kamui-docs-ui-pattern2-gradient.png" alt="kamui-docs-ui-pattern2-gradient" /><div class="media-info"><div class="media-name">kamui-docs-ui-pattern2-gradient.png</div></div></div>
+          <div class="media-item" data-path="./kamui-docs-ui-pattern3-minimal.png"><img class="media-thumbnail" src="./kamui-docs-ui-pattern3-minimal.png" alt="kamui-docs-ui-pattern3-minimal" /><div class="media-info"><div class="media-name">kamui-docs-ui-pattern3-minimal.png</div></div></div>
+          <div class="media-item" data-path="./kamui-docs-ui-pattern4-cyberpunk.png"><img class="media-thumbnail" src="./kamui-docs-ui-pattern4-cyberpunk.png" alt="kamui-docs-ui-pattern4-cyberpunk" /><div class="media-info"><div class="media-name">kamui-docs-ui-pattern4-cyberpunk.png</div></div></div>
+          <div class="media-item" data-path="./kamui-docs-ui-pattern5-japanese.png"><img class="media-thumbnail" src="./kamui-docs-ui-pattern5-japanese.png" alt="kamui-docs-ui-pattern5-japanese" /><div class="media-info"><div class="media-name">kamui-docs-ui-pattern5-japanese.png</div></div></div>
+          <div class="media-item" data-path="./kamui-v2-1-dark-neonblue.png"><img class="media-thumbnail" src="./kamui-v2-1-dark-neonblue.png" alt="kamui-v2-1-dark-neonblue" /><div class="media-info"><div class="media-name">kamui-v2-1-dark-neonblue.png</div></div></div>
+          <div class="media-item" data-path="./kamui-v2-2-white-enterprise.png"><img class="media-thumbnail" src="./kamui-v2-2-white-enterprise.png" alt="kamui-v2-2-white-enterprise" /><div class="media-info"><div class="media-name">kamui-v2-2-white-enterprise.png</div></div></div>
+          <div class="media-item" data-path="./kamui-v2-3-split-darklight.png"><img class="media-thumbnail" src="./kamui-v2-3-split-darklight.png" alt="kamui-v2-3-split-darklight" /><div class="media-info"><div class="media-name">kamui-v2-3-split-darklight.png</div></div></div>
+          <div class="media-item" data-path="./kamui-v2-4-terminal-green.png"><img class="media-thumbnail" src="./kamui-v2-4-terminal-green.png" alt="kamui-v2-4-terminal-green" /><div class="media-info"><div class="media-name">kamui-v2-4-terminal-green.png</div></div></div>
+          <div class="media-item" data-path="./kamui-v2-5-white-pastel.png"><img class="media-thumbnail" src="./kamui-v2-5-white-pastel.png" alt="kamui-v2-5-white-pastel" /><div class="media-info"><div class="media-name">kamui-v2-5-white-pastel.png</div></div></div>
+          <div class="media-item" data-path="./kamui-white-1.png"><img class="media-thumbnail" src="./kamui-white-1.png" alt="kamui-white-1" /><div class="media-info"><div class="media-name">kamui-white-1.png</div></div></div>
+          <div class="media-item" data-path="./kamui-white-2.png"><img class="media-thumbnail" src="./kamui-white-2.png" alt="kamui-white-2" /><div class="media-info"><div class="media-name">kamui-white-2.png</div></div></div>
+          <div class="media-item" data-path="./kamui-gradient-soft-1.png"><img class="media-thumbnail" src="./kamui-gradient-soft-1.png" alt="kamui-gradient-soft-1" /><div class="media-info"><div class="media-name">kamui-gradient-soft-1.png（淡い色調＋ノートPC版1）</div></div></div>
+          <div class="media-item" data-path="./kamui-gradient-soft-2.png"><img class="media-thumbnail" src="./kamui-gradient-soft-2.png" alt="kamui-gradient-soft-2" /><div class="media-info"><div class="media-name">kamui-gradient-soft-2.png（淡い色調＋ノートPC版2）</div></div></div>
+          <div class="media-item" data-path="./kamui-white-2-fullscreen-1.png"><img class="media-thumbnail" src="./kamui-white-2-fullscreen-1.png" alt="kamui-white-2-fullscreen-1" /><div class="media-info"><div class="media-name">kamui-white-2-fullscreen-1.png（フルスクリーンUI版1）</div></div></div>
+          <div class="media-item" data-path="./kamui-white-2-fullscreen-2.png"><img class="media-thumbnail" src="./kamui-white-2-fullscreen-2.png" alt="kamui-white-2-fullscreen-2" /><div class="media-info"><div class="media-name">kamui-white-2-fullscreen-2.png（フルスクリーンUI版2）</div></div></div>
+          <div class="media-item" data-path="./creative-tools-ui-1.png"><img class="media-thumbnail" src="./creative-tools-ui-1.png" alt="creative-tools-ui-1" /><div class="media-info"><div class="media-name">creative-tools-ui-1.png（Creative Toolsクリック後UI版1）</div></div></div>
+          <div class="media-item" data-path="./creative-tools-ui-2.png"><img class="media-thumbnail" src="./creative-tools-ui-2.png" alt="creative-tools-ui-2" /><div class="media-info"><div class="media-name">creative-tools-ui-2.png（Creative Toolsクリック後UI版2）</div></div></div>
+          <div class="media-item" data-path="./kamui-white-3.png"><img class="media-thumbnail" src="./kamui-white-3.png" alt="kamui-white-3" /><div class="media-info"><div class="media-name">kamui-white-3.png</div></div></div>
+          <div class="media-item" data-path="./kamui-white-4.png"><img class="media-thumbnail" src="./kamui-white-4.png" alt="kamui-white-4" /><div class="media-info"><div class="media-name">kamui-white-4.png</div></div></div>
+          <div class="media-item" data-path="./kamui-white-5.png"><img class="media-thumbnail" src="./kamui-white-5.png" alt="kamui-white-5" /><div class="media-info"><div class="media-name">kamui-white-5.png</div></div></div>
+        </div>
+        
+      </section>
+
+      <!-- MCP プレイリスト / カタログ -->
+      <section class="doc-section" id="mcp" data-cat="2" data-cat-name="UI">
+        <h2>MCPプレイリスト/カタログ</h2>
+        <p>MCPプレイリスト（上位）とMCPカタログをカテゴリ（クリエイティブ/開発/ビジネス）で切り替えて表示します。ボタンをクリックすると一覧（表）を表示します。</p>
+        <div class="section-image" style="max-width: 920px; margin-bottom: 10px;">
+          <img src="./kamui-white-2.png" alt="UI参考（ギャラリー風）" />
+        </div>
+        <div class="view-options" style="margin: 8px 0 12px 0;">
+          <span class="theme-label">種別:</span>
+          <button class="view-btn" id="btnMcpPlaylist" aria-pressed="true">MCPプレイリスト</button>
+          <button class="view-btn" id="btnMcpCatalog">MCPカタログ</button>
+          <span class="spacer"></span>
+          <span class="theme-label">カテゴリ:</span>
+          <button class="view-btn" id="btnCatCreative">クリエイティブ</button>
+          <button class="view-btn" id="btnCatDevelopment">開発</button>
+          <button class="view-btn" id="btnCatBusiness">ビジネス</button>
+        </div>
+        <div id="mcpMessage" class="doc-meta"></div>
+        <div style="overflow:auto; max-height: 480px; border: 1px solid var(--border); border-radius: 8px;">
+          <table class="menu-table" id="mcpTable">
+            <thead></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <!-- ローカルフォールバック（Pagesでは外部JSONを使用） -->
+        <script type="application/json" id="mcpPlaylistsInline"></script>
+        <script type="application/json" id="mcpCatalogInline"></script>
+      </section>
+
+
+
+      <section class="doc-section" id="architecture" data-cat="4" data-cat-name="アーキテクチャ">
+        <h2>5. アーキテクチャとエンドポイント設計</h2>
+        <p>実URL構造は提供JSONの<code>mcpServers[*].url</code>に準拠します。ベースドメインは <code>https://{BASE_URL}</code> で、先頭にカテゴリ（例: <code>t2i</code>, <code>i2i</code>, <code>t2v</code>, <code>i2v</code>, <code>v2v</code>, <code>r2v</code>, <code>t2s</code>, <code>t2m</code>, <code>v2a</code>, <code>uploader</code>, <code>train</code>, <code>video-analysis</code>, <code>requirement</code>, <code>storyboard</code>）が続き、ベンダ・モデル・モード等が後続します。</p>
+        <pre class="code"><code>BASE_URL = https://{BASE_URL}
+
+一般パターン:
+  {BASE_URL}/{category}/{vendor}/{model-or-service}/[variant|mode|action]
+
+例（JSONより抽出）:
+  テキスト→画像: {BASE_URL}/t2i/fal/bytedance/dreamina/v3.1/text-to-image
+  画像→画像:     {BASE_URL}/i2i/fal/flux/kontext/max
+  テキスト→動画: {BASE_URL}/t2v/fal/wan/v2.2-5b/text-to-video/fast-wan
+  画像→動画:     {BASE_URL}/i2v/fal/minimax/hailuo-02/fast
+  動画→動画:     {BASE_URL}/v2v/fal/pixverse/lipsync
+  参照→動画:     {BASE_URL}/r2v/fal/vidu/q1
+  テキスト→音声: {BASE_URL}/t2s/minimax/speech-2-5-turbo-preview
+  テキスト→音楽: {BASE_URL}/t2m/google/lyria
+  動画→音声:     {BASE_URL}/v2a/fal/thinksound/audio/standard
+  動画解析:       {BASE_URL}/video-analysis/google/gemini
+  学習:           {BASE_URL}/train/fal/flux/kontext
+  アップロード:   {BASE_URL}/uploader/fal
+  ドキュメント:   {BASE_URL}/requirement
+  ストーリーボード:{BASE_URL}/storyboard</code></pre>
+        <p>認証は環境に応じて <code>Authorization: Bearer &lt;TOKEN&gt;</code> または <code>x-api-key</code> 等を想定します。レート制御・タイムアウト・同期/非同期は各サーバーの特性に合わせクライアント指針を定義します。</p>
+        
+        <!-- システムアーキテクチャ図 -->
+        <div class="mermaid-wrapper">
+          <div class="mermaid">
+graph TB
+    subgraph "クライアント層"
+        C1[MCPクライアント]
+        C2[HTTPクライアント]
+        C3[SDK/ライブラリ]
+    end
+    
+    subgraph "ゲートウェイ層"
+        GW["KAMUI CODE ゲートウェイ<br/>({BASE_URL})"]
+    end
+    
+    subgraph "サービスルーター"
+        RT["カテゴリ別ルーティング<br/>(t2i, i2i, t2v 等)"]
+    end
+    
+    subgraph "プロバイダーサービス"
+        direction TB
+        P1[FAL.ai サービス]
+        P2[Google サービス]
+        P3[MiniMax サービス]
+        P4[Runway サービス]
+        P5[ByteDance サービス]
+    end
+    
+    subgraph "モデルエンドポイント"
+        M1[Imagen4 Ultra]
+        M2[Flux モデル群]
+        M3[Veo3]
+        M4[Hailuo-02]
+        M5[Dreamina v3.1]
+    end
+    
+    C1 --> GW
+    C2 --> GW
+    C3 --> GW
+    GW --> RT
+    RT --> P1
+    RT --> P2
+    RT --> P3
+    RT --> P4
+    RT --> P5
+    P1 --> M1
+    P1 --> M2
+    P2 --> M3
+    P3 --> M4
+    P5 --> M5
+    
+    style RT fill:#2d2d2d,stroke:#4a4a4a,stroke-width:1px
+          </div>
+          <div class="mermaid-caption">図: KAMUI CODE システムアーキテクチャ</div>
+        </div>
+        
+        <!-- エンドポイント階層図 -->
+        <div class="mermaid-wrapper">
+          <div class="mermaid">
+flowchart LR
+    subgraph "URL構造"
+        BASE["{BASE_URL}"] --> CAT["/｛カテゴリ｝"]
+        CAT --> VEND["/｛ベンダー｝"]
+        VEND --> MODEL["/｛モデル｝"]
+        MODEL --> VAR["/｛バリアント｝"]
+    end
+    
+    subgraph "例"
+        E1["t2i/fal/imagen4/ultra"]
+        E2["i2v/fal/minimax/hailuo-02/fast"]
+        E3["v2v/fal/pixverse/lipsync"]
+        E4["t2s/minimax/speech-25-turbo"]
+    end
+    
+    VAR --> E1
+    VAR --> E2
+    VAR --> E3
+    VAR --> E4
+    
+          </div>
+          <div class="mermaid-caption">図: エンドポイントURL階層構造</div>
+        </div>
+      </section>
+
+      <section class="doc-section" id="catalog" data-cat="5" data-cat-name="カタログ">
+        <h2>6. サーバーカタログ（例・カード一覧）</h2>
+        <p>以下のJSON（パッケージ）から実データを読み込み、サーバー一覧カードを自動生成します。</p>
+        <div class="card-grid" id="serverCards"></div>
+      </section>
+
+      <section class="doc-section" id="packages" data-cat="5" data-cat-name="カタログ">
+        <h2>7. パッケージ一覧（JSON）</h2>
+        <p>パッケージ化されたMCP定義JSONをカード表示します。クリックでJSONを開けます。</p>
+        <div class="card-grid" id="packageCards">
+          <!-- 動的に生成 -->
+        </div>
+      </section>
+
+      <section class="doc-section" id="usage" data-cat="6" data-cat-name="利用">
+        <h2>8. 使い方（HTTP・MCPクライアント）</h2>
+        <p>HTTPダイレクト利用の例（curl）。実URLと認証ヘッダは環境に合わせて置換してください。</p>
+        <pre class="code"><code># 画像生成（例）
+curl -X POST "{BASE_URL}/api/creative/image/v1/generate" \
+  -H "Authorization: Bearer &lt;TOKEN&gt;" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "夕暮れの富士山、浮世絵スタイル",
+    "size": "1024x1024"
+  }'
+
+# コード解析（例）
+curl -X POST "{BASE_URL}/api/dev/code/v1/analyze" \
+  -H "Authorization: Bearer &lt;TOKEN&gt;" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "language": "ts",
+    "source": "function add(a:number,b:number){return a+b}"
+  }'
+        </code></pre>
+        <p>MCP対応クライアントでの利用（概略）:</p>
+        <ol>
+          <li>本リポジトリの <code>mcp/config.json</code> を取得します（後述）。</li>
+          <li>クライアント側で設定ファイルの参照先を指定します。</li>
+          <li>クライアントのツール一覧に、定義済みサーバーが表示されます。</li>
+        </ol>
+        
+        <!-- API呼び出しワークフロー -->
+        <div class="mermaid-wrapper">
+          <div class="mermaid">
+sequenceDiagram
+    participant User as ユーザー
+    participant Client as MCPクライアント
+    participant Gateway as KAMUIゲートウェイ
+    participant Provider as プロバイダーAPI
+    participant Model as AIモデル
+    
+    User->>Client: 生成リクエスト
+    Client->>Client: mcp/config.json読み込み
+    Client->>Gateway: POST /t2i/fal/imagen4/ultra
+    Note over Gateway: 認証 & ルーティング
+    Gateway->>Provider: FAL APIへ転送
+    Provider->>Model: Imagen4 Ultra実行
+    Model-->>Provider: 生成画像
+    Provider-->>Gateway: 結果返却
+    Gateway-->>Client: URLレスポンス
+    Client-->>User: 結果表示
+          </div>
+          <div class="mermaid-caption">図: API呼び出しシーケンス</div>
+        </div>
+        
+        <!-- 処理フロー図 -->
+        <div class="mermaid-wrapper">
+          <div class="mermaid">
+flowchart LR
+    A[ユーザー入力] --> B{カテゴリ?}
+    B -->|画像生成| C[t2i エンドポイント]
+    B -->|動画生成| D[t2v/i2v エンドポイント]
+    B -->|音声/音楽| E[t2s/t2m エンドポイント]
+    B -->|解析| F[video-analysis]
+    
+    C --> G[プロバイダー選択]
+    D --> G
+    E --> G
+    F --> G
+    
+    G --> H{同期/非同期?}
+    H -->|同期| I[直接レスポンス]
+    H -->|非同期| J[ジョブキュー]
+    
+    J --> K[ステータス確認]
+    K --> L{完了?}
+    L -->|いいえ| K
+    L -->|はい| M[結果取得]
+    
+    I --> N[ユーザーへ返却]
+    M --> N
+    
+          </div>
+          <div class="mermaid-caption">図: リクエスト処理フロー</div>
+        </div>
+      </section>
+
+      <section class="doc-section" id="functional" data-cat="3" data-cat-name="要件">
+        <h2>9. 機能要件（ドキュメント/配布物）</h2>
+        <ul>
+          <li>GitHub Pages でホスト可能な単一HTML（本ファイル）。</li>
+          <li>サーバーカタログをカード表示し、各エンドポイントの説明を掲載。</li>
+          <li>使い方（HTTP/MCP）と設定ファイルのサンプルを提供。</li>
+          <li>テーマ切替（黒/白）、目次ナビ、全文検索（クライアント側）。</li>
+          <li>多言語対応（日本語/英語）切り替え機能。</li>
+        </ul>
+      </section>
+
+      <section class="doc-section" id="design-requirements" data-cat="3" data-cat-name="要件">
+        <h2>10. デザイン要件定義</h2>
+        
+        <h3>カラーパレット</h3>
+        <div class="color-palette">
+          <div class="color-group">
+            <h4>ダークテーマ</h4>
+            <div class="color-swatches">
+              <div class="color-swatch dark" style="background: #1a1a1a; color: #ffffff;">
+                <span class="color-label">背景</span>
+                <span class="color-code">#1a1a1a</span>
+              </div>
+              <div class="color-swatch dark" style="background: #0f0f0f; color: #ffffff;">
+                <span class="color-label">サイドバー</span>
+                <span class="color-code">#0f0f0f</span>
+              </div>
+              <div class="color-swatch" style="background: #ffffff; color: #000;">
+                <span class="color-label">テキスト</span>
+                <span class="color-code">#ffffff</span>
+              </div>
+              <div class="color-swatch" style="background: #b8b8b8; color: #000;">
+                <span class="color-label">補助テキスト</span>
+                <span class="color-code">#b8b8b8</span>
+              </div>
+              <div class="color-swatch" style="background: #4a9eff; color: #ffffff;">
+                <span class="color-label">リンク/アクセント</span>
+                <span class="color-code">#4a9eff</span>
+              </div>
+              <div class="color-swatch dark" style="background: #2a2a2a; color: #ffffff;">
+                <span class="color-label">ボーダー</span>
+                <span class="color-code">#2a2a2a</span>
+              </div>
+              <div class="color-swatch dark" style="background: #2d2d2d; color: #ffffff;">
+                <span class="color-label">選択/チップ</span>
+                <span class="color-code">#2d2d2d</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="color-group">
+            <h4>ライトテーマ</h4>
+            <div class="color-swatches">
+              <div class="color-swatch light" style="background: #f7f7f8;">
+                <span class="color-label">背景</span>
+                <span class="color-code">#f7f7f8</span>
+              </div>
+              <div class="color-swatch light" style="background: #ffffff;">
+                <span class="color-label">サイドバー</span>
+                <span class="color-code">#ffffff</span>
+              </div>
+              <div class="color-swatch light" style="background: #1a1a1a; color: #fff;">
+                <span class="color-label">テキスト</span>
+                <span class="color-code">#1a1a1a</span>
+              </div>
+              <div class="color-swatch light" style="background: #4a4a4a; color: #fff;">
+                <span class="color-label">補助テキスト</span>
+                <span class="color-code">#4a4a4a</span>
+              </div>
+              <div class="color-swatch light" style="background: #2563eb;">
+                <span class="color-label">リンク/アクセント</span>
+                <span class="color-code">#2563eb</span>
+              </div>
+              <div class="color-swatch light" style="background: #e4e4e7;">
+                <span class="color-label">ボーダー</span>
+                <span class="color-code">#e4e4e7</span>
+              </div>
+              <div class="color-swatch light" style="background: #eef0f4;">
+                <span class="color-label">選択/チップ</span>
+                <span class="color-code">#eef0f4</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <h3>カテゴリー別カラー</h3>
+        <div class="category-colors">
+          <div class="category-card creative">
+            <div class="category-gradient">
+              <h4>Creative tools</h4>
+              <p>クリエイティブツール</p>
+            </div>
+            <div class="category-specs">
+              <span class="gradient-spec">グラデーション: 紫 → ピンク → オレンジ</span>
+              <div class="color-values">
+                <span class="color-val">#8B5CF6 (紫)</span>
+                <span class="color-val">#EC4899 (ピンク)</span>
+                <span class="color-val">#FB923C (オレンジ)</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="category-card development">
+            <div class="category-gradient">
+              <h4>Development</h4>
+              <p>開発ツール</p>
+            </div>
+            <div class="category-specs">
+              <span class="gradient-spec">グラデーション: 青 → シアン → 緑</span>
+              <div class="color-values">
+                <span class="color-val">#3B82F6 (青)</span>
+                <span class="color-val">#06B6D4 (シアン)</span>
+                <span class="color-val">#10B981 (緑)</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="category-card business">
+            <div class="category-gradient">
+              <h4>Business</h4>
+              <p>ビジネスツール</p>
+            </div>
+            <div class="category-specs">
+              <span class="gradient-spec">グラデーション: 緑 → ティール → 青緑</span>
+              <div class="color-values">
+                <span class="color-val">#10B981 (緑)</span>
+                <span class="color-val">#14B8A6 (ティール)</span>
+                <span class="color-val">#06B6D4 (青緑)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <h3>タイポグラフィー</h3>
+        <div class="typography-samples">
+          <div class="typo-item">
+            <span class="typo-label">見出し1（ドキュメントタイトル）</span>
+            <div class="typo-sample" style="font-size: 1.6rem; font-weight: 700;">KAMUI CODE ドキュメント</div>
+            <span class="typo-spec">font-size: 1.6rem / font-weight: 700</span>
+          </div>
+          
+          <div class="typo-item">
+            <span class="typo-label">見出し2（セクションタイトル）</span>
+            <div class="typo-sample" style="font-size: 1.1rem; font-weight: 600;">セクションタイトル</div>
+            <span class="typo-spec">font-size: 1.1rem / font-weight: 600</span>
+          </div>
+          
+          <div class="typo-item">
+            <span class="typo-label">本文</span>
+            <div class="typo-sample" style="font-size: 0.95rem; line-height: 1.7;">これは本文のサンプルテキストです。可読性を重視し、適切な行間と文字サイズを設定しています。</div>
+            <span class="typo-spec">font-size: 0.95rem / line-height: 1.7</span>
+          </div>
+          
+          <div class="typo-item">
+            <span class="typo-label">コード/モノスペース</span>
+            <div class="typo-sample" style="font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.85rem; background: var(--code-bg); padding: 4px 8px; border-radius: 4px;">const apiEndpoint = "https://kamui-code.ai/api";</div>
+            <span class="typo-spec">font-family: ui-monospace / font-size: 0.85rem</span>
+          </div>
+          
+          <div class="typo-item">
+            <span class="typo-label">補助テキスト</span>
+            <div class="typo-sample" style="font-size: 0.85rem; color: var(--text-weak);">更新日: 2025年1月25日</div>
+            <span class="typo-spec">font-size: 0.85rem / color: text-weak</span>
+          </div>
+        </div>
+        
+        <h3>レイアウト構成</h3>
+        <div class="layout-specs">
+          <h4>グリッドシステム</h4>
+          <ul>
+            <li>サイドバー幅: 280px（固定）</li>
+            <li>メインコンテンツ: 残り全幅（フレキシブル）</li>
+            <li>コンテンツ最大幅: 1200px（中央配置）</li>
+            <li>カードグリッド: auto-fill, minmax(280px, 1fr)</li>
+            <li>メディアグリッド: auto-fill, minmax(220px, 1fr)</li>
+          </ul>
+          
+          <h4>スペーシング</h4>
+          <ul>
+            <li>セクション間隔: 16px</li>
+            <li>コンテンツパディング: 24px（デスクトップ）/ 14px（モバイル）</li>
+            <li>カード内パディング: 16px</li>
+            <li>要素間ギャップ: 10px - 18px</li>
+          </ul>
+        </div>
+        
+        <h3>インタラクション</h3>
+        <div class="interaction-specs">
+          <h4>ホバー効果</h4>
+          <ul>
+            <li>カード: translateY(-3px) + shadow増加</li>
+            <li>ボタン: ボーダー色変更 + テキスト色変更</li>
+            <li>タグ: 背景色変更（chip → chip-hover）</li>
+            <li>トランジション時間: 0.2s ease</li>
+          </ul>
+          
+          <h4>フォーカス状態</h4>
+          <ul>
+            <li>検索バー: ボーダー色 + box-shadow (2px)</li>
+            <li>入力要素: アウトライン表示</li>
+          </ul>
+        </div>
+        
+        <h3>レスポンシブ対応</h3>
+        <div class="responsive-specs">
+          <h4>ブレークポイント</h4>
+          <ul>
+            <li>モバイル: ≤768px</li>
+            <li>タブレット: 769px - 1024px</li>
+            <li>デスクトップ: ≥1025px</li>
+          </ul>
+          
+          <h4>モバイル最適化</h4>
+          <ul>
+            <li>サイドバー: スライドメニュー化（幅: min(82vw, 320px)）</li>
+            <li>ボタンラベル: アイコンのみ表示</li>
+            <li>グリッドカラム: 1列表示</li>
+            <li>フォントサイズ: 基本サイズ維持（拡大縮小なし）</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="doc-section" id="nonfunctional" data-cat="3" data-cat-name="要件">
+        <h2>11. 非機能要件</h2>
+        <ul>
+          <li>静的配信: ローカル/Pages/Cloudflare 上で動作、外部API不要。</li>
+          <li>可読性: PC/モバイルでのレスポンシブ表示、テーマ切替。</li>
+          <li>保守性: セクション追加・順序変更が容易な構造。</li>
+          <li>セキュリティ: 公開情報は機密を含まない。サンプルに秘密情報を含めない。</li>
+        </ul>
+      </section>
+
+      
+
+      <section class="doc-section" id="config" data-cat="6" data-cat-name="利用">
+        <h2>11. 設定ファイル（mcp/config.json）</h2>
+        <p>複数のMCPサーバーをまとめて配布するための設定例です。必要に応じてIDやURL、認証方式を調整します。</p>
+        <pre class="code"><code>{
+  "version": 1,
+  "servers": [
+    {
+      "id": "creative-image",
+      "name": "画像生成サーバー",
+      "category": "creative",
+      "baseUrl": "{BASE_URL}/api/creative/image/v1",
+      "endpoints": {
+        "generate": "/generate",
+        "variants": "/variants"
+      },
+      "auth": { "type": "bearer", "env": "KAMUI_TOKEN" }
+    },
+    {
+      "id": "dev-code",
+      "name": "コード支援サーバー",
+      "category": "dev",
+      "baseUrl": "{BASE_URL}/api/dev/code/v1",
+      "endpoints": {
+        "analyze": "/analyze",
+        "refactor": "/refactor"
+      },
+      "auth": { "type": "bearer", "env": "KAMUI_TOKEN" }
+    },
+    {
+      "id": "biz-translate",
+      "name": "翻訳サーバー",
+      "category": "biz",
+      "baseUrl": "{BASE_URL}/api/biz/translate/v1",
+      "endpoints": {
+        "translate": "/translate"
+      },
+      "auth": { "type": "apiKey", "header": "x-api-key", "env": "KAMUI_API_KEY" }
+    }
+  ]
+}
+        </code></pre>
+        <p>配布形態: リポジトリ内の <code>mcp/config.json</code> を固定パスで公開し、クライアントからURL指定で読み込み可能にします。</p>
+        <h3 style="margin-top:14px; font-size:1rem;">クライアント別サンプル（MCP設定JSON）</h3>
+        <p>各クライアントでMCPサーバーの記述方法や配置パスが異なります。以下は代表的な例です（カードをクリックするとJSONを表示）。</p>
+        <div class="card-grid" id="clientSampleCards"></div>
+      </section>
+
+      <section class="doc-section" id="packaging" data-cat="7" data-cat-name="運用">
+        <h2>12. パッケージング指針</h2>
+        <ul>
+          <li>単一ファイル: <code>mcp/config.json</code> に全サーバーを集約（推奨）。</li>
+          <li>分割構成: 領域別（creative/dev/biz）JSONを用意し、ビルドで結合。</li>
+          <li>バージョン付与: <code>servers[].version</code> などで互換性を明示。</li>
+          <li>配布: GitHub Release/Pages で静的配布。改訂履歴をCHANGELOGに記録。</li>
+        </ul>
+      </section>
+
+      <section class="doc-section" id="schedule" data-cat="6" data-cat-name="スケジュール">
+        <h2>プロジェクトスケジュール</h2>
+        <p>「渋谷猫カフェ - 要件定義書」の開発ガントチャートを参考に、本プロジェクトの概略スケジュールを示します。</p>
+        
+        <div class="gantt-wrapper">
+          <div class="mermaid" style="width: 1600px !important; min-width: 1600px !important; height: 500px !important;">
+gantt
+    title プロジェクトタイムライン
+    dateFormat YYYY-MM-DD
+    axisFormat %m/%d
+    
+    section 計画フェーズ
+    要件定義              :done,    plan1, 2025-08-01, 10d
+    設計書作成            :done,    plan2, after plan1, 7d
+    技術選定              :done,    plan3, 2025-08-12, 5d
+    
+    section デザイン
+    UI/UX設計             :active,  design1, 2025-08-20, 14d
+    モックアップ作成       :         design2, 2025-08-25, 10d
+    デザインレビュー       :         design3, after design2, 3d
+    
+    section 開発
+    目次/ナビゲーション実装 :         dev1, 2025-09-01, 10d
+    Mermaid図整備          :         dev2, 2025-09-05, 8d
+    MCPサンプル/JSON整備    :         dev3, 2025-09-08, 7d
+    画像アセット整理        :         dev4, 2025-09-10, 5d
+    
+    section テスト
+    表示/レイアウトテスト   :         test1, 2025-09-15, 7d
+    アクセシビリティ/SEO    :         test2, 2025-09-18, 5d
+    ユーザーテスト          :         test3, 2025-09-22, 5d
+    
+    section リリース
+    GitHub Pages設定        :         rel1, 2025-09-25, 3d
+    ドメイン/キャッシュ     :         rel2, 2025-09-27, 3d
+    公開                   :crit,    rel3, 2025-09-30, 2d
+          </div>
+          <div class="mermaid-caption">図: プロジェクトタイムライン</div>
+        </div>
+      </section>
+
+      <section class="doc-section" id="deploy" data-cat="7" data-cat-name="運用">
+        <h2>13. デプロイ（GitHub Pages / Cloudflare）</h2>
+        <ul>
+          <li>GitHub Pages: 本ファイル <code>index.html</code> をリポジトリ直下に配置 → Settings → Pages → Branch を <code>main</code> / <code>docs</code> に設定。</li>
+          <li>独自ドメイン: Pages の Custom domain を設定。必要なら Cloudflare DNS に A/AAAA/CNAME を追加。</li>
+          <li>Cloudflare: Pages/Workers のいずれでも静的配信可。キャッシュTTL・圧縮を有効化。</li>
+          <li>セキュリティ: HTTPS 強制、適切なキャッシュ制御（HTMLは短め、画像は長め）。</li>
+        </ul>
+        
+        <!-- デプロイメントフロー -->
+        <div class="mermaid-wrapper">
+          <div class="mermaid">
+flowchart LR
+    subgraph "開発"
+        A[ローカル開発] --> B[Git コミット]
+        B --> C[GitHub へプッシュ]
+    end
+    
+    subgraph "CI/CD パイプライン"
+        C --> D[GitHub Actions]
+        D --> E{テスト成功?}
+        E -->|はい| F[静的ファイルビルド]
+        E -->|いいえ| G[問題修正]
+        G --> B
+    end
+    
+    subgraph "デプロイ"
+        F --> H[GitHub Pages]
+        F --> I[Cloudflare Pages]
+        H --> J["docs.{BASE_URL}"]
+        I --> K["{BASE_URL}"]
+    end
+    
+    subgraph "CDN/配信"
+        J --> L[グローバル CDN]
+        K --> L
+        L --> M[エンドユーザー]
+    end
+    
+          </div>
+          <div class="mermaid-caption">図: デプロイメントパイプライン</div>
+        </div>
+      </section>
+
+      <section class="doc-section" id="operations" data-cat="7" data-cat-name="運用">
+        <h2>14. 運用・保守</h2>
+        <ul>
+          <li>サーバー追加・改廃時は <code>catalog</code> と <code>mcp/config.json</code> を同時更新。</li>
+          <li>非互換変更は <code>/v{major}</code> を上げ、旧版を一定期間並行運用。</li>
+          <li>秘密情報はリポジトリに含めず、クライアント側で環境変数参照。</li>
+        </ul>
+        
+        <!-- 運用監視フロー -->
+        <div class="mermaid-wrapper">
+          <div class="mermaid">
+flowchart LR
+    subgraph "監視"
+        M1[ヘルスチェック] --> M2{ステータスOK?}
+        M2 -->|はい| M3[メトリクス記録]
+        M2 -->|いいえ| M4[チームへ通知]
+    end
+    
+    subgraph "インシデント対応"
+        M4 --> I1[問題診断]
+        I1 --> I2{緊急度?}
+        I2 -->|高| I3[即座に修正]
+        I2 -->|低| I4[修正予定]
+        I3 --> I5[ホットフィックスデプロイ]
+        I4 --> I6[更新計画]
+    end
+    
+    subgraph "メンテナンス"
+        I6 --> U1[サービス更新]
+        U1 --> U2[変更テスト]
+        U2 --> U3[ステージングデプロイ]
+        U3 --> U4{テスト成功?}
+        U4 -->|はい| U5[本番デプロイ]
+        U4 -->|いいえ| U6[ロールバック]
+        I5 --> U5
+    end
+    
+          </div>
+          <div class="mermaid-caption">図: 運用監視とインシデント対応フロー</div>
+        </div>
+        
+        <!-- サービス追加ワークフロー -->
+        <div class="mermaid-wrapper">
+          <div class="mermaid">
+flowchart LR
+    A[新規サービス要求] --> B[API評価]
+    B --> C{互換性あり?}
+    C -->|いいえ| D[アダプター作成]
+    C -->|はい| E[エンドポイント定義]
+    D --> E
+    E --> F[config.json更新]
+    F --> G[カタログ追加]
+    G --> H[テスト作成]
+    H --> I[ステージングデプロイ]
+    I --> J[統合テスト]
+    J --> K{成功?}
+    K -->|いいえ| L[問題修正]
+    L --> H
+    K -->|はい| M[本番デプロイ]
+    M --> N[ドキュメント更新]
+    N --> O[ユーザー通知]
+    
+          </div>
+          <div class="mermaid-caption">図: 新規サービス追加ワークフロー</div>
+        </div>
+      </section>
+
+      <!-- 旧「前提・制約」「リスク」は必要に応じ今後追加 -->
+
+      <section class="doc-section" id="acceptance" data-cat="3" data-cat-name="要件">
+        <h2>15. 受入基準</h2>
+        <ul>
+          <li>左の目次から全セクションへ遷移できること。</li>
+          <li>カード/コード/JSON がレイアウト崩れなく表示されること（黒/白）。</li>
+          <li><code>mcp/config.json</code> サンプルがバリデーションを通ること（形式）。</li>
+          <li>GitHub Pages で正しく公開・閲覧できること。</li>
+        </ul>
+      </section>
+
+      <section class="doc-section" id="appendix" data-cat="8" data-cat-name="付録">
+        <h2>16. 付録</h2>
+        <p>プレースホルダ（{BASE_URL}、&lt;TOKEN&gt; など）は環境に合わせて置換してください。実エンドポイント/仕様は導入時の合意に基づき最新へ更新します。</p>
+      </section>
+    </div>
+  </div>
+
+  <!-- JSONプレビュー用モーダル -->
+  <div class="modal-backdrop" id="jsonModal">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="jsonModalTitle">
+      <div class="modal-header">
+        <div class="modal-title" id="jsonModalTitle">JSON プレビュー</div>
+        <div style="margin-left:auto"></div>
+        <button class="view-btn" id="jsonCopyBtn">コピー</button>
+        <button class="view-btn" id="jsonCloseBtn">閉じる</button>
+      </div>
+      <div class="modal-body">
+        <pre class="code"><code id="jsonModalCode"></code></pre>
+      </div>
+      <div class="modal-actions">
+        <a class="view-btn" id="jsonDownload" href="#" download>ダウンロード</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 画像プレビュー用モーダル -->
+  <div class="modal-backdrop" id="imgModal">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="imgModalTitle">
+      <div class="modal-header">
+        <div class="modal-title" id="imgModalTitle">画像プレビュー</div>
+        <div style="margin-left:auto"></div>
+        <button class="view-btn" id="imgCloseBtn">閉じる</button>
+      </div>
+      <div class="modal-body" style="background:var(--sidebar-bg)">
+        <div style="display:flex;align-items:center;justify-content:center;padding:10px;">
+          <img id="imgModalImage" alt="preview" style="max-width:100%;max-height:70vh;display:block;" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- パッケージJSONの埋め込み（file://でも読めるようにインライン） -->
+  <script type="application/json" id="pkg-storyboard">
+{
+  "mcpServers": {
+    "storyboard": {
+      "type": "http",
+      "url": "https://{BASE_URL}/storyboard",
+      "description": "KAMUI CODE Storyboard Viewer - Install and manage storyboard visualization tools"
+    }
+  }
+}
+  </script>
+  <!-- クライアント別サンプルのインラインJSON -->
+  <script type="application/json" id="client-codex">
+{
+  "mcpServers": {
+    "kamui-t2i-dreamina": { "type": "http", "url": "https://{BASE_URL}/t2i/fal/bytedance/dreamina/v3.1/text-to-image" },
+    "kamui-i2i-kontext":  { "type": "http", "url": "https://{BASE_URL}/i2i/fal/flux/kontext/max" },
+    "kamui-t2v-wan":      { "type": "http", "url": "https://{BASE_URL}/t2v/fal/wan/v2.2-5b/text-to-video/fast-wan" }
+  }
+}
+  </script>
+  <script type="application/json" id="client-claude">
+{
+  "mcpServers": {
+    "kamui-requirement": { "type": "http", "url": "https://{BASE_URL}/requirement" },
+    "kamui-storyboard":  { "type": "http", "url": "https://{BASE_URL}/storyboard" }
+  }
+}
+  </script>
+  <script type="application/json" id="client-claude-command">
+{
+  "mcpServers": {
+    "kamui-local": {
+      "type": "command",
+      "command": "/usr/local/bin/node",
+      "args": ["/path/to/kamui-server.js"],
+      "env": { "KAMUI_TOKEN": "${KAMUI_TOKEN}" }
+    }
+  }
+}
+  </script>
+  <script type="application/json" id="client-gemini">
+{
+  "mcpServers": {
+    "kamui-t2s": { "type": "http", "url": "https://{BASE_URL}/t2s/minimax/speech-2-5-turbo-preview" },
+    "kamui-t2m": { "type": "http", "url": "https://{BASE_URL}/t2m/google/lyria" }
+  }
+}
+  </script>
+  <script type="application/json" id="pkg-requirement">
+{
+  "mcpServers": {
+    "requirement": {
+      "type": "http",
+      "url": "https://{BASE_URL}/requirement",
+      "description": "KAMUI CODE Requirement Document Generator - Create HTML requirements with left sidebar navigation"
+    },
+    "t2i-kamui-imagen4-ultra": {
+      "type": "http",
+      "url": "https://{BASE_URL}/t2i/fal/imagen4/ultra",
+      "description": "Imagen4 Ultra (High Quality) via Kamui Code ⭐"
+    },
+    "i2i-kamui-flux-kontext-max": {
+      "type": "http",
+      "url": "https://{BASE_URL}/i2i/fal/flux/kontext/max",
+      "description": "Flux Kontext Max via Kamui Code ⭐"
+    },
+    "i2i-kamui-flux-krea-lora": {
+      "type": "http",
+      "url": "https://{BASE_URL}/i2i/fal/flux-krea-lora/image-to-image",
+      "description": "FLUX Krea LoRA Image-to-Image via Kamui Code ⭐"
+    },
+    "i2v-kamui-seedance-v1-lite": {
+      "type": "http",
+      "url": "https://{BASE_URL}/i2v/fal/bytedance/seedance-v1-lite",
+      "description": "ByteDance Seedance V1 Lite via Kamui Code ⭐"
+    }
+  }
+}
+  </script>
+  <script type="application/json" id="pkg-kamui-code">
+{
+  "mcpServers": {
+    "file-upload-kamui-fal": {
+      "type": "http",
+      "url": "https://{BASE_URL}/uploader/fal",
+      "description": "File Upload to FAL via Kamui Code (Local Uploader) ⭐⭐⭐"
+    },
+    "train-kamui-flux-kontext": {
+      "type": "http",
+      "url": "https://{BASE_URL}/train/fal/flux/kontext",
+      "description": "Flux Kontext Trainer via Kamui Code ⭐"
+    },
+    "video-analysis-kamui": {
+      "type": "http",
+      "url": "https://{BASE_URL}/video-analysis/google/gemini",
+      "description": "Gemini Video Analysis via Kamui Code ⭐"
+    },
+  }
+}
+  </script>
+  <script>
+    // テーマ（黒/白）切替
+    const themeDarkBtn = document.getElementById('themeDark');
+    const themeLightBtn = document.getElementById('themeLight');
+    function applyTheme(theme) {
+      const mode = theme === 'light' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', mode);
+      localStorage.setItem('theme', mode);
+      themeDarkBtn.classList.toggle('active', mode === 'dark');
+      themeLightBtn.classList.toggle('active', mode === 'light');
+    }
+    const savedTheme = localStorage.getItem('theme');
+    const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+    applyTheme(savedTheme || (prefersLight ? 'light' : 'dark'));
+    themeDarkBtn.addEventListener('click', () => applyTheme('dark'));
+    themeLightBtn.addEventListener('click', () => applyTheme('light'));
+
+    // 目次（TOC）動的生成 + スクロール
+    function buildToc(){
+      const tocList = document.getElementById('tocList');
+      if (!tocList) return [];
+      tocList.innerHTML = '';
+      const sections = Array.from(document.querySelectorAll('.doc-section'));
+      const groups = new Map(); // catValue -> { name, items: [{id,title}] }
+      sections.forEach(sec => {
+        const catVal = Number(sec.dataset.cat || '0');
+        const catName = sec.dataset.catName || 'その他';
+        const id = sec.id ? `#${sec.id}` : '';
+        const h2 = sec.querySelector('h2');
+        let title = h2 ? (h2.innerText || h2.textContent || id) : id;
+        title = title.replace(/^\s*\d+[.\-]\s*/, '');
+        if (!groups.has(catVal)) groups.set(catVal, { name: catName, items: [] });
+        groups.get(catVal).items.push({ id, title });
+      });
+      const sortedCats = Array.from(groups.keys()).sort((a,b)=>a-b);
+      sortedCats.forEach((catValue, catIdx) => {
+        const cat = groups.get(catValue);
+        const catNo = catIdx + 1;
+        const catItem = document.createElement('div');
+        catItem.className = 'tree-item';
+        const catLabel = document.createElement('div');
+        catLabel.className = 'tree-label category';
+        const toggle = document.createElement('span');
+        toggle.className = 'tree-toggle expanded';
+        toggle.textContent = '▼';
+        const name = document.createElement('span');
+        name.className = 'tree-name';
+        name.textContent = `${catNo}. ${cat.name}`;
+        catLabel.appendChild(toggle);
+        catLabel.appendChild(name);
+        const children = document.createElement('div');
+        children.className = 'tree-children expanded';
+        cat.items.forEach((it, i) => {
+          const item = document.createElement('div');
+          item.className = 'tree-item';
+          const label = document.createElement('div');
+          label.className = 'tree-label';
+          label.setAttribute('data-target', it.id);
+          const nm = document.createElement('span');
+          nm.className = 'tree-name';
+          nm.textContent = `${catNo}-${i+1}. ${it.title}`;
+          label.appendChild(nm);
+          item.appendChild(label);
+          children.appendChild(item);
+        });
+        catItem.appendChild(catLabel);
+        catItem.appendChild(children);
+        tocList.appendChild(catItem);
+      });
+      return Array.from(tocList.querySelectorAll('.tree-label[data-target]'));
+    }
+
+    // 本文を目次の順番に並べ替え、見出しを X-Y に採番
+    function reorderBodySectionsToMatchToc(){
+      const container = document.getElementById('docContainer');
+      if (!container) return [];
+      const secNodes = new Map();
+      document.querySelectorAll('.doc-section').forEach(sec => {
+        if (sec.id) secNodes.set(`#${sec.id}`, sec);
+      });
+      const orderedIds = Array.from(document.querySelectorAll('#tocList .tree-label[data-target]'))
+        .map(l => l.getAttribute('data-target'))
+        .filter(Boolean);
+      const frag = document.createDocumentFragment();
+      orderedIds.forEach(id => {
+        const node = secNodes.get(id);
+        if (node) frag.appendChild(node);
+      });
+      container.appendChild(frag);
+      return orderedIds;
+    }
+
+    function renumberBodyHeadingsByOrder(orderedIds){
+      const secById = new Map();
+      document.querySelectorAll('.doc-section').forEach(sec => {
+        if (sec.id) secById.set(`#${sec.id}`, sec);
+      });
+      const catOrder = new Map();
+      const catCounters = new Map();
+      let catNoSeq = 0;
+      orderedIds.forEach(id => {
+        const sec = secById.get(id);
+        if (!sec) return;
+        const catVal = String(sec.dataset.cat || '0');
+        if (!catOrder.has(catVal)) {
+          catOrder.set(catVal, ++catNoSeq);
+          catCounters.set(catVal, 0);
+        }
+        const h2 = sec.querySelector('h2');
+        if (!h2) return;
+        const raw = h2.innerText || h2.textContent || '';
+        const base = raw.replace(/^\s*\d+[.\-]\s*/, '');
+        const x = catOrder.get(catVal);
+        const y = (catCounters.get(catVal) || 0) + 1;
+        catCounters.set(catVal, y);
+        h2.textContent = `${x}-${y}. ${base}`;
+      });
+    }
+
+    const tocRoot = document.getElementById('folderTree');
+    // TOCを構築 → 本文をTOC順に並べ替え → 見出し採番
+    let itemLabels = buildToc();
+    const orderedIds = reorderBodySectionsToMatchToc();
+    renumberBodyHeadingsByOrder(orderedIds);
+    const sectionCount = document.getElementById('sectionCount');
+    sectionCount.textContent = itemLabels.length;
+
+    // クリックで本文へスクロール（項目のみ）
+    itemLabels.forEach(l => {
+      l.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const target = l.getAttribute('data-target');
+        if (target) {
+          document.querySelectorAll('.tree-label').forEach(el => el.classList.remove('selected'));
+          l.classList.add('selected');
+          const node = document.querySelector(target);
+          if (node) {
+            node.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+          // モバイル時はサイドバーを閉じる
+          if (window.matchMedia('(max-width: 768px)').matches) {
+            const sb = document.getElementById('sidebar');
+            const bd = document.getElementById('sidebarBackdrop');
+            sb?.classList.remove('open');
+            bd?.classList.remove('show');
+          }
+        }
+      });
+    });
+
+    // 大分類の展開/折りたたみ
+    tocRoot.querySelectorAll('.tree-label.category').forEach(cat => {
+      const toggle = cat.querySelector('.tree-toggle');
+      const children = cat.nextElementSibling;
+      cat.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (children) children.classList.toggle('expanded');
+        if (toggle) {
+          toggle.classList.toggle('expanded');
+          toggle.textContent = children && children.classList.contains('expanded') ? '▼' : '▶';
+        }
+        cat.classList.toggle('selected');
+      });
+    });
+
+    // ルートの折りたたみ
+    const root = document.querySelector('[data-toggle="root"]');
+    const rootChildren = document.querySelector('.tree-children');
+    const rootToggle = root.querySelector('.tree-toggle');
+    root.addEventListener('click', () => {
+      rootChildren.classList.toggle('expanded');
+      rootToggle.classList.toggle('expanded');
+      rootToggle.textContent = rootChildren.classList.contains('expanded') ? '▼' : '▶';
+      root.classList.toggle('selected');
+    });
+
+    // クイックリンク
+    document.querySelectorAll('.tag').forEach(tag => {
+      tag.addEventListener('click', () => {
+        const sel = tag.getAttribute('data-jump');
+        if (!sel) return;
+        document.querySelector(sel)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
+        tag.classList.add('active');
+      });
+    });
+
+    // サイドバー開閉（モバイル）
+    const sidebar = document.getElementById('sidebar');
+    const backdrop = document.getElementById('sidebarBackdrop');
+    const toggleBtn = document.getElementById('toggleSidebar');
+    function closeSidebar(){ sidebar?.classList.remove('open'); backdrop?.classList.remove('show'); }
+    function openSidebar(){ sidebar?.classList.add('open'); backdrop?.classList.add('show'); }
+    toggleBtn?.addEventListener('click', () => {
+      if (!sidebar) return;
+      sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+    });
+    backdrop?.addEventListener('click', closeSidebar);
+
+    // MCP プレイリスト/カタログ 表示
+    (async function initMcpSection(){
+      const state = { top: 'playlist', cat: 'creative' }; // playlist|catalog, creative|development|business
+      const btnTop = {
+        playlist: document.getElementById('btnMcpPlaylist'),
+        catalog: document.getElementById('btnMcpCatalog')
+      };
+      const btnCat = {
+        creative: document.getElementById('btnCatCreative'),
+        development: document.getElementById('btnCatDevelopment'),
+        business: document.getElementById('btnCatBusiness')
+      };
+      const table = document.getElementById('mcpTable');
+      const thead = table?.querySelector('thead');
+      const tbody = table?.querySelector('tbody');
+      const msg = document.getElementById('mcpMessage');
+
+      function setActive(){
+        Object.values(btnTop).forEach(b=>b?.classList.remove('active'));
+        Object.values(btnCat).forEach(b=>b?.classList.remove('active'));
+        btnTop[state.top]?.classList.add('active');
+        btnCat[state.cat]?.classList.add('active');
+      }
+
+      async function loadJson(url, inlineId, fallbackArray){
+        let items = [];
+        if (location.protocol !== 'file:') {
+          try { const res = await fetch(url, { cache: 'no-cache' }); if (res.ok) items = await res.json(); } catch(_) {}
+        }
+        if (!Array.isArray(items) || items.length===0) {
+          const inline = document.getElementById(inlineId);
+          if (inline && !inline.textContent && fallbackArray) inline.textContent = JSON.stringify(fallbackArray, null, 2);
+          try { items = JSON.parse(document.getElementById(inlineId)?.textContent || '[]'); } catch(_) {}
+        }
+        return Array.isArray(items)? items: [];
+      }
+
+      const playlists = await loadJson('./data/mcp_playlists.json', 'mcpPlaylistsInline', [
+        { category:'creative', name:'Creative Base', url:'https://example.com/mcp/creative.json', format:'json', description:'クリエイティブ向けMCPサーバーのプレイリスト' }
+      ]);
+      const catalogs = await loadJson('./data/mcp_catalog.json', 'mcpCatalogInline', [
+        { category:'creative', title:'Creative Servers', url:'https://docs.example.com/catalog/creative', description:'クリエイティブ領域のMCPサーバーカタログ' }
+      ]);
+      // 階層図（種別/カテゴリ）は非表示方針のため削除
+
+      function render(){
+        if (!thead || !tbody) return;
+        setActive();
+        const cat = state.cat;
+        if (state.top === 'playlist') {
+          thead.innerHTML = `<tr><th>名前</th><th>URL</th><th>形式</th><th>説明</th></tr>`;
+          const filtered = playlists.filter(x=>x.category===cat);
+          const rows = filtered.map(x=> `
+            <tr>
+              <td>${escapeHtml(x.name||'')}</td>
+              <td><a href="${escapeAttr(x.url||'')}" target="_blank" rel="noopener">${escapeHtml(x.url||'')}</a></td>
+              <td><code>${escapeHtml(x.format||'')}</code></td>
+              <td>${escapeHtml(x.description||'')}</td>
+            </tr>`).join('');
+          tbody.innerHTML = rows || `<tr><td colspan="4">該当するプレイリストがありません。</td></tr>`;
+          if (msg) msg.textContent = 'MCPプレイリスト（カテゴリ別）';
+          // 階層図非表示
+        } else {
+          thead.innerHTML = `<tr><th>ページ</th><th>URL</th><th>説明</th></tr>`;
+          const filtered = catalogs.filter(x=>x.category===cat);
+          const rows = filtered.map(x=> `
+            <tr>
+              <td>${escapeHtml(x.title||'')}</td>
+              <td><a href="${escapeAttr(x.url||'')}" target="_blank" rel="noopener">${escapeHtml(x.url||'')}</a></td>
+              <td>${escapeHtml(x.description||'')}</td>
+            </tr>`).join('');
+          tbody.innerHTML = rows || `<tr><td colspan="3">該当するカタログページがありません。</td></tr>`;
+          if (msg) msg.textContent = 'MCPカタログ（カテゴリ別）';
+          // 階層図非表示
+        }
+      }
+
+      btnTop.playlist?.addEventListener('click', ()=>{ state.top='playlist'; render(); });
+      btnTop.catalog?.addEventListener('click',  ()=>{ state.top='catalog';  render(); });
+      btnCat.creative?.addEventListener('click', ()=>{ state.cat='creative'; render(); });
+      btnCat.development?.addEventListener('click', ()=>{ state.cat='development'; render(); });
+      btnCat.business?.addEventListener('click', ()=>{ state.cat='business'; render(); });
+
+      // 初期状態（プレイリスト > クリエイティブ）
+      render();
+    })();
+
+    // メニュー定義（JSON読み込み → 表/階層図を描画）
+    // 削除: 旧メニュー定義（要件ドキュメントの目次）
+    async function renderMenuDefinitions(){
+      try {
+        let items = [];
+        const msg = document.getElementById('menuMessage');
+        const isFileProto = location.protocol === 'file:';
+        if (!isFileProto) {
+          try {
+            const res = await fetch('./data/menus.json', { cache: 'no-cache' });
+            if (res.ok) items = await res.json();
+          } catch (e) { /* fallback to inline */ }
+        }
+        if (!Array.isArray(items) || items.length === 0) {
+          const inline = document.getElementById('menusInline');
+          if (inline?.textContent?.trim()) {
+            try { items = JSON.parse(inline.textContent); } catch(e) {}
+          }
+          if (msg) msg.textContent = 'ローカル閲覧（file://）または外部JSON未取得のため、埋め込み定義を表示中。GitHub Pagesでは data/menus.json が自動読込されます。';
+        } else {
+          if (msg) msg.textContent = '';
+        }
+        if (!Array.isArray(items) || items.length === 0) {
+          if (msg) msg.textContent = 'メニュー定義が見つかりません。data/menus.json を確認してください。';
+          return;
+        }
+        // 表の描画
+        const tbody = document.querySelector('#menuTable tbody');
+        if (tbody) {
+          const byOrder = [...items].sort((a,b)=> (a.order||0)-(b.order||0));
+          tbody.innerHTML = byOrder.map(it => `
+            <tr>
+              <td>${escapeHtml(it.label || '')}</td>
+              <td><code>${escapeHtml(it.id || '')}</code></td>
+              <td>${it.path ? `<a href="${escapeAttr(it.path)}">${escapeHtml(it.path)}</a>` : ''}</td>
+              <td>${escapeHtml(it.parentId || '')}</td>
+              <td style="text-align:right;">${Number(it.order||0)}</td>
+              <td><code>${Array.isArray(it.roles)? it.roles.join(','): ''}</code></td>
+              <td>${it.visible===false? 'false':'true'}</td>
+              <td><code>${escapeHtml(it.icon || '')}</code></td>
+              <td>${escapeHtml(it.description || '')}</td>
+            </tr>`).join('');
+        }
+        // Mermaid階層図（flowchart）
+        const wrap = document.getElementById('menuDefsMermaid');
+        const mer = document.getElementById('menuMermaid');
+        if (wrap && mer && window.mermaid) {
+          const idSafe = s => (s||'').replace(/[^a-zA-Z0-9_]/g,'_');
+          const nodes = new Set();
+          let edges = '';
+          const byId = new Map(items.map(it=>[it.id,it]));
+          items.forEach(it => {
+            const n = `${idSafe(it.id)}["${(it.label||it.id).replace(/"/g,'\"')}"]`;
+            nodes.add(n);
+            if (it.parentId && byId.has(it.parentId)) {
+              const p = idSafe(it.parentId);
+              const c = idSafe(it.id);
+              edges += `  ${p} --> ${c}\n`;
+            }
+          });
+          const graph = `flowchart TD\n  %% auto-generated from menus.json\n  ${Array.from(nodes).join('\n  ')}\n${edges}`;
+          mer.textContent = graph;
+          wrap.style.display = 'block';
+          try { mermaid.init(undefined, [mer]); } catch(e) { /* noop */ }
+        }
+      } catch (e) {
+        console.warn('Menu defs render failed:', e);
+      }
+    }
+
+    function escapeHtml(s){ return String(s||'').replace(/[&<>"]/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[m])); }
+    function escapeAttr(s){ return String(s||'').replace(/["<>\n\r]/g,''); }
+
+    // renderMenuDefinitions(); // 旧機能は削除（非呼び出し）
+
+    // 検索（タイトルと本文中テキストを対象）
+    const searchInput = document.getElementById('searchInput');
+    // 単純な部分一致での強調（正規表現は使わず安全に）
+    function highlightTextNode(node, q){
+      const text = node.nodeValue || '';
+      const query = q.toLowerCase();
+      const lower = text.toLowerCase();
+      let pos = 0;
+      let idx = lower.indexOf(query, pos);
+      if (idx === -1) return;
+      const frag = document.createDocumentFragment();
+      while (idx !== -1){
+        const before = text.slice(pos, idx);
+        if (before) frag.appendChild(document.createTextNode(before));
+        const mark = document.createElement('mark');
+        mark.className = 'hl';
+        mark.textContent = text.slice(idx, idx + q.length);
+        frag.appendChild(mark);
+        pos = idx + q.length;
+        idx = lower.indexOf(query, pos);
+      }
+      const after = text.slice(pos);
+      if (after) frag.appendChild(document.createTextNode(after));
+      node.parentNode && node.parentNode.replaceChild(frag, node);
+    }
+    function clearHighlights(root){
+      root.querySelectorAll('mark.hl').forEach(m => {
+        const text = document.createTextNode(m.textContent || '');
+        m.parentNode && m.parentNode.replaceChild(text, m);
+      });
+    }
+    function highlightInElements(elements, q){
+      if (!q) return;
+      elements.forEach(el => {
+        clearHighlights(el);
+        el.childNodes.forEach(node => {
+          if (node.nodeType === Node.TEXT_NODE && node.nodeValue){
+            highlightTextNode(node, q);
+          }
+        });
+      });
+    }
+    searchInput.addEventListener('input', () => {
+      const q = searchInput.value.trim();
+      const sections = document.querySelectorAll('.doc-section');
+      // 表示/非表示の適用
+      sections.forEach(sec => {
+        const text = sec.innerText.toLowerCase();
+        sec.style.display = q === '' || text.includes(q.toLowerCase()) ? '' : 'none';
+      });
+      // ハイライトの適用（本文）
+      const doc = document.getElementById('docContainer');
+      if (doc){
+        clearHighlights(doc);
+        if (q){
+          const selectors = ['h2','p','li','.media-name','.endpoint','.card-title'];
+          highlightInElements([...doc.querySelectorAll(selectors.join(','))], q);
+        }
+      }
+      // 目次のフィルタ＋ハイライト
+      itemLabels.forEach(l => {
+        const nameEl = l.querySelector('.tree-name');
+        const name = nameEl?.innerText || '';
+        const targetId = l.getAttribute('data-target');
+        const secText = targetId ? (document.querySelector(targetId)?.innerText || '') : '';
+        const show = q === '' || name.toLowerCase().includes(q.toLowerCase()) || secText.toLowerCase().includes(q.toLowerCase());
+        l.parentElement.style.display = show ? '' : 'none';
+        if (nameEl){
+          // TOC内の強調
+          clearHighlights(nameEl);
+          if (q) highlightInElements([nameEl], q);
+        }
+      });
+    });
+
+    // 展開/折りたたみ/Top
+    document.getElementById('expandAll').addEventListener('click', () => {
+      rootChildren.classList.add('expanded');
+      rootToggle.classList.add('expanded');
+      rootToggle.textContent = '▼';
+    });
+    document.getElementById('collapseAll').addEventListener('click', () => {
+      rootChildren.classList.remove('expanded');
+      rootToggle.classList.remove('expanded');
+      rootToggle.textContent = '▶';
+    });
+    document.getElementById('toTop').addEventListener('click', () => {
+      document.getElementById('docContainer').scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // ==========================
+    // UI遷移図（Figma風）
+    // ==========================
+    (function initUiFlow(){
+      const flowInner = document.getElementById('flowInner');
+      const flowSvg = document.getElementById('flowSvg');
+      const flowNodes = document.getElementById('flowNodes');
+      if (!flowInner || !flowSvg || !flowNodes) return; // セクションが非表示の場合
+
+      // 画像を使った簡易遷移図（例）
+      const nodes = [
+        { id: 'home',    title: 'Home',    img: './kamui-docs-ui-pattern2-gradient.png',              x: 60,  y: 60 },
+        { id: 'gallery', title: 'Gallery', img: './kamui-white-2.png',              x: 360, y: 60 },
+        { id: 'detail',  title: 'Detail',  img: './kamui-white-3.png',              x: 660, y: 60 },
+        { id: 'config',  title: 'Config',  img: './kamui-docs-ui-pattern3-minimal.png', x: 960, y: 60 },
+        { id: 'publish', title: 'Publish', img: './kamui-v2-5-white-pastel.png',    x: 960, y: 360 },
+        { id: 'done',    title: 'Success', img: './kamui-docs-ui-pattern1-dark.png',x: 1260,y: 360 }
+      ];
+      const edges = [
+        { from: 'home', to: 'gallery', label: '一覧へ' },
+        { from: 'gallery', to: 'detail', label: '詳細へ' },
+        { from: 'detail', to: 'config', label: '設定' },
+        { from: 'config', to: 'publish', label: '公開' },
+        { from: 'publish', to: 'done', label: '完了' }
+      ];
+
+      // KAMUI CODE ドキュメントのメニュー（JSON読み込み → 表/階層図）
+      (async function renderKamuiDocMenus(){
+        try {
+          const msg = document.getElementById('docMenuMessage');
+          const tbody = document.querySelector('#docMenuTable tbody');
+          if (!tbody) return;
+          let items = [];
+          const isFileProto = location.protocol === 'file:';
+          if (!isFileProto) {
+            try{
+              const res = await fetch('./data/kamui-doc-menus.json', { cache: 'no-cache' });
+              if (res.ok) items = await res.json();
+            } catch(_) {}
+          }
+          if (!Array.isArray(items) || items.length===0) {
+            // inline fallback（Home/Welcome + 2大カテゴリ + 各3カテゴリ）
+            const inlineEl = document.getElementById('kamuiMenusInline');
+            if (inlineEl && !inlineEl.textContent) {
+              inlineEl.textContent = JSON.stringify([
+                { id:'home', label:'ホーム', type:'menu', path:'/', parentId:null, order:0, description:'KAMUI CODE ドキュメントのホーム' },
+                { id:'welcome', label:'はじめまして', type:'menu', path:'/welcome', parentId:null, order:0.2, description:'初めての方向けの案内' },
+                { id: 'mcp-playlist', label:'MCPプレイリスト', type:'group', path:'/playlist', parentId:null, order:1, description:'MCPサーバーURLのプレイリスト（最上位）' },
+                { id: 'playlist-all', label:'プレイリスト一覧', type:'menu', path:'/playlist/all', parentId:'mcp-playlist', order:1.01, description:'プレイリストIDの一覧と検索' },
+                { id: 'playlist-creative', label:'プレイリスト（クリエイティブ）', type:'menu', path:'/playlist/creative', parentId:'mcp-playlist', order:1.10, description:'クリエイティブ向けプレイリスト' },
+                { id: 'playlist-development', label:'プレイリスト（開発）', type:'menu', path:'/playlist/development', parentId:'mcp-playlist', order:1.20, description:'開発向けプレイリスト' },
+                { id: 'playlist-business', label:'プレイリスト（ビジネス）', type:'menu', path:'/playlist/business', parentId:'mcp-playlist', order:1.30, description:'ビジネス向けプレイリスト' },
+                { id: 'mcp-catalog', label:'MCPカタログ', type:'group', path:'/catalog', parentId:null, order:2, description:'MCPサーバー/パッケージのカタログ' },
+                { id: 'catalog-all', label:'カタログ一覧', type:'menu', path:'/catalog/all', parentId:'mcp-catalog', order:2.01, description:'カタログIDの一覧と検索' },
+                { id: 'catalog-creative', label:'カタログ（クリエイティブ）', type:'menu', path:'/catalog/creative', parentId:'mcp-catalog', order:2.10, description:'クリエイティブ領域のカタログ' },
+                { id: 'catalog-development', label:'カタログ（開発）', type:'menu', path:'/catalog/development', parentId:'mcp-catalog', order:2.20, description:'開発領域のカタログ' },
+                { id: 'catalog-business', label:'カタログ（ビジネス）', type:'menu', path:'/catalog/business', parentId:'mcp-catalog', order:2.30, description:'ビジネス領域のカタログ' }
+              ], null, 2);
+            }
+            try { items = JSON.parse(document.getElementById('kamuiMenusInline').textContent || '[]'); } catch(_) {}
+            if (msg) msg.textContent = 'ローカル閲覧（file://）または外部JSON未取得のため、埋め込み定義を表示中。';
+          } else {
+            if (msg) msg.textContent = '';
+          }
+
+          // 追加: MCPカタログ/プレイリストの id 階層項目をメニュー一覧に追記
+          async function fetchJsonOrFallback(url, fallback){
+            let data = [];
+            if (location.protocol !== 'file:') {
+              try { const r = await fetch(url, { cache:'no-cache' }); if (r.ok) data = await r.json(); } catch(_) {}
+            }
+            if (!Array.isArray(data) || data.length===0) data = fallback || [];
+            return data;
+          }
+          const catalogData = await fetchJsonOrFallback('./data/mcp_catalog.json', [
+            { category:'creative', title:'Imagen4 Ultra (T2I)', path:'/catalog/id/t2i/fal/imagen4/ultra', description:'例: クリエイティブ向けテキスト→画像' }
+          ]);
+          const playlistData = await fetchJsonOrFallback('./data/mcp_playlists.json', [
+            { category:'business', name:'Requirement', path:'/playlist/id/requirement', format:'json', description:'例: 要件ドキュメント系のプレイリスト' },
+            { category:'business', name:'Storyboard',  path:'/playlist/id/storyboard',  format:'json', description:'例: ストーリーボード系のプレイリスト' }
+          ]);
+          const catParent = { creative:'catalog-creative', development:'catalog-development', business:'catalog-business' };
+          const plParent  = { creative:'playlist-creative', development:'playlist-development', business:'playlist-business' };
+          // 親の直後に挿入されるよう、親の並び順+小数で配置
+          const parentOrder = new Map(items.map(it => [it.id, Number(it.order||0)]));
+          const childIndex = new Map(); // parentId -> i
+          let seq = 100; // フォールバック用
+          const extras = [];
+          catalogData.forEach(x => {
+            const parentId = catParent[x.category] || 'mcp-catalog';
+            const m = String(x.path||'').match(/\/catalog\/id\/(.+)$/);
+            const id = 'catalog-id-' + (m? m[1] : String(x.path||'')).replace(/^\/+|\/+$/g,'').replace(/\//g,'-').replace(/[^a-zA-Z0-9_-]/g,'_');
+            const base = parentOrder.get(parentId) ?? 99;
+            const idx = (childIndex.get(parentId) ?? 0) + 1; childIndex.set(parentId, idx);
+            extras.push({
+              label: x.title || x.path,
+              id,
+              type: 'catalog-id',
+              path: x.path || '',
+              parentId,
+              order: base + idx/100,
+              description: x.description || ''
+            });
+          });
+          playlistData.forEach(x => {
+            const parentId = plParent[x.category] || 'mcp-playlist';
+            const m = String(x.path||'').match(/\/playlist\/id\/(.+)$/);
+            const id = 'playlist-id-' + (m? m[1] : String(x.path||'')).replace(/^\/+|\/+$/g,'').replace(/\//g,'-').replace(/[^a-zA-Z0-9_-]/g,'_');
+            const base = parentOrder.get(parentId) ?? 99;
+            const idx = (childIndex.get(parentId) ?? 0) + 1; childIndex.set(parentId, idx);
+            extras.push({
+              label: x.name || x.path,
+              id,
+              type: 'playlist-id',
+              path: x.path || '',
+              parentId,
+              order: base + idx/100,
+              description: x.description || ''
+            });
+          });
+          const allItems = items.concat(extras);
+
+          // 表描画
+          const byOrder = [...allItems].sort((a,b)=> (a.order||0)-(b.order||0));
+          tbody.innerHTML = byOrder.map(it => `
+            <tr>
+              <td>${escapeHtml(it.label||'')}</td>
+              <td><code>${escapeHtml(it.id||'')}</code></td>
+              <td><code>${escapeHtml(it.type||'menu')}</code></td>
+              <td>${linkifyPath(it.path)}</td>
+              <td>${escapeHtml(it.parentId||'')}</td>
+              <td style="text-align:right;">${Number(it.order||0)}</td>
+              <td>${escapeHtml(it.description||'')}</td>
+            </tr>`).join('');
+
+          // 階層図の生成は非表示要望により削除
+        } catch (e) { console.warn('renderKamuiDocMenus failed', e); }
+      })();
+
+      function linkifyPath(p){
+        const s = String(p||'');
+        if (!s) return '';
+        // 実ページとして存在する可能性が高いもののみリンク化
+        if (/^\/$|^\/welcome$|^\/playlist\/?$|^\/playlist\/all$|^\/catalog\/?$|^\/catalog\/all$/.test(s)) {
+          return `<a href="${escapeAttr(s)}">${escapeHtml(s)}</a>`;
+        }
+        return `<code>${escapeHtml(s)}</code>`;
+      }
+
+      // 定数
+      const NODE_W = 220; const NODE_H = 180; // 画像140 + タイトル40程度
+
+      // 矢印マーカー
+      const defs = document.createElementNS('http://www.w3.org/2000/svg','defs');
+      const marker = document.createElementNS('http://www.w3.org/2000/svg','marker');
+      marker.setAttribute('id','arrow');
+      marker.setAttribute('markerWidth','10');
+      marker.setAttribute('markerHeight','10');
+      marker.setAttribute('refX','10');
+      marker.setAttribute('refY','3');
+      marker.setAttribute('orient','auto');
+      const arrowPath = document.createElementNS('http://www.w3.org/2000/svg','path');
+      arrowPath.setAttribute('d','M0,0 L10,3 L0,6 Z');
+      arrowPath.setAttribute('fill','currentColor');
+          arrowPath.setAttribute('opacity','1');
+      marker.appendChild(arrowPath);
+      defs.appendChild(marker);
+      flowSvg.appendChild(defs);
+
+      // ノード描画
+      const nodeMap = new Map();
+      nodes.forEach(n => {
+        const el = document.createElement('div');
+        el.className = 'flow-node';
+        el.style.left = n.x + 'px';
+        el.style.top  = n.y + 'px';
+        el.setAttribute('data-id', n.id);
+        el.innerHTML = `<img src="${n.img}" alt="${n.title}"><div class="title">${n.title}</div>`;
+        flowNodes.appendChild(el);
+        nodeMap.set(n.id, el);
+      });
+
+      // エッジ描画
+      const edgeEls = [];
+      function drawEdges(){
+        // クリア（defsは維持）
+        [...flowSvg.querySelectorAll('path.edge, text.flow-label')].forEach(e => e.remove());
+        edges.forEach(e => {
+          const fromEl = nodeMap.get(e.from);
+          const toEl   = nodeMap.get(e.to);
+          if (!fromEl || !toEl) return;
+          const fromRect = fromEl.getBoundingClientRect();
+          const toRect   = toEl.getBoundingClientRect();
+          const svgRect  = flowSvg.getBoundingClientRect();
+          // 右辺→左辺を結ぶ曲線
+          const sx = (fromRect.left - svgRect.left) + NODE_W; // 右側
+          const sy = (fromRect.top  - svgRect.top)  + NODE_H/2;
+          const ex = (toRect.left   - svgRect.left);          // 左側
+          const ey = (toRect.top    - svgRect.top)   + NODE_H/2;
+          const dx = Math.max(60, (ex - sx) / 2);
+          const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+          const d = `M ${sx},${sy} C ${sx+dx},${sy} ${ex-dx},${ey} ${ex},${ey}`;
+          path.setAttribute('d', d);
+          path.setAttribute('stroke', 'currentColor');
+          path.setAttribute('stroke-width', '2.8');
+          path.setAttribute('opacity','1');
+          path.setAttribute('fill', 'none');
+          path.setAttribute('marker-end', 'url(#arrow)');
+          path.setAttribute('class','edge');
+          flowSvg.appendChild(path);
+          if (e.label) {
+            const label = document.createElementNS('http://www.w3.org/2000/svg','text');
+            label.setAttribute('class','flow-label');
+            label.textContent = e.label;
+            const mx = (sx+ex)/2; const my = (sy+ey)/2 - 6;
+            label.setAttribute('x', mx);
+            label.setAttribute('y', my);
+            flowSvg.appendChild(label);
+          }
+        });
+      }
+
+      // ドラッグ
+      let dragging = null; let offsetX = 0; let offsetY = 0;
+      function onMouseDown(ev){
+        const el = ev.currentTarget;
+        dragging = el;
+        const rect = el.getBoundingClientRect();
+        offsetX = ev.clientX - rect.left;
+        offsetY = ev.clientY - rect.top;
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+      }
+      function onMouseMove(ev){
+        if (!dragging) return;
+        const parentRect = flowNodes.getBoundingClientRect();
+        const x = ev.clientX - parentRect.left - offsetX;
+        const y = ev.clientY - parentRect.top  - offsetY;
+        dragging.style.left = Math.max(0, x) + 'px';
+        dragging.style.top  = Math.max(0, y) + 'px';
+        requestAnimationFrame(drawEdges);
+      }
+      function onMouseUp(){
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+        dragging = null;
+      }
+      nodeMap.forEach(el => {
+        el.addEventListener('mousedown', onMouseDown);
+        // 画像クリックでポップアップ拡大
+        const im = el.querySelector('img');
+        im?.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openImgModal(im.getAttribute('src') || '', im.getAttribute('alt') || '');
+        });
+      });
+
+      // ズーム
+      const zoomOutBtn = document.getElementById('flowZoomOut');
+      const zoomInBtn  = document.getElementById('flowZoomIn');
+      const zoomResetBtn = document.getElementById('flowZoomReset');
+      let scale = 1;
+      function applyScale(){
+        flowInner.style.transform = `scale(${scale})`;
+        // SVGやノードは一緒に拡大縮小される
+      }
+      zoomOutBtn?.addEventListener('click', () => { scale = Math.max(0.5, +(scale - 0.1).toFixed(2)); applyScale(); });
+      zoomInBtn?.addEventListener('click',  () => { scale = Math.min(2.0, +(scale + 0.1).toFixed(2)); applyScale(); });
+      zoomResetBtn?.addEventListener('click',() => { scale = 1; applyScale(); });
+
+      // 初期描画
+      drawEdges();
+      window.addEventListener('resize', drawEdges);
+    })();
+
+    // ==========================
+    // カードのパステル配色 & パッケージ表示
+    // ==========================
+    (function initCards(){
+      // 安定したパステル色生成（タイトルからHSLを作る）
+      function pastelFrom(text){
+        let h = 0;
+        for (let i=0;i<text.length;i++) h = (h*31 + text.charCodeAt(i)) >>> 0;
+        h = h % 360;
+        const s = 70; // 彩度
+        const l = 90; // 輝度（淡く）
+        return `hsl(${h} ${s}% ${l}%)`;
+      }
+      function hueFrom(text){
+        let h = 0;
+        for (let i=0;i<text.length;i++) h = (h*31 + text.charCodeAt(i)) >>> 0;
+        return h % 360;
+      }
+      function randFrom(text){
+        // 簡易シード乱数（0..1）
+        let x = 2166136261 >>> 0;
+        for (let i=0;i<text.length;i++) x = Math.imul(x ^ text.charCodeAt(i), 16777619) >>> 0;
+        return (x % 1000) / 1000;
+      }
+      function setCardGradient(card, label){
+        const base = hueFrom(label);
+        const r = randFrom(label);
+        // もう一方の色相は+30~+70度の範囲でずらす
+        const offset = 30 + Math.round(r * 40);
+        const hueA = base;
+        const hueB = (base + offset) % 360;
+        // 彩度/輝度/透明度を少し揺らす
+        const satA = 66 + Math.round(r * 10);      // 66..76
+        const satB = 62 + Math.round((1-r) * 12);  // 62..74
+        const lightA = 90 + Math.round(r * 4);     // 90..94
+        const lightB = 86 + Math.round((1-r) * 6); // 86..92
+        const alphaA = 0.48 + (r * 0.18);          // 0.48..0.66
+        const alphaB = 0.45 + ((1-r) * 0.18);      // 0.45..0.63
+        card.style.setProperty('--card-hue-a', String(hueA));
+        card.style.setProperty('--card-hue-b', String(hueB));
+        card.style.setProperty('--card-sat-a', satA + '%');
+        card.style.setProperty('--card-sat-b', satB + '%');
+        card.style.setProperty('--card-light-a', lightA + '%');
+        card.style.setProperty('--card-light-b', lightB + '%');
+        card.style.setProperty('--card-alpha-a', String(alphaA));
+        card.style.setProperty('--card-alpha-b', String(alphaB));
+      }
+
+      // パッケージカードの生成
+      const packages = [
+        { file: 'mcp/mcp-storyboard.json',  title: 'Storyboard パッケージ' },
+        { file: 'mcp/mcp-requirement.json', title: 'Requirement パッケージ' },
+        { file: 'mcp/mcp-kamui-code.json',  title: 'KAMUI CODE パッケージ' }
+      ];
+      const pkgContainer = document.getElementById('packageCards');
+
+      // JSONモーダル制御
+      const modal = document.getElementById('jsonModal');
+      const modalCode = document.getElementById('jsonModalCode');
+      const modalTitle = document.getElementById('jsonModalTitle');
+      const modalClose = document.getElementById('jsonCloseBtn');
+      const modalCopy = document.getElementById('jsonCopyBtn');
+      const modalDownload = document.getElementById('jsonDownload');
+      function openJsonModal(text, filename){
+        modalCode.textContent = text;
+        modalTitle.textContent = `JSON プレビュー - ${filename}`;
+        modalDownload.href = filename;
+        modal.classList.add('active');
+      }
+      modalClose?.addEventListener('click', () => modal.classList.remove('active'));
+      modal?.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); });
+      modalCopy?.addEventListener('click', async () => { try { await navigator.clipboard.writeText(modalCode.textContent || ''); } catch {} });
+
+      async function readJsonWithFallback(path, inlineId){
+        try {
+          const res = await fetch(path);
+          if (res.ok) return await res.json();
+        } catch {}
+        // fallback to inline script
+        try {
+          const el = document.getElementById(inlineId);
+          if (el) return JSON.parse(el.textContent || '{}');
+        } catch {}
+        return null;
+      }
+
+      async function renderPackages(){
+        if (!pkgContainer) return;
+        for (const p of packages){
+          let meta = { size: '-', servers: '-' };
+          let text = '';
+          let json = await readJsonWithFallback(p.file, 'pkg-' + p.file.split('/').pop().replace(/\.json$/, '').replace('mcp-',''));
+          if (!json) json = {};
+          const map = json?.mcpServers || {};
+          meta.servers = Object.keys(map).length;
+          try { text = JSON.stringify(json, null, 2); meta.size = `${new Blob([text]).size} bytes`; } catch {}
+
+          const card = document.createElement('div');
+          card.className = 'card pastel';
+          setCardGradient(card, p.title);
+          card.innerHTML = `
+            <div class=\"card-title\">${p.title}</div>
+            <div class=\"endpoint\">./${p.file}</div>
+            <ul>
+              <li>サーバー数: ${meta.servers}</li>
+              <li>サイズ: ${meta.size}</li>
+            </ul>
+            <div style=\"margin-top:8px;display:flex;gap:8px;\">
+              <button class=\"view-btn\" data-open-json=\"${p.file}\">JSONを開く</button>
+              <button class=\"view-btn\" data-preview>プレビュー</button>
+            </div>
+          `;
+          pkgContainer.appendChild(card);
+
+          const openBtn = card.querySelector('[data-open-json]');
+          openBtn?.addEventListener('click', async (ev) => {
+            const path = ev.currentTarget.getAttribute('data-open-json');
+            const inlineId = 'pkg-' + path.split('/').pop().replace(/\.json$/, '').replace('mcp-','');
+            try {
+              const res = await fetch(path);
+              if (res.ok) { const text = await res.text(); return openJsonModal(text, path); }
+            } catch {}
+            const el = document.getElementById(inlineId);
+            if (el) return openJsonModal(el.textContent || '', path);
+            openJsonModal('読み込みに失敗しました', path);
+          });
+
+          const btn = card.querySelector('[data-preview]');
+          btn?.addEventListener('click', async () => {
+            const inlineId = 'pkg-' + p.file.split('/').pop().replace(/\.json$/, '').replace('mcp-','');
+            let json = await readJsonWithFallback(p.file, inlineId);
+            if (json) return openJsonModal(JSON.stringify(json, null, 2), p.file);
+            openJsonModal('プレビューを取得できませんでした', p.file);
+          });
+        }
+      }
+
+      // サーバーカタログの自動生成
+      async function renderServers(){
+        const serverContainer = document.getElementById('serverCards');
+        if (!serverContainer) return;
+        const all = {};
+        for (const p of packages){
+          const inlineId = 'pkg-' + p.file.split('/').pop().replace(/\.json$/, '').replace('mcp-','');
+          const json = await readJsonWithFallback(p.file, inlineId);
+          if (json) Object.assign(all, json?.mcpServers || {});
+        }
+        // 上限を設けてカード数を抑制（例: 6件まで）
+        const MAX_CARDS = 6;
+        const entries = Object.entries(all).slice(0, MAX_CARDS);
+        if (entries.length === 0) {
+          // フォールバック（復元）
+          const fallback = [
+            { title:'画像生成サーバー', path:'/t2i/example/model', badges:['t2i','example'] },
+            { title:'コード支援サーバー', path:'/dev/code/analyze', badges:['dev','code'] },
+            { title:'翻訳サーバー', path:'/biz/translate', badges:['biz','translate'] },
+            { title:'レポート生成サーバー', path:'/biz/report', badges:['biz','report'] }
+          ];
+          fallback.forEach(f => {
+            const card = document.createElement('div');
+            card.className = 'card pastel';
+            setCardGradient(card, f.title);
+            card.innerHTML = `<div class=\"card-title\">${f.title}</div>
+              ${f.badges.map(b=>`<span class=\\\"badge\\\">${b}</span>`).join(' ')}
+              <div class=\"endpoint\">${f.path}</div>`;
+            serverContainer.appendChild(card);
+          });
+          return;
+        }
+        entries.forEach(([key, v]) => {
+          const url = v.url || '';
+          let category = '-'; let vendor = '-'; let pathOnly = url;
+          try {
+            const u = new URL(url);
+            const seg = u.pathname.split('/').filter(Boolean);
+            category = seg[0] || '-'; vendor = seg[1] || '-';
+            pathOnly = u.pathname;
+          } catch {}
+          const title = v.description || key;
+          const card = document.createElement('div');
+          card.className = 'card pastel';
+          setCardGradient(card, title);
+          card.innerHTML = `
+            <div class=\"card-title\">${title}</div>
+            <span class=\"badge\">${category}</span>
+            <span class=\"badge\">${vendor}</span>
+            <div class=\"endpoint\">${pathOnly}</div>
+          `;
+          card.style.cursor = 'pointer';
+          card.addEventListener('click', () => {
+            const usage = buildUsage(category, url);
+            openJsonModal(usage, title);
+          });
+          serverContainer.appendChild(card);
+        });
+      }
+
+      // 利用方法テンプレート
+      function buildUsage(category, url){
+        const h = `# 利用方法\n対象: ${url}\nカテゴリ: ${category}\n\n`;
+        const tpl = {
+          't2i': `curl -X POST "${url}" \\\n+  -H "Authorization: Bearer <TOKEN>" \\\n+  -H "Content-Type: application/json" \\\n+  -d '{"prompt":"桜並木の夕景","size":"1024x1024"}'`,
+          'i2i': `curl -X POST "${url}" \\\n+  -H "Authorization: Bearer <TOKEN>" \\\n+  -H "Content-Type: application/json" \\\n+  -d '{"image_url":"https://example.com/input.png","prompt":"油絵風に"}'`,
+          't2v': `curl -X POST "${url}" \\\n+  -H "Authorization: Bearer <TOKEN>" \\\n+  -H "Content-Type: application/json" \\\n+  -d '{"prompt":"街のタイムラプス映像、夜景"}'`,
+          'i2v': `curl -X POST "${url}" \\\n+  -H "Authorization: Bearer <TOKEN>" \\\n+  -H "Content-Type: application/json" \\\n+  -d '{"image_url":"https://example.com/frame.png","prompt":"スムーズなパン動作"}'`,
+          'v2v': `curl -X POST "${url}" \\\n+  -H "Authorization: Bearer <TOKEN>" \\\n+  -H "Content-Type: application/json" \\\n+  -d '{"video_url":"https://example.com/input.mp4","instruction":"リップシンク"}'`,
+          'r2v': `curl -X POST "${url}" \\\n+  -H "Authorization: Bearer <TOKEN>" \\\n+  -H "Content-Type: application/json" \\\n+  -d '{"reference_url":"https://example.com/ref.png","prompt":"同じキャラで別ポーズ"}'`,
+          't2s': `curl -X POST "${url}" \\\n+  -H "Authorization: Bearer <TOKEN>" \\\n+  -H "Content-Type: application/json" \\\n+  -d '{"text":"こんにちは、KAMUI CODEです"}'`,
+          't2m': `curl -X POST "${url}" \\\n+  -H "Authorization: Bearer <TOKEN>" \\\n+  -H "Content-Type: application/json" \\\n+  -d '{"prompt":"lofi hiphop, 90bpm"}'`,
+          'v2a': `curl -X POST "${url}" \\\n+  -H "Authorization: Bearer <TOKEN>" \\\n+  -H "Content-Type: application/json" \\\n+  -d '{"video_url":"https://example.com/input.mp4"}'`,
+          'uploader': `curl -X POST "${url}" \\\n+  -H "Authorization: Bearer <TOKEN>" \\\n+  -F 'file=@/path/to/local.file'`,
+          'train': `curl -X POST "${url}" \\\n+  -H "Authorization: Bearer <TOKEN>" \\\n+  -H "Content-Type: application/json" \\\n+  -d '{"dataset_url":"https://example.com/dataset.zip","epochs":2}'`,
+          'video-analysis': `curl -X POST "${url}" \\\n+  -H "Authorization: Bearer <TOKEN>" \\\n+  -H "Content-Type: application/json" \\\n+  -d '{"video_url":"https://example.com/input.mp4","question":"内容を要約"}'`,
+          'requirement': `curl "${url}"`,
+          'storyboard': `curl "${url}"`
+        };
+        const code = tpl[category] || `curl -X POST "${url}" -H "Authorization: Bearer <TOKEN>" -H "Content-Type: application/json" -d '{"prompt":"..."}'`;
+        return h + '```bash\n' + code + '\n```';
+      }
+
+      // 実行
+      renderPackages();
+      renderServers();
+
+      // クライアント別サンプル（カード）
+      const clientSamples = [
+        { id:'client-codex', title:'Codex CLI 用サンプル' },
+        { id:'client-claude', title:'Claude Code / Claude 用サンプル' },
+        { id:'client-claude-command', title:'Claude（command型）サンプル' },
+        { id:'client-gemini', title:'Gemini CLI 用サンプル' }
+      ];
+      const clientContainer = document.getElementById('clientSampleCards');
+      if (clientContainer){
+        clientSamples.forEach(s => {
+          const card = document.createElement('div');
+          card.className = 'card pastel';
+          setCardGradient(card, s.title);
+          const jsonText = (document.getElementById(s.id)?.textContent)||'';
+          let servers = '-';
+          try { const obj = JSON.parse(jsonText||'{}'); servers = Object.keys(obj.mcpServers||{}).length; } catch {}
+          card.innerHTML = `
+            <div class=\"card-title\">${s.title}</div>
+            <div class=\"endpoint-box\"><div class=\"endpoint\">サーバー定義数: ${servers}</div></div>
+            <div style=\"display:flex;gap:8px;margin-top:8px;\">
+              <button class=\"view-btn\" data-open-client=\"${s.id}\">サンプルを見る</button>
+              <button class=\"view-btn\" data-copy-client=\"${s.id}\">コピー</button>
+            </div>
+          `;
+          clientContainer.appendChild(card);
+          card.addEventListener('click', (ev) => {
+            const target = ev.target;
+            const isButton = target && typeof target.closest === 'function' && target.closest('button');
+            if (isButton) return; // ボタンは別
+            openJsonModal(jsonText, s.title);
+          });
+          const openBtn = card.querySelector('[data-open-client]');
+          openBtn?.addEventListener('click', () => openJsonModal(jsonText, s.title));
+          const copyBtn = card.querySelector('[data-copy-client]');
+          copyBtn?.addEventListener('click', async () => { try { await navigator.clipboard.writeText(jsonText); } catch {} });
+        });
+      }
+
+      // 8. UI/画面（画像）をクリックで拡大表示
+      function openImgModal(src, title){
+        const modal = document.getElementById('imgModal');
+        const img = document.getElementById('imgModalImage');
+        const ttl = document.getElementById('imgModalTitle');
+        const closeBtn = document.getElementById('imgCloseBtn');
+        if (!modal || !img || !ttl) return;
+        img.setAttribute('src', src);
+        ttl.textContent = title || '画像プレビュー';
+        modal.classList.add('active');
+        closeBtn?.addEventListener('click', () => modal.classList.remove('active'), { once: true });
+        modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('active'); }, { once: true });
+      }
+      window.openImgModal = openImgModal;
+      document.querySelectorAll('#ui .media-grid img').forEach((im) => {
+        im.addEventListener('click', () => openImgModal(im.getAttribute('src'), im.getAttribute('alt')));
+      });
+      // 2. コンセプトと対象領域の画像も拡大対象
+      document.querySelectorAll('#domains .section-image img').forEach((im) => {
+        im.addEventListener('click', () => openImgModal(im.getAttribute('src'), im.getAttribute('alt')));
+      });
+      document.querySelectorAll('#docHero img').forEach((im) => {
+        im.addEventListener('click', () => openImgModal(im.getAttribute('src'), im.getAttribute('alt')));
+      });
+      
+      // 新しく追加した画像もクリックで拡大対象（clickable-imgクラス）
+      document.querySelectorAll('.clickable-img img').forEach((im) => {
+        im.style.cursor = 'pointer';
+        im.addEventListener('click', () => {
+          const parent = im.closest('.media-item');
+          const title = parent?.querySelector('.media-name')?.textContent || im.getAttribute('alt');
+          openImgModal(im.getAttribute('src'), title);
+        });
+      });
+      
+      // コンセプト図の下に追加した画像も拡大対象
+      document.querySelectorAll('#domains .media-grid img').forEach((im) => {
+        im.style.cursor = 'pointer';
+        im.addEventListener('click', () => {
+          const parent = im.closest('.media-item');
+          const title = parent?.querySelector('.media-name')?.textContent || im.getAttribute('alt');
+          openImgModal(im.getAttribute('src'), title);
+        });
+      });
+      
+      // 9. 右クリックメニューで相対パスコピー機能
+      const contextMenu = document.createElement('div');
+      contextMenu.id = 'custom-context-menu';
+      contextMenu.style.cssText = `
+        position: fixed;
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        z-index: 10000;
+        display: none;
+        min-width: 180px;
+      `;
+      contextMenu.innerHTML = `
+        <div id="copy-path-btn" style="padding: 8px 12px; cursor: pointer; border-radius: 4px; font-size: 0.9rem; color: var(--text);">
+          📋 相対パスをコピー
+        </div>
+      `;
+      document.body.appendChild(contextMenu);
+      
+      let currentPath = '';
+      
+      // メディアアイテムに右クリックイベントを追加
+      document.querySelectorAll('.media-item[data-path]').forEach(item => {
+        item.addEventListener('contextmenu', (e) => {
+          e.preventDefault();
+          currentPath = item.getAttribute('data-path');
+          
+          // メニューを表示
+          contextMenu.style.display = 'block';
+          contextMenu.style.left = e.pageX + 'px';
+          contextMenu.style.top = e.pageY + 'px';
+          
+          // 画面外にはみ出ないよう調整
+          const rect = contextMenu.getBoundingClientRect();
+          if (rect.right > window.innerWidth) {
+            contextMenu.style.left = (window.innerWidth - rect.width - 10) + 'px';
+          }
+          if (rect.bottom > window.innerHeight) {
+            contextMenu.style.top = (window.innerHeight - rect.height - 10) + 'px';
+          }
+        });
+      });
+      
+      // コピーボタンのクリックイベント
+      document.getElementById('copy-path-btn').addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(currentPath);
+          const btn = document.getElementById('copy-path-btn');
+          const originalText = btn.innerHTML;
+          btn.innerHTML = '✅ コピーしました！';
+          setTimeout(() => {
+            btn.innerHTML = originalText;
+          }, 1500);
+        } catch (err) {
+          console.error('コピーに失敗しました:', err);
+        }
+        contextMenu.style.display = 'none';
+      });
+      
+      // ホバー効果
+      document.getElementById('copy-path-btn').addEventListener('mouseenter', (e) => {
+        e.target.style.background = 'var(--hover)';
+      });
+      document.getElementById('copy-path-btn').addEventListener('mouseleave', (e) => {
+        e.target.style.background = 'transparent';
+      });
+      
+      // 他の場所をクリックしたらメニューを閉じる
+      document.addEventListener('click', (e) => {
+        if (!contextMenu.contains(e.target)) {
+          contextMenu.style.display = 'none';
+        }
+      });
+      
+      // ESCキーでメニューを閉じる
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          contextMenu.style.display = 'none';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

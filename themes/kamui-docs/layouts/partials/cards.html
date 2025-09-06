@@ -1,0 +1,25 @@
+<div class="card-grid">
+  {{ range . }}
+  <div class="card{{ if .pastel }} pastel{{ end }}"{{ if .gradient }} style="{{ .gradient }}"{{ end }}>
+    <div class="card-title">{{ .title }}</div>
+    {{ range .badges }}
+    <span class="badge">{{ . }}</span>
+    {{ end }}
+    {{ if .endpoint }}
+    <div class="endpoint-box">
+      <div class="endpoint">{{ .endpoint }}</div>
+    </div>
+    {{ end }}
+    {{ if .content }}
+    <div>{{ .content | markdownify }}</div>
+    {{ end }}
+    {{ if .list }}
+    <ul class="{{ .list_class | default "" }}">
+      {{ range .list }}
+      <li>{{ . }}</li>
+      {{ end }}
+    </ul>
+    {{ end }}
+  </div>
+  {{ end }}
+</div>

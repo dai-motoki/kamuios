@@ -1,0 +1,23 @@
+<div class="section-image" style="max-width: 920px; margin-bottom: 10px;">
+  <img src="{{ .mcp_section.image }}" alt="UI参考（ギャラリー風）" />
+</div>
+<div class="view-options" style="margin: 8px 0 12px 0;">
+  <span class="theme-label">種別:</span>
+  <button class="view-btn" id="btnMcpPlaylist" aria-pressed="true">MCPプレイリスト</button>
+  <button class="view-btn" id="btnMcpCatalog">MCPカタログ</button>
+  <span class="spacer"></span>
+  <span class="theme-label">カテゴリ:</span>
+  <button class="view-btn" id="btnCatCreative">クリエイティブ</button>
+  <button class="view-btn" id="btnCatDevelopment">開発</button>
+  <button class="view-btn" id="btnCatBusiness">ビジネス</button>
+</div>
+<div id="mcpMessage" class="doc-meta"></div>
+<div style="overflow:auto; max-height: 480px; border: 1px solid var(--border); border-radius: 8px;">
+  <table class="menu-table" id="mcpTable">
+    <thead></thead>
+    <tbody></tbody>
+  </table>
+</div>
+<!-- ローカルフォールバック（Pagesでは外部JSONを使用） -->
+<script type="application/json" id="mcpPlaylistsInline"></script>
+<script type="application/json" id="mcpCatalogInline"></script>

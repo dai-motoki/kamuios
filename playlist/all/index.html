@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MCP プレイリスト一覧</title>
+  <style>
+    :root { --bg:#0f0f10; --text:#f7f8fa; --border:#2a2f3a; --code:#111318; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:var(--bg); color:var(--text); }
+    .wrap { max-width: 1100px; margin: 24px auto; padding: 0 16px; }
+    h1 { font-size: 1.4rem; margin: 0 0 12px; }
+    .meta { color:#9aa4af; margin-bottom: 12px; }
+    .controls { display:flex; gap:10px; align-items:center; margin: 10px 0 12px; }
+    input[type="search"] { flex:1; padding:8px 12px; background:var(--code); color:var(--text); border:1px solid var(--border); border-radius:8px; outline:none; }
+    table { width:100%; border-collapse: collapse; }
+    th, td { border:1px solid var(--border); padding:8px 10px; font-size: 0.92rem; }
+    th { text-align:left; background:#171a20; position:sticky; top:0; }
+    code { background:var(--code); border:1px solid var(--border); padding:1px 4px; border-radius:4px; }
+    a { color:#93c5fd; text-decoration:none; }
+    .back { margin: 8px 0 16px; display:inline-block; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="back" href="../../index.html">← ドキュメントへ戻る</a>
+    <h1>MCP プレイリスト一覧</h1>
+    <div class="meta">プレイリストIDの一覧と検索</div>
+    <div class="controls">
+      <input id="q" type="search" placeholder="ID/名前/カテゴリ/URL を検索..." />
+    </div>
+    <div style="overflow:auto; max-height: 70vh; border:1px solid var(--border); border-radius:8px;">
+      <table id="tbl">
+        <thead><tr>
+          <th>カテゴリ</th><th>名前</th><th>ID</th><th>パス</th><th>形式</th><th>URL</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+  <script>
+    function idFromPath(p){
+      const m = String(p||'').match(/\/playlist\/id\/(.+)$/); return m? m[1] : '';
+    }
+    function rowHtml(x){
+      const id = idFromPath(x.path);
+      const url = x.url ? `<a href="${x.url}" target="_blank" rel="noopener">${x.url}</a>` : '';
+      return `<tr>
+        <td><code>${x.category||''}</code></td>
+        <td>${(x.name||'')}</td>
+        <td><code>${id}</code></td>
+        <td><code>${x.path||''}</code></td>
+        <td><code>${x.format||''}</code></td>
+        <td>${url}</td>
+      </tr>`;
+    }
+    async function load(){
+      let items = [];
+      try { const r = await fetch('../../data/mcp_playlists.json', { cache:'no-cache' }); if (r.ok) items = await r.json(); } catch(_) {}
+      if (!Array.isArray(items) || items.length===0) {
+        items = [ { category:'business', name:'Requirement', path:'/playlist/id/requirement', format:'json', url:'' } ];
+      }
+      const tbody = document.querySelector('#tbl tbody');
+      const q = document.getElementById('q');
+      function render(){
+        const s = (q.value||'').toLowerCase();
+        const rows = items.filter(x => {
+          const plain = [x.category, x.name, idFromPath(x.path), x.path, x.format, x.url].join(' ').toLowerCase();
+          return plain.includes(s);
+        }).map(rowHtml).join('');
+        tbody.innerHTML = rows || '<tr><td colspan="6">該当するプレイリストがありません</td></tr>';
+      }
+      q.addEventListener('input', render);
+      render();
+    }
+    load();
+  </script>
+</body>
+</html>
+

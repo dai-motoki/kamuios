@@ -1,0 +1,27 @@
+# 事業構築 - 戦略
+
+- id: biz-strategy
+  category: 6
+  category_name: 事業構築
+  title: 戦略
+  content: ""
+  custom_html: |
+    <div style="margin-bottom: 20px;">
+      <button onclick="window.location.hash=''; location.reload();" style="padding: 8px 16px; background: #4a4a4a; border: none; border-radius: 6px; color: white; cursor: pointer; font-size: 14px;">
+        ← ダッシュボードに戻る
+      </button>
+    </div>
+    <style>
+      .biz-doc { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
+      .biz-doc h3 { color: var(--link); margin-top: 16px; }
+      .biz-list { color: var(--text-weak); line-height: 1.8; }
+    </style>
+    <div class="biz-doc">
+      <h3>事業戦略の骨子</h3>
+      <ul class="biz-list">
+        <li>ターゲットセグメント / ペルソナ定義</li>
+        <li>提供価値（JTBD）と優位性</li>
+        <li>チャネル / 価格 / 収益モデル</li>
+        <li>ロードマップ（0-1 / 1-10）</li>
+      </ul>
+    </div>

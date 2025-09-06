@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "storyboard": {
+      "type": "http",
+      "url": "{BASE_URL}/storyboard",
+      "description": "KAMUI CODE Storyboard Viewer - Install and manage storyboard visualization tools"
+    }
+  }
+}

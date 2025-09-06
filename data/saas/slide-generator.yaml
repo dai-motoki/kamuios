@@ -1,0 +1,412 @@
+# スライドエディタ
+# プレゼンテーション用スライドを表示・編集するエディタ
+
+- id: slide-generator
+  category: 4
+  category_name: ビジネスツール
+  title: スライドエディタ
+  content: ""
+  custom_html: |
+    <div style="margin-bottom: 20px;">
+      <button onclick="window.location.hash=''; location.reload();" style="padding: 8px 16px; background: #4a4a4a; border: none; border-radius: 6px; color: white; cursor: pointer; font-size: 14px;">
+        ← ダッシュボードに戻る
+      </button>
+    </div>
+    <style>
+      .slide-generator {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 20px;
+      }
+      .slide-header {
+        border-bottom: 2px solid var(--border);
+        padding-bottom: 16px;
+        margin-bottom: 24px;
+      }
+      .slide-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 8px;
+      }
+      .slide-meta {
+        display: flex;
+        gap: 20px;
+        font-size: 0.9rem;
+        color: var(--text-weak);
+      }
+      .slide-viewer {
+        background: #1a1a1a;
+        border-radius: 12px;
+        padding: 40px;
+        min-height: 600px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .slide-display {
+        position: relative;
+        background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+        border-radius: 16px;
+        width: 1200px;
+        height: 675px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        overflow: hidden;
+      }
+      .slide-page {
+        display: none;
+        animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        width: 100%;
+        height: 100%;
+        padding: 60px;
+        position: relative;
+        color: #ffffff;
+      }
+      .slide-page.active {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+      }
+      .slide-page h1 {
+        font-size: 2.2rem;
+        font-weight: 700;
+        margin-bottom: 50px;
+        background: linear-gradient(90deg, #60a5fa, #a78bfa);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        line-height: 1.2;
+        text-align: left;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #334155;
+      }
+      .slide-page h2 {
+        font-size: 1.4rem;
+        color: #94a3b8;
+        margin-bottom: 20px;
+      }
+      .slide-page h3 {
+        font-size: 1.2rem;
+        color: #60a5fa;
+        margin-bottom: 15px;
+      }
+      @keyframes slideIn {
+        from { 
+          opacity: 0;
+          transform: translateX(30px);
+        }
+        to { 
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+      .slide-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 50px;
+        align-items: start;
+        margin-top: 20px;
+        height: calc(100% - 120px);
+        overflow: hidden;
+      }
+      .slide-content {
+        color: #e2e8f0;
+        font-size: 1rem;
+        line-height: 1.6;
+      }
+      .slide-image {
+        width: 100%;
+        height: auto;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      }
+      .metric-card {
+        background: linear-gradient(135deg, #1e293b, #334155);
+        border: 1px solid #334155;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 15px;
+      }
+      .metric-value {
+        font-size: 2rem;
+        font-weight: 700;
+        background: linear-gradient(90deg, #60a5fa, #a78bfa);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .feature-card {
+        background: rgba(30, 41, 59, 0.5);
+        border: 1px solid #334155;
+        border-radius: 12px;
+        padding: 18px;
+        backdrop-filter: blur(10px);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      .feature-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.2);
+      }
+      .slide-image-small {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 8px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      }
+    </style>
+    
+    <div class="slide-generator">
+      <div class="slide-header">
+        <h2 class="slide-title">📊 スライドエディタ</h2>
+        <div class="slide-meta">
+          <span>バージョン: 1.0</span>
+          <span>対応形式: PowerPoint, Google Slides</span>
+        </div>
+      </div>
+      
+      <div class="slide-controls">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <div style="color: var(--text-weak);">スライド: <span id="currentSlide">1</span> / <span id="totalSlides">6</span></div>
+          <div style="display: flex; gap: 10px;">
+            <button onclick="previousSlide()" style="padding: 8px 16px; background: var(--border); border: none; border-radius: 6px; color: var(--text); cursor: pointer;">← 前へ</button>
+            <button onclick="nextSlide()" style="padding: 8px 16px; background: var(--link); border: none; border-radius: 6px; color: white; cursor: pointer;">次へ →</button>
+            <button onclick="toggleFullscreen()" style="padding: 8px 16px; background: var(--border); border: none; border-radius: 6px; color: var(--text); cursor: pointer;">🔍 フルスクリーン</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="slide-viewer" id="slideViewer">
+        <div class="slide-display" id="slideDisplay">
+          <!-- スライド1 -->
+          <div class="slide-page active" id="slide-1">
+            <div style="text-align: center;">
+              <h1>HandwriteRef</h1>
+              <h2>手書きスケッチからAI生成への革新的SaaSプラットフォーム</h2>
+              <div style="margin: 60px auto; max-width: 500px;">
+                <img src="/images/hand-sketch.png" alt="Hand sketch" class="slide-image">
+              </div>
+              <div style="margin-top: 60px;">
+                <p style="font-size: 1.3rem; color: #94a3b8; margin-bottom: 10px;">シードラウンド 事業計画書</p>
+                <p style="font-size: 1.1rem; color: #64748b;">2025年9月 | Kamui Development Team</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- スライド2 -->
+          <div class="slide-page" id="slide-2">
+            <h1>市場機会</h1>
+            <div class="slide-grid">
+              <div>
+                <div class="metric-card">
+                  <p style="color: #94a3b8; margin-bottom: 10px;">グローバルAIコンテンツ市場</p>
+                  <div class="metric-value">$15.7B</div>
+                  <p style="color: #64748b; margin-top: 10px;">2025年 予測</p>
+                </div>
+                <div class="metric-card">
+                  <p style="color: #94a3b8; margin-bottom: 10px;">年平均成長率 (CAGR)</p>
+                  <div class="metric-value">38.1%</div>
+                  <p style="color: #64748b; margin-top: 10px;">2025-2030</p>
+                </div>
+                <div class="metric-card">
+                  <p style="color: #94a3b8; margin-bottom: 10px;">ターゲットユーザー数</p>
+                  <div class="metric-value">500M+</div>
+                  <p style="color: #64748b; margin-top: 10px;">クリエイター・教育関係者</p>
+                </div>
+              </div>
+              <div>
+                <img src="/images/whiteboard_saas_ui_1_full.png" class="slide-image" alt="Market Overview">
+              </div>
+            </div>
+          </div>
+          
+          <!-- スライド3 -->
+          <div class="slide-page" id="slide-3">
+            <h1>ソリューション</h1>
+            <div class="slide-grid">
+              <div>
+                <div class="feature-card" style="margin-bottom: 18px;">
+                  <h3 style="margin-bottom: 12px; font-size: 1.1rem;">AI Portrait Generator</h3>
+                  <p class="slide-content" style="font-size: 0.95rem;">手書きスケッチを瞬時に高品質なデジタルアートに変換</p>
+                </div>
+                <div class="feature-card" style="margin-bottom: 18px;">
+                  <h3 style="margin-bottom: 12px; font-size: 1.1rem;">ビデオコンテンツ生成</h3>
+                  <p class="slide-content" style="font-size: 0.95rem;">スケッチからアニメーション・動画を自動作成</p>
+                </div>
+                <div class="feature-card" style="margin-bottom: 18px;">
+                  <h3 style="margin-bottom: 12px; font-size: 1.1rem;">教育コンテンツプラットフォーム</h3>
+                  <p class="slide-content" style="font-size: 0.95rem;">ホワイトボード・プレゼン資料の自動生成</p>
+                </div>
+                <div class="feature-card">
+                  <h3 style="margin-bottom: 12px; font-size: 1.1rem;">コラボレーション機能</h3>
+                  <p class="slide-content" style="font-size: 0.95rem;">リアルタイム共同編集とフィードバック</p>
+                </div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 15px;">
+                <img src="/images/portrait-reference-1.png" class="slide-image-small" alt="AI Generation Example" style="height: 200px;">
+                <img src="/images/collaborative_whiteboard_saas_ui_3_full.png" class="slide-image-small" alt="Collaboration Platform" style="height: 200px;">
+              </div>
+            </div>
+          </div>
+          
+          <!-- スライド4 -->
+          <div class="slide-page" id="slide-4">
+            <h1 style="font-size: 2rem; color: var(--link); margin-bottom: 30px;">🚀 主要機能とUI</h1>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+              <div style="background: var(--sidebar-bg); padding: 20px; border-radius: 8px;">
+                <h3 style="color: var(--link); margin-bottom: 15px;">🎨 AI Portrait Generator</h3>
+                <p style="color: var(--text-weak); margin-bottom: 15px;">手書きスケッチから高品質な画像を生成</p>
+                <img src="/images/creative-tools-ui-1.png" alt="Creative Tools UI" style="width: 100%; border-radius: 6px;">
+              </div>
+              <div style="background: var(--sidebar-bg); padding: 20px; border-radius: 8px;">
+                <h3 style="color: var(--link); margin-bottom: 15px;">📚 教育コンテンツ作成</h3>
+                <p style="color: var(--text-weak); margin-bottom: 15px;">動画・プレゼン資料の自動生成</p>
+                <img src="/images/educational_blackboard_saas_ui_4_full.png" alt="Educational UI" style="width: 100%; border-radius: 6px;">
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+              <div style="background: var(--sidebar-bg); padding: 20px; border-radius: 8px;">
+                <h3 style="color: var(--link); margin-bottom: 15px;">🎬 ビデオエディタ</h3>
+                <p style="color: var(--text-weak); margin-bottom: 15px;">リアルタイムプレビュー機能</p>
+                <img src="/images/interactive_presentation_maker_ui_3_full.png" alt="Video Editor UI" style="width: 100%; border-radius: 6px;">
+              </div>
+              <div style="background: var(--sidebar-bg); padding: 20px; border-radius: 8px;">
+                <h3 style="color: var(--link); margin-bottom: 15px;">👥 コラボレーション</h3>
+                <p style="color: var(--text-weak); margin-bottom: 15px;">チーム共同編集機能</p>
+                <img src="/images/advanced_educational_platform_ui_5_full.png" alt="Collaboration UI" style="width: 100%; border-radius: 6px;">
+              </div>
+            </div>
+          </div>
+          
+          <!-- スライド5 -->
+          <div class="slide-page" id="slide-5">
+            <h1 style="font-size: 2rem; color: var(--link); margin-bottom: 30px;">💰 収益モデル & ロードマップ</h1>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+              <div>
+                <h3 style="color: var(--link); margin-bottom: 20px; font-size: 1.4rem;">💳 収益構造</h3>
+                <ul style="font-size: 1.2rem; line-height: 2; color: var(--text); margin-bottom: 30px;">
+                  <li>🆓 フリーミアム（基本機能無料）</li>
+                  <li>💎 プレミアム（$19/月）</li>
+                  <li>🏢 エンタープライズ（$99/月）</li>
+                  <li>🤝 API利用料（従量課金）</li>
+                </ul>
+                <h3 style="color: var(--link); margin-bottom: 20px; font-size: 1.4rem;">📈 成長予測</h3>
+                <ul style="font-size: 1.1rem; line-height: 1.8; color: var(--text);">
+                  <li>Year 1: $50K ARR</li>
+                  <li>Year 2: $500K ARR</li>
+                  <li>Year 3: $2M ARR</li>
+                  <li>Break-even: Month 8</li>
+                </ul>
+              </div>
+              <div>
+                <h3 style="color: var(--link); margin-bottom: 20px; font-size: 1.4rem;">🗓️ 開発計画</h3>
+                <div style="background: var(--sidebar-bg); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                  <h4 style="color: #e74c3c; margin-bottom: 10px;">Q4 2025 - MVP</h4>
+                  <p style="font-size: 0.9rem; color: var(--text-weak);">基本AI生成機能</p>
+                </div>
+                <div style="background: var(--sidebar-bg); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                  <h4 style="color: #f39c12; margin-bottom: 10px;">Q1 2026 - Beta</h4>
+                  <p style="font-size: 0.9rem; color: var(--text-weak);">動画編集・コラボ機能</p>
+                </div>
+                <div style="background: var(--sidebar-bg); padding: 20px; border-radius: 8px;">
+                  <h4 style="color: #27ae60; margin-bottom: 10px;">Q2 2026 - Launch</h4>
+                  <p style="font-size: 0.9rem; color: var(--text-weak);">本格サービス開始</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- スライド6 -->
+          <div class="slide-page" id="slide-6">
+            <h1 style="font-size: 2rem; color: var(--link); margin-bottom: 30px;">🎉 まとめ & Next Steps</h1>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+              <div>
+                <h3 style="color: var(--link); margin-bottom: 20px; font-size: 1.4rem;">✨ 競合優位性</h3>
+                <ul style="font-size: 1.1rem; line-height: 1.8; color: var(--text); margin-bottom: 30px;">
+                  <li>🎨 手書きスケッチ特化AI</li>
+                  <li>⚡ 高速レンダリング技術</li>
+                  <li>🤝 直感的なUI/UX</li>
+                  <li>🔧 API-First設計</li>
+                  <li>📚 教育分野への特化</li>
+                </ul>
+                <h3 style="color: var(--link); margin-bottom: 20px; font-size: 1.4rem;">🚀 今後のアクション</h3>
+                <ul style="font-size: 1.1rem; line-height: 1.8; color: var(--text);">
+                  <li>💰 投資ラウンド準備</li>
+                  <li>👥 チーム拡充</li>
+                  <li>🧪 ユーザーテスト実施</li>
+                  <li>🤝 戦略的パートナーシップ</li>
+                </ul>
+              </div>
+              <div style="text-align: center;">
+                <img src="/images/journey-discover.png" alt="User Journey" style="width: 100%; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                <p style="font-size: 0.9rem; color: var(--text-weak); margin-bottom: 30px;">ユーザージャーニー概要</p>
+                <div style="background: linear-gradient(135deg, var(--link), #9b59b6); padding: 30px; border-radius: 12px; color: white; text-align: center;">
+                  <h3 style="margin-bottom: 15px; font-size: 1.5rem;">🎯 投資目標</h3>
+                  <p style="font-size: 2rem; font-weight: bold; margin-bottom: 10px;">$500K</p>
+                  <p style="font-size: 1rem; opacity: 0.9;">シードラウンド</p>
+                  <p style="font-size: 0.9rem; opacity: 0.8; margin-top: 15px;">18ヶ月の開発資金</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <script>
+      let currentSlideIndex = 1;
+      const totalSlides = 6;
+      
+      function showSlide(index) {
+        // すべてのスライドを非表示
+        document.querySelectorAll('.slide-page').forEach(slide => {
+          slide.classList.remove('active');
+        });
+        
+        // 指定されたスライドを表示
+        const targetSlide = document.getElementById('slide-' + index);
+        if (targetSlide) {
+          targetSlide.classList.add('active');
+          document.getElementById('currentSlide').textContent = index;
+        }
+      }
+      
+      function nextSlide() {
+        if (currentSlideIndex < totalSlides) {
+          currentSlideIndex++;
+          showSlide(currentSlideIndex);
+        }
+      }
+      
+      function previousSlide() {
+        if (currentSlideIndex > 1) {
+          currentSlideIndex--;
+          showSlide(currentSlideIndex);
+        }
+      }
+      
+      function toggleFullscreen() {
+        const viewer = document.getElementById('slideViewer');
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        } else {
+          viewer.requestFullscreen();
+        }
+      }
+      
+      // キーボードナビゲーション
+      document.addEventListener('keydown', function(event) {
+        if (event.target.closest('.slide-generator')) {
+          if (event.key === 'ArrowRight' || event.key === ' ') {
+            event.preventDefault();
+            nextSlide();
+          } else if (event.key === 'ArrowLeft') {
+            event.preventDefault();
+            previousSlide();
+          } else if (event.key === 'f' || event.key === 'F11') {
+            event.preventDefault();
+            toggleFullscreen();
+          }
+        }
+      });
+    </script>

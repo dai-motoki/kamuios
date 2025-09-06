@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f172a"/>
+      <stop offset="1" stop-color="#111827"/>
+    </linearGradient>
+    <style>
+      .title{font:700 42px system-ui, -apple-system, Segoe UI, sans-serif; fill:#e5e7eb}
+      .subtitle{font:600 22px system-ui, -apple-system, Segoe UI, sans-serif; fill:#93c5fd}
+      .mono{font:600 18px ui-monospace, SFMono-Regular, Menlo, monospace; fill:#e5e7eb}
+      .hint{font:500 16px system-ui, -apple-system, Segoe UI, sans-serif; fill:#cbd5e1}
+      .box{fill:#0b1220; stroke:#1f2937; stroke-width:2}
+      .badge{fill:#111827; stroke:#374151; stroke-width:1.5}
+      .badgeText{font:700 14px system-ui, -apple-system, Segoe UI, sans-serif; fill:#e5e7eb}
+      .path{fill:#0b1220; stroke:#334155; stroke-width:2}
+      .pathText{font:600 16px ui-monospace, SFMono-Regular, Menlo, monospace; fill:#c7d2fe}
+      .em{fill:#60a5fa}
+      .ok{fill:#22c55e}
+    </style>
+  </defs>
+  <rect x="0" y="0" width="1200" height="630" fill="url(#g)"/>
+
+  <text x="60" y="90" class="title">Media Assets Guidelines</text>
+  <text x="60" y="130" class="hint">画像/動画/JSONの置き場所と参照ルール（ドキュメント用）</text>
+
+  <!-- Folder tree card -->
+  <rect x="60" y="170" rx="14" ry="14" width="520" height="360" class="box"/>
+  <text x="80" y="205" class="subtitle">Folder Layout</text>
+  <text x="80" y="245" class="mono">requirement-docs/</text>
+  <text x="110" y="275" class="mono">└─ static/</text>
+  <text x="150" y="305" class="mono em">├─ images/</text>
+  <text x="150" y="335" class="mono">├─ <tspan class="em">videos/</tspan></text>
+  <text x="150" y="365" class="mono">└─ <tspan class="em">data/</tspan></text>
+  <circle cx="90" cy="396" r="6" class="ok"/>
+  <text x="105" y="402" class="hint">公開パスは /images, /videos, /data で参照</text>
+
+  <!-- Usage card -->
+  <rect x="620" y="170" rx="14" ry="14" width="520" height="360" class="box"/>
+  <text x="640" y="205" class="subtitle">Usage Examples</text>
+  <rect x="640" y="230" rx="8" ry="8" width="480" height="80" class="badge"/>
+  <text x="660" y="260" class="badgeText">Markdown</text>
+  <text x="660" y="290" class="pathText">![UI](/images/creative-tools-ui-1.png)</text>
+
+  <rect x="640" y="324" rx="8" ry="8" width="480" height="84" class="badge"/>
+  <text x="660" y="354" class="badgeText">HTML</text>
+  <text x="660" y="382" class="pathText">&lt;video src="/videos/demo.mp4" controls&gt;&lt;/video&gt;</text>
+
+  <rect x="640" y="420" rx="8" ry="8" width="480" height="84" class="badge"/>
+  <text x="660" y="450" class="badgeText">JSON</text>
+  <text x="660" y="478" class="pathText">/data/images_list.json</text>
+
+  <!-- Footer hint -->
+  <text x="60" y="560" class="hint">Tip: `node requirement-docs/server.js` → `/api/images` で images_list.json を再生成</text>
+</svg>

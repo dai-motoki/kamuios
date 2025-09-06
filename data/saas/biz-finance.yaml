@@ -1,0 +1,296 @@
+# 事業構築 - 財務
+
+- id: biz-finance
+  category: 6
+  category_name: 事業構築
+  title: 財務ダッシュボード
+  content: ""
+  custom_html: |
+    <div style="margin-bottom: 20px;">
+      <button onclick="window.location.hash=''; location.reload();" style="padding: 8px 16px; background: #4a4a4a; border: none; border-radius: 6px; color: white; cursor: pointer; font-size: 14px;">
+        ← ダッシュボードに戻る
+      </button>
+    </div>
+    
+    <style>
+      .finance-container {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 24px;
+      }
+      
+      .finance-header {
+        margin-bottom: 24px;
+      }
+      
+      .finance-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 8px;
+      }
+      
+      .finance-subtitle {
+        color: var(--text-weak);
+        font-size: 0.95rem;
+      }
+      
+      /* メトリクスセクション削除 */
+      
+      
+      /* チャートセクション */
+      .chart-section {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 24px;
+      }
+      
+      .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+      }
+      
+      .chart-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--text);
+      }
+      
+      .chart-controls {
+        display: flex;
+        gap: 8px;
+      }
+      
+      .chart-btn {
+        padding: 6px 12px;
+        background: var(--button-bg);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        color: var(--text-weak);
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      
+      .chart-btn:hover {
+        border-color: var(--link);
+        color: var(--link);
+      }
+      
+      .chart-btn.active {
+        background: var(--link);
+        border-color: var(--link);
+        color: white;
+      }
+      
+      /* 棒グラフ */
+      .bar-chart {
+        height: 300px;
+        position: relative;
+        padding: 20px 0;
+      }
+      
+      .bar-chart-grid {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        right: 20px;
+        bottom: 40px;
+        border-left: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+      }
+      
+      .bar-chart-bars {
+        position: absolute;
+        bottom: 40px;
+        left: 20px;
+        right: 20px;
+        height: calc(100% - 60px);
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-around;
+        gap: 10px;
+      }
+      
+      .bar-group {
+        display: flex;
+        gap: 8px;
+        align-items: flex-end;
+        flex: 1;
+        max-width: 120px;
+        position: relative;
+        height: 100%;
+      }
+      
+      .bar {
+        flex: 1;
+        min-width: 20px;
+        border-radius: 6px 6px 0 0;
+        transition: all 0.3s ease;
+        position: relative;
+        cursor: pointer;
+        min-height: 10px;
+      }
+      
+      .bar:hover {
+        filter: brightness(1.2);
+      }
+      
+      
+      .bar.new {
+        background: #10b981 !important;
+      }
+      
+      .bar.recurring {
+        background: #60a5fa !important;
+      }
+      
+      .bar.churn {
+        background: #ef4444 !important;
+      }
+      
+      .chart-labels {
+        position: absolute;
+        bottom: -30px;
+        left: 20px;
+        right: 20px;
+        display: flex;
+        justify-content: space-around;
+        color: var(--text-weak);
+        font-size: 0.85rem;
+      }
+      
+      .chart-legend {
+        display: flex;
+        gap: 24px;
+        margin-top: 40px;
+        justify-content: center;
+      }
+      
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.85rem;
+        color: var(--text-weak);
+      }
+      
+      .legend-color {
+        width: 12px;
+        height: 12px;
+        border-radius: 2px;
+      }
+      
+      /* テーブルセクション削除 */
+      
+    </style>
+    
+    <div class="finance-container">
+      <div class="finance-header">
+        <h1 class="finance-title">財務ダッシュボード</h1>
+        <p class="finance-subtitle">グラフ表示</p>
+      </div>
+      
+      <!-- グラフ -->
+      <div class="chart-section">
+        <div class="chart-header">
+          <h2 class="chart-title">成長トレンド</h2>
+          <div class="chart-controls">
+            <button class="chart-btn active">月次</button>
+            <button class="chart-btn">四半期</button>
+            <button class="chart-btn">年次</button>
+          </div>
+        </div>
+        
+        <div class="bar-chart">
+          <div class="bar-chart-grid"></div>
+          <div class="bar-chart-bars" id="mrrChart">
+            <div class="bar-group">
+              <div class="bar new" style="height: 15%;"></div>
+              <div class="bar recurring" style="height: 60%;"></div>
+              <div class="bar churn" style="height: 3%;"></div>
+            </div>
+            <div class="bar-group">
+              <div class="bar new" style="height: 18%;"></div>
+              <div class="bar recurring" style="height: 62%;"></div>
+              <div class="bar churn" style="height: 2%;"></div>
+            </div>
+            <div class="bar-group">
+              <div class="bar new" style="height: 22%;"></div>
+              <div class="bar recurring" style="height: 65%;"></div>
+              <div class="bar churn" style="height: 4%;"></div>
+            </div>
+            <div class="bar-group">
+              <div class="bar new" style="height: 28%;"></div>
+              <div class="bar recurring" style="height: 68%;"></div>
+              <div class="bar churn" style="height: 5%;"></div>
+            </div>
+            <div class="bar-group">
+              <div class="bar new" style="height: 32%;"></div>
+              <div class="bar recurring" style="height: 70%;"></div>
+              <div class="bar churn" style="height: 4%;"></div>
+            </div>
+            <div class="bar-group">
+              <div class="bar new" style="height: 35%;"></div>
+              <div class="bar recurring" style="height: 73%;"></div>
+              <div class="bar churn" style="height: 3%;"></div>
+            </div>
+          </div>
+          <div class="chart-labels">
+            <span>1月</span>
+            <span>2月</span>
+            <span>3月</span>
+            <span>4月</span>
+            <span>5月</span>
+            <span>6月</span>
+          </div>
+        </div>
+        
+        <div class="chart-legend">
+          <div class="legend-item">
+            <div class="legend-color" style="background: #10b981;"></div>
+            <span>新規</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #60a5fa;"></div>
+            <span>継続</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #ef4444;"></div>
+            <span>解約</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <script>
+      // チャートボタンの切り替え
+      document.querySelectorAll('.chart-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.chart-btn').forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+        });
+      });
+      
+      // バーアニメーション（デバッグ用に簡略化）
+      setTimeout(() => {
+        const section = document.getElementById('biz-finance');
+        if (!section) return;
+        
+        section.querySelectorAll('.bar').forEach((bar, index) => {
+          const height = bar.style.height;
+          if (height) {
+            bar.style.height = '0';
+            setTimeout(() => {
+              bar.style.transition = 'height 0.8s ease';
+              bar.style.height = height;
+            }, index * 100);
+          }
+        });
+      }, 100);
+    </script>

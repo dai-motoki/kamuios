@@ -1,0 +1,29 @@
+{
+  "mcpServers": {
+    "requirement": {
+      "type": "http",
+      "url": "{BASE_URL}/requirement",
+      "description": "KAMUI CODE Requirement Document Generator - Create HTML requirements with left sidebar navigation"
+    },
+    "t2i-kamui-imagen4-ultra": {
+      "type": "http",
+      "url": "{BASE_URL}/t2i/fal/imagen4/ultra",
+      "description": "Imagen4 Ultra (High Quality) via Kamui Code ⭐"
+    },
+    "i2i-kamui-flux-kontext-max": {
+      "type": "http",
+      "url": "{BASE_URL}/i2i/fal/flux/kontext/max",
+      "description": "Flux Kontext Max via Kamui Code ⭐"
+    },
+    "i2i-kamui-flux-krea-lora": {
+      "type": "http",
+      "url": "{BASE_URL}/i2i/fal/flux-krea-lora/image-to-image",
+      "description": "FLUX Krea LoRA Image-to-Image via Kamui Code ⭐"
+    },
+    "i2v-kamui-seedance-v1-lite": {
+      "type": "http",
+      "url": "{BASE_URL}/i2v/fal/bytedance/seedance-v1-lite",
+      "description": "ByteDance Seedance V1 Lite via Kamui Code ⭐"
+    }
+  }
+}

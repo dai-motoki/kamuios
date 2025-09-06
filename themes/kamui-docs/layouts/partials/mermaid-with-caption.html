@@ -1,0 +1,8 @@
+<div class="mermaid-wrapper">
+  <div class="mermaid">
+{{ .content }}
+  </div>
+  {{ if .type }}
+  <div class="mermaid-caption">図: {{ if eq .type "system_architecture" }}KAMUI CODE システムアーキテクチャ{{ else if eq .type "endpoint_hierarchy" }}エンドポイントURL階層構造{{ else if eq .type "api_sequence" }}API呼び出しシーケンス{{ else if eq .type "processing_flow" }}リクエスト処理フロー{{ else if eq .type "deployment_flow" }}デプロイメントフロー{{ else if eq .type "operations_flow" }}運用フロー{{ else if eq .type "extension_flow" }}拡張フロー{{ else }}{{ .type }}{{ end }}</div>
+  {{ end }}
+</div>

@@ -1,0 +1,15 @@
+<div class="flow-wrapper" id="{{ .flow_diagram.id }}">
+  <div class="flow-controls">
+    <strong>UI遷移図</strong>
+    <div class="spacer"></div>
+    <button class="view-btn" id="flowZoomOut">-</button>
+    <button class="view-btn" id="flowZoomReset">100%</button>
+    <button class="view-btn" id="flowZoomIn">+</button>
+  </div>
+  <div class="flow-viewport" id="flowViewport">
+    <div class="flow-inner" id="flowInner" style="width: {{ .flow_diagram.width }}px; height: {{ .flow_diagram.height }}px;">
+      <svg class="flow-svg" id="flowSvg" width="{{ .flow_diagram.width }}" height="{{ .flow_diagram.height }}"></svg>
+      <div class="nodes-layer" id="flowNodes"></div>
+    </div>
+  </div>
+</div>

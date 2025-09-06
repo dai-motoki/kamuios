@@ -1,0 +1,16 @@
+name: Kamui Docs
+license: MIT
+licenselink: https://github.com/yourname/kamui-docs/blob/master/LICENSE
+description: A modern documentation theme for KAMUI CODE
+homepage: https://github.com/yourname/kamui-docs/
+demosite: https://example.com
+tags:
+  - documentation
+  - responsive
+  - dark-mode
+features:
+  - Responsive design
+  - Dark/Light theme support
+  - Sidebar navigation
+  - Search functionality
+min_version: "0.112.0"

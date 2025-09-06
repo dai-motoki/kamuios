@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "servers": [
+    {
+      "id": "creative-image",
+      "name": "画像生成サーバー",
+      "category": "creative",
+      "baseUrl": "{BASE_URL}/api/creative/image/v1",
+      "endpoints": {
+        "generate": "/generate",
+        "variants": "/variants"
+      },
+      "auth": { "type": "bearer", "env": "KAMUI_TOKEN" }
+    },
+    {
+      "id": "dev-code",
+      "name": "コード支援サーバー",
+      "category": "dev",
+      "baseUrl": "{BASE_URL}/api/dev/code/v1",
+      "endpoints": {
+        "analyze": "/analyze",
+        "refactor": "/refactor"
+      },
+      "auth": { "type": "bearer", "env": "KAMUI_TOKEN" }
+    },
+    {
+      "id": "biz-translate",
+      "name": "翻訳サーバー",
+      "category": "biz",
+      "baseUrl": "{BASE_URL}/api/biz/translate/v1",
+      "endpoints": {
+        "translate": "/translate"
+      },
+      "auth": { "type": "apiKey", "header": "x-api-key", "env": "KAMUI_API_KEY" }
+    }
+  ]
+}
+

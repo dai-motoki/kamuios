@@ -1,0 +1,77 @@
+<h3>カラーパレット</h3>
+<div class="color-palette">
+  {{ range .colors }}
+  <div class="color-group">
+    <h4>{{ .group }}</h4>
+    <div class="color-swatches">
+      {{ range .swatches }}
+      <div class="color-swatch{{ if .light }} light{{ end }}" style="background-color: {{ .color }}; color: {{ if .light }}#1a1a1a{{ else }}#ffffff{{ end }};">
+        <div class="color-label">{{ .name }}</div>
+        <div class="color-code">{{ .color }}</div>
+      </div>
+      {{ end }}
+    </div>
+  </div>
+  {{ end }}
+</div>
+
+<h3>カテゴリー別カラー</h3>
+<div class="category-colors">
+  {{ range .categories }}
+  <div class="category-card {{ .class }}">
+    <div class="category-gradient" style="background: {{ .gradient }};">
+      <h4>{{ .name }}</h4>
+      <p>{{ .description }}</p>
+    </div>
+    <div class="category-specs">
+      <span class="gradient-spec">グラデーション指定:</span>
+      <div class="color-values">
+        {{ range .colors }}
+        <span class="color-val">{{ . }}</span>
+        {{ end }}
+      </div>
+    </div>
+  </div>
+  {{ end }}
+</div>
+
+<h3>タイポグラフィー</h3>
+<div class="typography-samples">
+  {{ range .typography }}
+  <div class="typo-item">
+    <span class="typo-label">{{ .label }}</span>
+    <div class="typo-sample" style="{{ .spec }}">{{ .sample }}</div>
+    <span class="typo-spec">{{ .spec }}</span>
+  </div>
+  {{ end }}
+</div>
+
+<h3>レイアウト構成</h3>
+<div class="layout-specs">
+  <h4>基本レイアウト</h4>
+  <ul>
+    {{ range .layout }}
+    <li>{{ . }}</li>
+    {{ end }}
+  </ul>
+</div>
+
+<h3>インタラクション</h3>
+<div class="interaction-specs">
+  <h4>アニメーション設定</h4>
+  <ul>
+    {{ range .interaction }}
+    <li>{{ . }}</li>
+    {{ end }}
+  </ul>
+</div>
+
+<h3>レスポンシブ対応</h3>
+<div class="responsive-specs">
+  <h4>ブレークポイント</h4>
+  <ul>
+    {{ range .responsive }}
+    <li>{{ . }}</li>
+    {{ end }}
+  </ul>
+</div>

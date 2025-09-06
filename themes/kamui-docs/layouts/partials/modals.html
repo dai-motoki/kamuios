@@ -1,0 +1,30 @@
+<!-- JSONプレビューモーダル -->
+<div class="modal-backdrop" id="jsonModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="jsonModalTitle">JSONプレビュー</span>
+    </div>
+    <div class="modal-body">
+      <pre class="code" id="jsonContent"></pre>
+    </div>
+    <div class="modal-actions">
+      <button class="view-btn" id="jsonCopyBtn">コピー</button>
+      <button class="view-btn" id="jsonCloseBtn">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<!-- 画像プレビューモーダル -->
+<div class="modal-backdrop" id="imgModal">
+  <div class="modal" style="max-width:90%; width:auto;">
+    <div class="modal-header">
+      <span class="modal-title" id="imgModalTitle">画像プレビュー</span>
+    </div>
+    <div class="modal-body" style="padding:0; background:var(--media-bg);">
+      <img id="imgModalImage" src="" alt="" style="width:100%; height:auto; display:block;">
+    </div>
+    <div class="modal-actions">
+      <button class="view-btn" id="imgCloseBtn">閉じる</button>
+    </div>
+  </div>
+</div>

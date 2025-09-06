@@ -1,0 +1,15 @@
+<div id="{{ .dynamic_table.id }}Message" class="doc-meta"></div>
+<div style="overflow:auto; max-height: 420px; border: 1px solid var(--border); border-radius: 8px;">
+  <table class="menu-table" id="{{ .dynamic_table.id }}">
+    <thead>
+      <tr>
+        {{ range .dynamic_table.headers }}
+        <th>{{ . }}</th>
+        {{ end }}
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+<!-- ローカル閲覧(file://)フォールバック -->
+<script type="application/json" id="{{ .dynamic_table.data_source }}Inline"></script>

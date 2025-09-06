@@ -1,0 +1,705 @@
+# ストーリーボードビューアー アプリケーション
+# Source: https://github.com/dai-motoki/storyboard-viewer/blob/main/storyboard_flow.html
+
+- id: saas-storyboard-viewer
+  category: 3
+  category_name: メディアエディタ
+  title: ストーリーボードビューアー
+  content: ""
+  custom_html: |
+    <div style="margin-bottom: 20px;">
+      <button onclick="window.location.hash=''; location.reload();" style="padding: 8px 16px; background: #4a4a4a; border: none; border-radius: 6px; color: white; cursor: pointer; font-size: 14px;">
+        ← SaaS一覧に戻る
+      </button>
+    </div>
+    <!DOCTYPE html>
+    <html lang="ja">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>絵コンテ 見開きフロー</title>
+      <style>
+        :root {
+          --page-bg: #fdfcf8;
+          --paper-line: rgba(60, 100, 160, 0.08);
+          --ring: #c3c3c3;
+          --shadow: rgba(0,0,0,0.15);
+          --seam: rgba(0,0,0,0.18);
+          --scale: 0.67; /* 見開き時の縮小率（67%） */
+          --header-h: 44px; /* 固定ヘッダー高さ */
+        }
+
+        * { box-sizing: border-box; }
+        html, body { height: 100%; width: 100%; }
+        body {
+          margin: 0;
+          background: #2c2c2c;
+          font-family: system-ui, -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", Arial, sans-serif;
+          color: #222;
+          padding: 0; /* 固定ヘッダー採用のため本文の上余白は不要 */
+          overflow-x: hidden;
+        }
+
+        .header {
+          background: white;
+          border-radius: 0;
+          box-shadow: none;
+          padding: 4px 12px;
+          width: 100%;
+          max-width: none;
+          margin: 0;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 16px;
+          position: relative;
+          z-index: 1000;
+        }
+
+        /* 全体をヘッダー行 + コンテンツ行の2段グリッドで構成 */
+        .app {
+          position: relative;
+          top: 0; left: 0; right: 0; bottom: 0;
+          display: grid;
+          grid-template-rows: auto 1fr;
+          height: 100vh; width: 100%;
+        }
+        .views { position: relative; height: 100%; width: 100%; overflow-y: auto; overflow-x: auto; }
+        .title { font-size: 18px; font-weight: 700; color: #333; }
+        .meta { color: #666; font-size: 12px; }
+        .meta span + span { margin-left: 10px; }
+        .links a { color: #0a6cff; text-decoration: none; font-size: 12px; }
+
+        /* 見開き本体 */
+        .spread {
+          position: relative;
+          width: 100%;
+          max-width: none;
+          margin: 0;
+          background: white;
+          border-radius: 0;
+          box-shadow: none;
+          padding: 0;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 0;
+        }
+
+        /* 見開きスケール用のラッパーと中身 */
+        .view-spread { position: absolute; inset: 0; width: 100%; overflow: hidden auto; }
+        /* 0.67倍に縮小 → 149.254vw を縮小するとちょうど100vw相当になる */
+        .spread-inner { transform: scale(var(--scale)); transform-origin: top left; width: 149.254%; max-width: none; margin: 0; }
+
+        /* 中央の綴じ目 */
+        .spread::after {
+          content: "";
+          position: absolute;
+          top: 20px; bottom: 20px; left: 50%; width: 2px;
+          transform: translateX(-50%);
+          background: linear-gradient(to bottom, transparent 0, var(--seam) 8%, var(--seam) 92%, transparent 100%);
+        }
+
+        /* ノート風のページ */
+        .page {
+          position: relative;
+          background: var(--page-bg);
+          border-radius: 0;
+          overflow: hidden;
+          box-shadow: inset 0 0 0 1px rgba(0,0,0,0.04);
+        }
+        /* 罫線（横線） */
+        .page::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background: repeating-linear-gradient(
+            to bottom,
+            transparent 0 26px,
+            var(--paper-line) 26px 27px
+          );
+          pointer-events: none;
+        }
+        /* 綴じリングの穴（内側余白側に表示） */
+        .page::after {
+          content: "";
+          position: absolute;
+          top: 22px; bottom: 22px;
+          width: 14px;
+          background:
+            radial-gradient(circle 4px at 50% 16px, rgba(0,0,0,0.08) 0 70%, transparent 72%) repeat-y,
+            radial-gradient(circle 3.5px at 50% 16px, var(--ring) 0 60%, transparent 62%) repeat-y;
+          background-size: 14px 44px, 14px 44px;
+          background-position: center top, center top;
+          opacity: 0.9;
+          pointer-events: none;
+        }
+        .page.left::after { left: 8px; }
+        .page.right::after { right: 8px; }
+
+        .page-inner { position: relative; padding: 0 8px 8px; }
+
+        .page-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 10px;
+          position: sticky; top: 0; z-index: 3;
+          background: linear-gradient(var(--page-bg), var(--page-bg));
+          padding: 4px 6px; /* 上の詰め */
+          border-radius: 6px;
+          box-shadow: 0 1px 0 rgba(0,0,0,0.04);
+        }
+        .badge { background:#ffd84d; padding: 4px 10px; border-radius: 20px; font-weight: 700; font-size: 12px; }
+        .scene { color:#555; font-weight:700; font-size: 12px; }
+
+        /* 画像＋テキストの縦フロー（上下連結） */
+        .stack { display: flex; flex-direction: column; gap: 0; }
+        .row {
+          display: grid;
+          grid-template-columns: 56px 3fr 1.6fr 1.6fr 64px; /* CUT | PICTURE | text | script | TIME */
+          align-items: stretch;
+          background: var(--page-bg);
+        }
+        .row + .row { border-top: 1px solid rgba(0,0,0,0.06); }
+        .cell { position: relative; background: transparent; }
+        .cell + .cell { border-left: 2px solid rgba(0,0,0,0.12); }
+
+        /* 列ヘッダー */
+        .row.header { position: static; z-index: 1; background: linear-gradient(var(--page-bg), var(--page-bg)); }
+        .row.header .cell { 
+          font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em;
+          color: #333; display: flex; align-items: center; justify-content: center;
+          background: #eceff7; border-left-color: rgba(0,0,0,0.14);
+          padding: 6px 4px;
+        }
+
+        /* 画像セル */
+        .frame { position: relative; overflow: hidden; }
+        /* どのアスペクト比でも全体が見えるように contain + 自然高さ */
+        .img { width: 100%; height: auto; object-fit: contain; display: block; background: #fff; }
+        /* オーバーレイ（CUT・TIME） */
+        .overlay {
+          position: absolute; left: 8px; top: 8px;
+          background: rgba(255,255,255,0.92);
+          border: 1px solid rgba(0,0,0,0.2);
+          border-radius: 4px; padding: 2px 8px;
+          font-size: 12px; font-weight: 700; color: #111;
+        }
+        .time { position: absolute; right: 8px; bottom: 8px; background: rgba(0,0,0,0.65); color: #fff; font-size: 11px; font-weight: 700; padding: 2px 6px; border-radius: 4px; }
+
+        /* 画像上のCUT/秒数は非表示（列側に表示するため） */
+        .frame .overlay, .frame .time { display: none !important; }
+
+        /* テキスト/スクリプト/時間セル */
+        .text, .script { padding: 10px; font-size: 12px; line-height: 1.5; color: #222; white-space: pre-wrap; }
+        .timecell { display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; background: #fff; }
+
+        /* 常に左右2カラム表示（小さい画面でも崩さない） */
+        @media (max-width: 700px) {
+          /* 700px 未満では綴じ目の演出だけ抑える */
+          .spread::after { display: none; }
+        }
+
+        /* トグルボタン */
+        .view-toggle { display: inline-flex; background: #f1f5f9; border-radius: 8px; padding: 4px; gap: 4px; }
+        .toggle-btn { appearance: none; border: 1px solid #cbd5e1; background: white; color: #0f172a; padding: 6px 10px; border-radius: 6px; font-weight: 700; font-size: 12px; cursor: pointer; }
+        .toggle-btn.active { background: #0a6cff; border-color: #0a6cff; color: white; }
+        /* 動画タグ */
+        .vid { width: 100%; height: auto; object-fit: contain; display: none; background: #000; }
+
+        /* メディアトグル */
+        .media-toggle { display: inline-flex; gap: 4px; margin-left: 6px; background: #e2e8f0; border-radius: 6px; padding: 2px; }
+        .media-btn { appearance: none; border: 1px solid #cbd5e1; background: white; color: #0f172a; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 10px; cursor: pointer; }
+        .media-btn.active { background: #0a6cff; border-color: #0a6cff; color: white; }
+
+        /* 画像モードトグル */
+        .image-toggle { display: inline-flex; gap: 4px; margin-left: 8px; background: #e2e8f0; border-radius: 6px; padding: 2px; }
+        .img-toggle-btn { appearance: none; border: 1px solid #cbd5e1; background: white; color: #0f172a; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 10px; cursor: pointer; }
+        .img-toggle-btn.active { background: #0a6cff; border-color: #0a6cff; color: white; }
+        /* 縦ビューも固定配置でヘッダー直下から開始し、左右いっぱい */
+        .view-vertical {
+          position: static; /* フローに参加して .views を押し広げる */
+          width: 100%; max-width: none; margin: 0;
+          background: transparent;
+          display: block;
+        }
+      </style>
+      <!-- 画像は docs/pencil_drawings/scene1.png ... scene10.png を使用 -->
+      <!-- 実写は docs/storyboard_images/scene1_realistic.jpg ... を参照 -->
+    </head>
+    <body data-mode="spread" data-image-mode="sketch" data-media-mode="image">
+      <div class="app">
+      <div class="header">
+        <div>
+          <div class="title">🎞️ 絵コンテ 見開きフロー（連結）</div>
+          <div class="meta">
+            <span>プロジェクト: サンプル</span>
+            <span>日付: 2025-08-23</span>
+            <span>カット: 10</span>
+          </div>
+        </div>
+        <div class="view-toggle" role="group" aria-label="表示切り替え">
+          <button class="toggle-btn" data-mode="vertical">上から下</button>
+          <button class="toggle-btn active" data-mode="spread">見開き</button>
+        </div>
+      </div>
+
+      <div class="views">
+      <!-- 見開きビュー -->
+      <div class="view-spread">
+        <div class="spread spread-inner">
+        <!-- 左ページ -->
+        <section class="page left">
+          <div class="page-inner">
+            <div class="page-header">
+              <div class="badge">Left 1/1</div>
+              <div class="scene">シーン: 左列（1-5）</div>
+            </div>
+            <div class="stack">
+              <div class="row header">
+                <div class="cell">CUT</div>
+                <div class="cell"><span>PICTURE</span>
+                  <span class="image-toggle" title="画像切替 (鉛筆/実写)">
+                    <button class="img-toggle-btn active" data-image="sketch">鉛筆</button>
+                    <button class="img-toggle-btn" data-image="live">実写</button>
+                  </span>
+                  <span class="media-toggle" title="メディア切替 (静止画/動画)">
+                    <button class="media-btn active" data-media="image">静止画</button>
+                    <button class="media-btn" data-media="video">動画</button>
+                  </span>
+                </div>
+                <div class="cell">TEXT</div>
+                <div class="cell">SCRIPT</div>
+                <div class="cell">TIME</div>
+              </div>
+
+              <div class="row">
+                <div class="cell timecell">001</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene1.png" data-live-src="storyboard_images/scene1_sparkle.png" src="pencil_drawings/scene1.png" alt="Scene 1" />
+                    <video class="vid" data-video-src="storyboard_videos/scene1_video.mp4" muted playsinline loop preload="metadata"></video>
+                    <figcaption class="overlay">CUT 001</figcaption>
+                    <div class="time">3秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">暗闇の中から巨大なモンスターがゆっくりと姿を現す。<br>全身に鱗が光り、鋭い牙を見せながら威嚇のポーズ。<br>口を大きく開けて火を噴く準備をしている。<br>カメラはローアングルから見上げる構図で、<br>モンスターの巨大さと恐ろしさを強調。<br>背景には荒廃した大地が広がっている。</div>
+                <div class="cell script">BGM: 低音の弦楽器による緊迫感のある音楽がフェードイン<br>SE: 地響きのような低い唸り声が徐々に大きくなる<br>SE: 火花が散る音、金属がきしむような音<br>環境音: 遠くで風が吹く音、小石が転がる音</div>
+                <div class="cell timecell">3秒</div>
+              </div>
+
+              <div class="row">
+                <div class="cell timecell">002</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene2.png" data-live-src="storyboard_images/scene2_realistic.jpg" src="pencil_drawings/scene2.png" alt="Scene 2" />
+                    <video class="vid" data-video-src="storyboard_videos/scene2_video.mp4" muted playsinline loop preload="metadata"></video>
+                    <figcaption class="overlay">CUT 002</figcaption>
+                    <div class="time">2秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">草原の真ん中に立つ小さな丸い生き物。<br>その大きな瞳には不安と好奇心が混じり合っている。<br>ゆっくりと首を傾けながら空を見上げる仕草。<br>耳がピクピクと動き、何かを感じ取っている様子。<br>足元の草が風に揺れ、生き物の小さな影が揺らめく。<br>表情はクローズアップで、瞳に空が映り込んでいる。</div>
+                <div class="cell script">BGM: ピアノソロの静かで神秘的なメロディー<br>SE: 優しい風の音が吹き抜ける<br>SE: 遠くで鳥のさえずり、草がそよぐ音<br>環境音: 静寂の中に響く心臓の鼓動音（かすかに）</div>
+                <div class="cell timecell">2秒</div>
+              </div>
+
+              <div class="row">
+                <div class="cell timecell">003</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene3.png" data-live-src="storyboard_images/scene3_realistic.jpg" src="pencil_drawings/scene3.png" alt="Scene 3" />
+                    <figcaption class="overlay">CUT 003</figcaption>
+                    <div class="time">3秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">色とりどりの動物たちが一斉にジャンプ！<br>ウサギ、リス、小鳥たちが喜びを全身で表現。<br>紙吹雪が舞い散る中、みんなで輪になって踊る。<br>それぞれのキャラクターが個性的な動きで喜びを表現。<br>背景には虹がかかり、お祝いムード満点の演出。<br>カメラは引きの構図で全体の賑やかさを捉える。</div>
+                <div class="cell script">BGM: オーケストラによる祝祭的な明るい音楽<br>SE: 動物たちの歓声、笑い声が重なり合う<br>SE: 紙吹雪がひらひらと舞う音<br>SE: 拍手、口笛、タンバリンの音<br>環境音: 祭りの太鼓の音が遠くから聞こえる</div>
+                <div class="cell timecell">3秒</div>
+              </div>
+
+              <div class="row">
+                <div class="cell timecell">004</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene4.png" data-live-src="storyboard_images/scene4_realistic.jpg" src="pencil_drawings/scene4.png" alt="Scene 4" />
+                    <figcaption class="overlay">CUT 004</figcaption>
+                    <div class="time">2秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">主人公が木漏れ日の差す森の小道をゆっくり歩く。<br>時々立ち止まっては周りを見回し、道を確認する仕草。<br>大きな木の根を慎重にまたぎ、苔むした石を避ける。<br>蝶々が主人公の周りを飛び回り、道案内をするかのよう。<br>背景には巨大な古木と緑豊かな下草が描かれる。<br>光と影のコントラストが美しい雰囲気を演出。</div>
+                <div class="cell script">BGM: アコースティックギターの穏やかなメロディー<br>SE: 落ち葉を踏む柔らかい足音のリズム<br>SE: 様々な鳥のさえずりが森にこだまする<br>SE: 小川のせせらぎ、風で木々が揺れる音<br>環境音: 虫の羽音、遠くでキツツキが木を叩く音</div>
+                <div class="cell timecell">2秒</div>
+              </div>
+
+              <div class="row">
+                <div class="cell timecell">005</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene5.png" data-live-src="storyboard_images/scene5_realistic.jpg" src="pencil_drawings/scene5.png" alt="Scene 5" />
+                    <figcaption class="overlay">CUT 005</figcaption>
+                    <div class="time">1秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">超クローズアップで主人公の顔がフレームいっぱいに。<br>瞳孔が徐々に開いていく様子をスローモーションで描写。<br>額に汗が一筋流れ、口が少し開く。<br>眉毛が上がり、顔全体に驚愕の表情が広がる。<br>瞳には何か信じられないものが映り込んでいる。<br>時間が止まったかのような一瞬を切り取る。</div>
+                <div class="cell script">BGM: 完全に音楽が止まり、無音状態に<br>SE: 「ハッ」という短い息を呑む音<br>SE: 心臓の鼓動音が徐々に速くなる<br>環境音: 周りの音も全て消え、静寂が支配<br>※この無音が次のシーンへの緊張感を高める</div>
+                <div class="cell timecell">1秒</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 右ページ -->
+        <section class="page right">
+          <div class="page-inner">
+            <div class="page-header">
+              <div class="badge">Right 1/1</div>
+              <div class="scene">シーン: 右列（6-10）</div>
+            </div>
+            <div class="stack">
+              <div class="row header">
+                <div class="cell">CUT</div>
+                <div class="cell"><span>PICTURE</span>
+                  <span class="image-toggle" title="画像切替 (鉛筆/実写)">
+                    <button class="img-toggle-btn active" data-image="sketch">鉛筆</button>
+                    <button class="img-toggle-btn" data-image="live">実写</button>
+                  </span>
+                  <span class="media-toggle" title="メディア切替 (静止画/動画)">
+                    <button class="media-btn active" data-media="image">静止画</button>
+                    <button class="media-btn" data-media="video">動画</button>
+                  </span>
+                </div>
+                <div class="cell">TEXT</div>
+                <div class="cell">SCRIPT</div>
+                <div class="cell">TIME</div>
+              </div>
+
+              <div class="row">
+                <div class="cell timecell">006</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene6.png" data-live-src="storyboard_images/scene6_realistic.jpg" src="pencil_drawings/scene6.png" alt="Scene 6" />
+                    <figcaption class="overlay">CUT 006</figcaption>
+                    <div class="time">4秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">二人のキャラクターが向かい合って真剣な表情で会話。<br>一人が地図を広げて指差しながら説明している。<br>もう一人は腕を組んで考え込む仕草を見せる。<br>吹き出しには「この先に伝説の宝が...」という文字。<br>背景の夕日が二人のシルエットを美しく照らす。<br>緊迫感と期待感が入り混じる重要な場面。</div>
+                <div class="cell script">BGM: チェロとバイオリンの静かで緊張感のある旋律<br>SE: 紙の地図を広げる音、指で地図をなぞる音<br>SE: 低い声での真剣な会話のトーン<br>SE: 時々聞こえる深いため息<br>環境音: 夕暮れの虫の音、遠くの鐘の音</div>
+                <div class="cell timecell">4秒</div>
+              </div>
+
+              <div class="row">
+                <div class="cell timecell">007</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene7.png" data-live-src="storyboard_images/scene7_realistic.jpg" src="pencil_drawings/scene7.png" alt="Scene 7" />
+                    <figcaption class="overlay">CUT 007</figcaption>
+                    <div class="time">2秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">主人公が助走をつけて大ジャンプ！<br>倒木、岩、川を次々と華麗に飛び越えていく。<br>空中で体をひねり、アクロバティックな動きを披露。<br>着地の瞬間、土煙が舞い上がるダイナミックな演出。<br>スピード線と残像効果で疾走感を表現。<br>カメラは横移動でキャラクターを追いかける。</div>
+                <div class="cell script">BGM: ドラムとエレキギターの激しいロック調<br>SE: 「ヒュッ」という風を切る音<br>SE: 着地時の「ドスン」という重い音<br>SE: 石が転がる音、水しぶきの音<br>SE: 主人公の力強い呼吸音と掛け声</div>
+                <div class="cell timecell">2秒</div>
+              </div>
+
+              <div class="row">
+                <div class="cell timecell">008</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene8.png" data-live-src="storyboard_images/scene8_realistic.jpg" src="pencil_drawings/scene8.png" alt="Scene 8" />
+                    <figcaption class="overlay">CUT 008</figcaption>
+                    <div class="time">3秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">壮大な山脈のパノラマショット。<br>雲がゆっくりと山の頂を流れていく様子。<br>朝日が山肌を黄金色に染め上げる美しい瞬間。<br>鷲が優雅に空を舞い、遠くに小さく見える。<br>手前には野花が風に揺れ、奥行きを演出。<br>時間の流れを感じさせる叙情的なシーン。</div>
+                <div class="cell script">BGM: オーケストラによる壮大で感動的な楽曲<br>SE: 高山を吹き抜ける風の音<br>SE: 遠くで鷲の鳴き声がこだまする<br>環境音: 小川のせせらぎ、草花が揺れる音<br>※自然の雄大さを音で表現する重要なシーン</div>
+                <div class="cell timecell">3秒</div>
+              </div>
+
+              <div class="row">
+                <div class="cell timecell">009</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene9.png" data-live-src="storyboard_images/scene9_realistic.jpg" src="pencil_drawings/scene9.png" alt="Scene 9" />
+                    <figcaption class="overlay">CUT 009</figcaption>
+                    <div class="time">2秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">洞窟の奥で光る謎の物体を発見する主人公。<br>そっと腰を落とし、警戒しながら一歩ずつ近づく。<br>物体から発せられる不思議な光が顔を照らす。<br>手を伸ばしかけて、一度ためらう仕草を見せる。<br>周りを見回し、誰もいないことを確認。<br>緊張の面持ちで、ついに物体に手を伸ばす瞬間。</div>
+                <div class="cell script">BGM: シンセサイザーによる神秘的で不気味な音楽<br>SE: 「キラキラ」という幻想的な輝きの音<br>SE: 洞窟内で響く水滴の音<br>SE: 主人公の緊張した呼吸音<br>環境音: 低周波の振動音が徐々に強くなる</div>
+                <div class="cell timecell">2秒</div>
+              </div>
+
+              <div class="row">
+                <div class="cell timecell">010</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene10.png" data-live-src="storyboard_images/scene10_realistic.jpg" src="pencil_drawings/scene10.png" alt="Scene 10" />
+                    <figcaption class="overlay">CUT 010</figcaption>
+                    <div class="time">5秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">丘の上で全員が集まり、大きく手を振る感動のフィナーレ。<br>オレンジ色の夕日が地平線に沈みかけている。<br>それぞれのキャラクターが笑顔で別れを惜しむ。<br>主人公は振り返りながら、ゆっくりと歩き始める。<br>仲間たちの姿が徐々に小さくなっていく。<br>最後は夕日のシルエットとなり、画面が暗転。<br>「また会おう」という文字がフェードイン。</div>
+                <div class="cell script">BGM: フルオーケストラによる感動的なエンディングテーマ<br>SE: 優しい夕暮れの風が吹く音<br>SE: 遠くで響く別れの言葉の余韻<br>SE: 足音が徐々に遠ざかっていく<br>環境音: 夕暮れの虫の合唱、波の音<br>※音楽は最後まで続き、余韻を残してフェードアウト</div>
+                <div class="cell timecell">5秒</div>
+              </div>
+            </div>
+          </div>
+        </section>
+        </div>
+      </div>
+
+      <!-- 上から下ビュー（単ページ縦並び） -->
+      <div class="view-vertical" style="display:none;">
+        <section class="page left" style="margin: 0 0 24px 0;">
+          <div class="page-inner">
+            <div class="page-header">
+              <div class="badge">Vertical</div>
+              <div class="scene">シーン: 連結ビュー（1-10）</div>
+            </div>
+            <div class="stack">
+              <div class="row header">
+                <div class="cell">CUT</div>
+                <div class="cell"><span>PICTURE</span>
+                  <span class="image-toggle" title="画像切替 (鉛筆/実写)">
+                    <button class="img-toggle-btn active" data-image="sketch">鉛筆</button>
+                    <button class="img-toggle-btn" data-image="live">実写</button>
+                  </span>
+                  <span class="media-toggle" title="メディア切替 (静止画/動画)">
+                    <button class="media-btn active" data-media="image">静止画</button>
+                    <button class="media-btn" data-media="video">動画</button>
+                  </span>
+                </div>
+                <div class="cell">TEXT</div>
+                <div class="cell">SCRIPT</div>
+                <div class="cell">TIME</div>
+              </div>
+
+              <!-- CUT 001 → 010 を縦に通しで表示 -->
+              <!-- 001 -->
+              <div class="row">
+                <div class="cell timecell">001</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene1.png" data-live-src="storyboard_images/scene1_sparkle.png" src="pencil_drawings/scene1.png" alt="Scene 1" />
+                    <video class="vid" data-video-src="storyboard_videos/scene1_video.mp4" muted playsinline loop preload="metadata"></video>
+                    <figcaption class="overlay">CUT 001</figcaption>
+                    <div class="time">3秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">暗闇の中から巨大なモンスターがゆっくりと姿を現す。<br>全身に鱗が光り、鋭い牙を見せながら威嚇のポーズ。<br>口を大きく開けて火を噴く準備をしている。<br>カメラはローアングルから見上げる構図で、<br>モンスターの巨大さと恐ろしさを強調。<br>背景には荒廃した大地が広がっている。</div>
+                <div class="cell script">BGM: 低音の弦楽器による緊迫感のある音楽がフェードイン<br>SE: 地響きのような低い唸り声が徐々に大きくなる<br>SE: 火花が散る音、金属がきしむような音<br>環境音: 遠くで風が吹く音、小石が転がる音</div>
+                <div class="cell timecell">3秒</div>
+              </div>
+
+              <!-- 002 -->
+              <div class="row">
+                <div class="cell timecell">002</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene2.png" data-live-src="storyboard_images/scene2_realistic.jpg" src="pencil_drawings/scene2.png" alt="Scene 2" />
+                    <video class="vid" data-video-src="storyboard_videos/scene2_video.mp4" muted playsinline loop preload="metadata"></video>
+                    <figcaption class="overlay">CUT 002</figcaption>
+                    <div class="time">2秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">草原の真ん中に立つ小さな丸い生き物。<br>その大きな瞳には不安と好奇心が混じり合っている。<br>ゆっくりと首を傾けながら空を見上げる仕草。<br>耳がピクピクと動き、何かを感じ取っている様子。<br>足元の草が風に揺れ、生き物の小さな影が揺らめく。<br>表情はクローズアップで、瞳に空が映り込んでいる。</div>
+                <div class="cell script">BGM: ピアノソロの静かで神秘的なメロディー<br>SE: 優しい風の音が吹き抜ける<br>SE: 遠くで鳥のさえずり、草がそよぐ音<br>環境音: 静寂の中に響く心臓の鼓動音（かすかに）</div>
+                <div class="cell timecell">2秒</div>
+              </div>
+
+              <!-- 003 -->
+              <div class="row">
+                <div class="cell timecell">003</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene3.png" data-live-src="storyboard_images/scene3_realistic.jpg" src="pencil_drawings/scene3.png" alt="Scene 3" />
+                    <figcaption class="overlay">CUT 003</figcaption>
+                    <div class="time">3秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">色とりどりの動物たちが一斉にジャンプ！<br>ウサギ、リス、小鳥たちが喜びを全身で表現。<br>紙吹雪が舞い散る中、みんなで輪になって踊る。<br>それぞれのキャラクターが個性的な動きで喜びを表現。<br>背景には虹がかかり、お祝いムード満点の演出。<br>カメラは引きの構図で全体の賑やかさを捉える。</div>
+                <div class="cell script">BGM: オーケストラによる祝祭的な明るい音楽<br>SE: 動物たちの歓声、笑い声が重なり合う<br>SE: 紙吹雪がひらひらと舞う音<br>SE: 拍手、口笛、タンバリンの音<br>環境音: 祭りの太鼓の音が遠くから聞こえる</div>
+                <div class="cell timecell">3秒</div>
+              </div>
+
+              <!-- 004 -->
+              <div class="row">
+                <div class="cell timecell">004</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene4.png" data-live-src="storyboard_images/scene4_realistic.jpg" src="pencil_drawings/scene4.png" alt="Scene 4" />
+                    <figcaption class="overlay">CUT 004</figcaption>
+                    <div class="time">2秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">主人公が木漏れ日の差す森の小道をゆっくり歩く。<br>時々立ち止まっては周りを見回し、道を確認する仕姿。<br>大きな木の根を慎重にまたぎ、苔むした石を避ける。<br>蝶々が主人公の周りを飛び回り、道案内をするかのよう。<br>背景には巨大な古木と緑豊かな下草が描かれる。<br>光と影のコントラストが美しい雰囲気を演出。</div>
+                <div class="cell script">BGM: アコースティックギターの穏やかなメロディー<br>SE: 落ち葉を踏む柔らかい足音のリズム<br>SE: 様々な鳥のさえずりが森にこだまする<br>SE: 小川のせせらぎ、風で木々が揺れる音<br>環境音: 虫の羽音、遠くでキツツキが木を叩く音</div>
+                <div class="cell timecell">2秒</div>
+              </div>
+
+              <!-- 005 -->
+              <div class="row">
+                <div class="cell timecell">005</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene5.png" data-live-src="storyboard_images/scene5_realistic.jpg" src="pencil_drawings/scene5.png" alt="Scene 5" />
+                    <figcaption class="overlay">CUT 005</figcaption>
+                    <div class="time">1秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">超クローズアップで主人公の顔がフレームいっぱいに。<br>瞳孔が徐々に開いていく様子をスローモーションで描写。<br>額に汗が一筋流れ、口が少し開く。<br>眉毛が上がり、顔全体に驚愕の表情が広がる。<br>瞳には何か信じられないものが映り込んでいる。<br>時間が止まったかのような一瞬を切り取る。</div>
+                <div class="cell script">BGM: 完全に音楽が止まり、無音状態に<br>SE: 「ハッ」という短い息を呑む音<br>SE: 心臓の鼓動音が徐々に速くなる<br>環境音: 周りの音も全て消え、静寂が支配<br>※この無音が次のシーンへの緊張感を高める</div>
+                <div class="cell timecell">1秒</div>
+              </div>
+
+              <!-- 006 -->
+              <div class="row">
+                <div class="cell timecell">006</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene6.png" data-live-src="storyboard_images/scene6_realistic.jpg" src="pencil_drawings/scene6.png" alt="Scene 6" />
+                    <figcaption class="overlay">CUT 006</figcaption>
+                    <div class="time">4秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">二人のキャラクターが向かい合って真剣な表情で会話。<br>一人が地図を広げて指差しながら説明している。<br>もう一人は腕を組んで考え込む仕草を見せる。<br>吹き出しには「この先に伝説の宝が...」という文字。<br>背景の夕日が二人のシルエットを美しく照らす。<br>緊迫感と期待感が入り混じる重要な場面。</div>
+                <div class="cell script">BGM: チェロとバイオリンの静かで緊張感のある旋律<br>SE: 紙の地図を広げる音、指で地図をなぞる音<br>SE: 低い声での真剣な会話のトーン<br>SE: 時々聞こえる深いため息<br>環境音: 夕暮れの虫の音、遠くの鐘の音</div>
+                <div class="cell timecell">4秒</div>
+              </div>
+
+              <!-- 007 -->
+              <div class="row">
+                <div class="cell timecell">007</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene7.png" data-live-src="storyboard_images/scene7_realistic.jpg" src="pencil_drawings/scene7.png" alt="Scene 7" />
+                    <figcaption class="overlay">CUT 007</figcaption>
+                    <div class="time">2秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">主人公が助走をつけて大ジャンプ！<br>倒木、岩、川を次々と華麗に飛び越えていく。<br>空中で体をひねり、アクロバティックな動きを披露。<br>着地の瞬間、土煙が舞い上がるダイナミックな演出。<br>スピード線と残像効果で疾走感を表現。<br>カメラは横移動でキャラクターを追いかける。</div>
+                <div class="cell script">BGM: ドラムとエレキギターの激しいロック調<br>SE: 「ヒュッ」という風を切る音<br>SE: 着地時の「ドスン」という重い音<br>SE: 石が転がる音、水しぶきの音<br>SE: 主人公の力強い呼吸音と掛け声</div>
+                <div class="cell timecell">2秒</div>
+              </div>
+
+              <!-- 008 -->
+              <div class="row">
+                <div class="cell timecell">008</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene8.png" data-live-src="storyboard_images/scene8_realistic.jpg" src="pencil_drawings/scene8.png" alt="Scene 8" />
+                    <figcaption class="overlay">CUT 008</figcaption>
+                    <div class="time">3秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">壮大な山脈のパノラマショット。<br>雲がゆっくりと山の頂を流れていく様子。<br>朝日が山肌を黄金色に染め上げる美しい瞬間。<br>鷲が優雅に空を舞い、遠くに小さく見える。<br>手前には野花が風に揺れ、奥行きを演出。<br>時間の流れを感じさせる叙情的なシーン。</div>
+                <div class="cell script">BGM: オーケストラによる壮大で感動的な楽曲<br>SE: 高山を吹き抜ける風の音<br>SE: 遠くで鷲の鳴き声がこだまする<br>環境音: 小川のせせらぎ、草花が揺れる音<br>※自然の雄大さを音で表現する重要なシーン</div>
+                <div class="cell timecell">3秒</div>
+              </div>
+
+              <!-- 009 -->
+              <div class="row">
+                <div class="cell timecell">009</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene9.png" data-live-src="storyboard_images/scene9_realistic.jpg" src="pencil_drawings/scene9.png" alt="Scene 9" />
+                    <figcaption class="overlay">CUT 009</figcaption>
+                    <div class="time">2秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">洞窟の奥で光る謎の物体を発見する主人公。<br>そっと腰を落とし、警戒しながら一歩ずつ近づく。<br>物体から発せられる不思議な光が顔を照らす。<br>手を伸ばしかけて、一度ためらう仕草を見せる。<br>周りを見回し、誰もいないことを確認。<br>緊張の面持ちで、ついに物体に手を伸ばす瞬間。</div>
+                <div class="cell script">BGM: シンセサイザーによる神秘的で不気味な音楽<br>SE: 「キラキラ」という幻想的な輝きの音<br>SE: 洞窟内で響く水滴の音<br>SE: 主人公の緊張した呼吸音<br>環境音: 低周波の振動音が徐々に強くなる</div>
+                <div class="cell timecell">2秒</div>
+              </div>
+
+              <!-- 010 -->
+              <div class="row">
+                <div class="cell timecell">010</div>
+                <div class="cell">
+                  <figure class="frame">
+                    <img class="img" data-sketch-src="pencil_drawings/scene10.png" data-live-src="storyboard_images/scene10_realistic.jpg" src="pencil_drawings/scene10.png" alt="Scene 10" />
+                    <figcaption class="overlay">CUT 010</figcaption>
+                    <div class="time">5秒</div>
+                  </figure>
+                </div>
+                <div class="cell text">丘の上で全員が集まり、大きく手を振る感動のフィナーレ。<br>オレンジ色の夕日が地平線に沈みかけている。<br>それぞれのキャラクターが笑顔で別れを惜しむ。<br>主人公は振り返りながら、ゆっくりと歩き始める。<br>仲間たちの姿が徐々に小さくなっていく。<br>最後は夕日のシルエットとなり、画面が暗転。<br>「また会おう」という文字がフェードイン。</div>
+                <div class="cell script">BGM: フルオーケストラによる感動的なエンディングテーマ<br>SE: 優しい夕暮れの風が吹く音<br>SE: 遠くで響く別れの言葉の余韻<br>SE: 足音が徐々に遠ざかっていく<br>環境音: 夕暮れの虫の合唱、波の音<br>※音楽は最後まで続き、余韻を残してフェードアウト</div>
+                <div class="cell timecell">5秒</div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+      </div> <!-- /views -->
+      </div> <!-- /app -->
+
+      <script>
+        // トグル切り替え
+        const buttons = document.querySelectorAll('.toggle-btn');
+        buttons.forEach(btn => btn.addEventListener('click', () => {
+          const mode = btn.dataset.mode;
+          document.body.setAttribute('data-mode', mode);
+          document.querySelector('.view-spread').style.display = (mode === 'spread') ? 'block' : 'none';
+          document.querySelector('.view-vertical').style.display = (mode === 'spread') ? 'none' : 'block';
+          buttons.forEach(b => b.classList.toggle('active', b === btn));
+        }));
+
+        // 画像モード（鉛筆/実写）切替
+        const imgBtns = document.querySelectorAll('.img-toggle-btn');
+        function applyImageMode(mode) {
+          document.body.setAttribute('data-image-mode', mode);
+          document.querySelectorAll('.frame img[data-sketch-src]').forEach(img => {
+            const sketch = img.getAttribute('data-sketch-src');
+            const live = img.getAttribute('data-live-src') || sketch;
+            img.src = (mode === 'live') ? live : sketch;
+          });
+          imgBtns.forEach(b => b.classList.toggle('active', b.dataset.image === mode));
+        }
+        imgBtns.forEach(btn => btn.addEventListener('click', () => applyImageMode(btn.dataset.image)));
+        // メディアモード切替（静止画/動画）
+        const mediaBtns = document.querySelectorAll('.media-btn');
+        function applyMediaMode(mode) {
+          document.body.setAttribute('data-media-mode', mode);
+          document.querySelectorAll('.frame').forEach(frame => {
+            const img = frame.querySelector('img');
+            const vid = frame.querySelector('video.vid');
+            if (!img && !vid) return;
+            if (mode === 'image') {
+              if (vid) {
+                try { vid.pause(); } catch (e) {}
+                vid.removeAttribute('src');
+                vid.load();
+                vid.style.display = 'none';
+              }
+              if (img) img.style.display = 'block';
+            } else {
+              // video
+              if (img) img.style.display = 'none';
+              if (vid) {
+                const src = vid.getAttribute('data-video-src');
+                if (!src) { vid.style.display = 'none'; return; }
+                // セットしてロード
+                if (vid.getAttribute('src') !== src) {
+                  vid.setAttribute('src', src);
+                }
+                vid.load();
+                vid.onloadedmetadata = () => {
+                  vid.style.display = 'block';
+                  const p = vid.play(); if (p && p.catch) p.catch(() => {});
+                };
+                vid.onerror = () => { vid.style.display = 'none'; };
+              }
+            }
+          });
+          mediaBtns.forEach(b => b.classList.toggle('active', b.dataset.media === mode));
+        }
+        mediaBtns.forEach(btn => btn.addEventListener('click', () => applyMediaMode(btn.dataset.media)));
+
+        // 初期モード適用
+        applyImageMode(document.body.getAttribute('data-image-mode') || 'sketch');
+        applyMediaMode(document.body.getAttribute('data-media-mode') || 'image');
+
+        // グリッドレイアウトに統一したため、上下位置の補正処理は不要
+      </script>
+    </body>
+    </html>

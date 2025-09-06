@@ -1,0 +1,21 @@
+# Pages configuration for docs site
+# NOTE: Adjust `src` to actual video path or embed URL.
+
+pages:
+  - id: github-actions-mcp-workflow-demo
+    title: "GitHub Actions × MCP Workflow Demo"
+    path: "/demo/github-actions-mcp-workflow"
+    hero:
+      type: video            # video | image | none
+      # If using a local MP4/WEBM asset, set the relative path below.
+      # Example: 
+      src: "./assets/videos/github-actions-mcp-workflow.mp4"
+      autoplay: true
+      muted: true            # required for autoplay on mobile
+      loop: true             # ← requested change: enable loop
+      controls: false
+      playsinline: true
+    description: "GitHub Actions と MCP のワークフロー連携デモ。"
+    visible: true
+    order: 10
+
