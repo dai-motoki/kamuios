@@ -1,11 +1,14 @@
 # 要件定義書
-# メディアエディタプラットフォームの要件定義書
+# KAMUI CODE プラットフォームの要件定義書
 
 - id: requirements-document
   category: 2
   category_name: 要件定義・開発
   title: 要件定義書
-  content: ""
+  content: |
+    KAMUI CODE プラットフォームの包括的な要件定義書です。システム要件、デザイン要件、技術仕様、開発計画を網羅しています。
+  
+  # プロジェクト概要セクション
   custom_html: |
     <style>
       .requirement-doc {
@@ -86,17 +89,17 @@
     
     <div class="requirement-doc">
       <div class="requirement-header">
-        <h2 class="requirement-title">メディアエディタプラットフォーム 要件定義書</h2>
+        <h2 class="requirement-title">KAMUI CODE プラットフォーム 要件定義書</h2>
         <div class="requirement-meta">
-          <span>バージョン: 1.0</span>
-          <span>更新日: 2025年1月</span>
-          <span>ステータス: ドラフト</span>
+          <span>バージョン: 2.0</span>
+          <span>更新日: 2025年9月</span>
+          <span>ステータス: レビュー中</span>
         </div>
       </div>
       
       <div class="requirement-section">
         <h3>1. プロジェクト概要</h3>
-        <p>本プロジェクトは、Web上で動作する統合型メディアエディタプラットフォームの開発を目的とします。AIを活用した画像生成、ビデオ編集、ストーリーボード作成など、クリエイティブな作業を一つの環境で完結できるシステムを構築します。</p>
+        <p>KAMUI CODE は、MCP（Model Context Protocol）に準拠した複数のサーバー群を統合的に提供するプラットフォームです。クリエイティブ、開発、ビジネスの3領域を横断し、AIを活用した画像生成、ビデオ編集、コード生成、文書作成など、あらゆるデジタルコンテンツ制作を一つの環境で完結できるシステムを構築します。</p>
       </div>
       
       <div class="requirement-section">
@@ -114,23 +117,33 @@
           <tbody>
             <tr>
               <td>FR-001</td>
-              <td>AI画像生成</td>
-              <td>手書きスケッチから高品質な画像を生成する機能</td>
+              <td>テキスト→画像生成 (T2I)</td>
+              <td>プロンプトから高品質な画像を生成（Flux, SDXL, Dalle-3対応）</td>
             </tr>
             <tr>
               <td>FR-002</td>
-              <td>ビデオビューアー</td>
-              <td>タイムライン管理とシーン別ナビゲーション機能</td>
+              <td>画像→画像変換 (I2I)</td>
+              <td>既存画像の編集・スタイル変換・高解像度化機能</td>
             </tr>
             <tr>
               <td>FR-003</td>
-              <td>ストーリーボード表示</td>
-              <td>見開き/縦スクロールの切替表示機能</td>
+              <td>テキスト→動画生成 (T2V)</td>
+              <td>プロンプトから動画を生成（GenVideo, HaiperAI対応）</td>
             </tr>
             <tr>
               <td>FR-004</td>
-              <td>リアルタイムプレビュー</td>
-              <td>編集内容を即座に確認できるプレビュー機能</td>
+              <td>MCPサーバー統合</td>
+              <td>クリエイティブ/開発/ビジネス領域の統合API管理</td>
+            </tr>
+            <tr>
+              <td>FR-005</td>
+              <td>要件定義書生成</td>
+              <td>プロジェクト要件の自動生成・管理機能</td>
+            </tr>
+            <tr>
+              <td>FR-006</td>
+              <td>ストーリーボード作成</td>
+              <td>ビジュアルストーリーテリング支援機能</td>
             </tr>
           </tbody>
         </table>
@@ -231,6 +244,204 @@
           <li>AI画像生成のAPIには利用制限があるため、ユーザーごとに生成回数を制限する</li>
           <li>動画ファイルのアップロードサイズは500MBまでとする</li>
           <li>初期リリースでは日本語のみ対応とし、多言語対応は次期バージョンで検討</li>
+          <li>MCPプロトコル準拠のため、JSON-RPC 2.0形式での通信が必須</li>
         </ul>
       </div>
     </div>
+  
+  # デザイン要件セクション
+  design_specs:
+    colors:
+      - group: ダークテーマ
+        swatches:
+          - name: 背景
+            color: "#1a1a1a"
+            label: bg
+          - name: テキスト
+            color: "#ffffff"
+            label: text
+          - name: ボーダー
+            color: "#2a2a2a"
+            label: border
+          - name: リンク
+            color: "#4a9eff"
+            label: link
+      - group: ライトテーマ
+        swatches:
+          - name: 背景
+            color: "#f7f7f8"
+            label: bg
+            light: true
+          - name: テキスト
+            color: "#1a1a1a"
+            label: text
+            light: true
+          - name: ボーダー
+            color: "#e4e4e7"
+            label: border
+            light: true
+          - name: リンク
+            color: "#2563eb"
+            label: link
+            light: true
+    categories:
+      - name: クリエイティブ
+        class: creative
+        gradient: "linear-gradient(135deg, #8B5CF6 0%, #EC4899 50%, #FB923C 100%)"
+        description: 画像・動画・音楽生成
+        colors:
+          - "#8B5CF6"
+          - "#EC4899"
+          - "#FB923C"
+      - name: 開発
+        class: development
+        gradient: "linear-gradient(135deg, #3B82F6 0%, #06B6D4 50%, #10B981 100%)"
+        description: コード生成・分析・デバッグ
+        colors:
+          - "#3B82F6"
+          - "#06B6D4"
+          - "#10B981"
+      - name: ビジネス
+        class: business
+        gradient: "linear-gradient(135deg, #10B981 0%, #14B8A6 50%, #06B6D4 100%)"
+        description: 翻訳・要約・レポート
+        colors:
+          - "#10B981"
+          - "#14B8A6"
+          - "#06B6D4"
+    typography:
+      - label: メインタイトル
+        sample: "KAMUI CODE ドキュメント"
+        spec: "font-size: 1.6rem; font-weight: 700;"
+      - label: セクションヘッダー
+        sample: "1. 概要"
+        spec: "font-size: 1.1rem; font-weight: 600;"
+      - label: 本文
+        sample: "KAMUI CODE は、MCP（Model Context Protocol）に準拠した複数のサーバー群を統合的に提供します。"
+        spec: "font-size: 0.95rem; line-height: 1.7;"
+      - label: コード
+        sample: "const result = await api.generate({ prompt: 'hello' });"
+        spec: "font-family: ui-monospace, monospace; font-size: 0.85rem;"
+    layout:
+      - サイドバー幅: 280px
+      - メインコンテンツパディング: 24px
+      - カード間隔: 18px
+      - ボーダーラジウス: 8px～16px
+    interaction:
+      - ホバーエフェクト: 背景色変化、translateY(-2px)
+      - トランジション: all 0.2s ease
+      - スクロールビヘイビア: smooth
+      - モーダル背景: rgba(0,0,0,0.6)
+    responsive:
+      - ブレークポイント: 768px
+      - モバイルサイドバー: スライド式
+      - グリッド調整: 3列 → 2列 → 1列
+      - タッチ対応: タップ操作最適化
+  
+  # MCPプロトコル準拠の設定例
+  code:
+    language: json
+    content: |
+      {
+        "mcpServers": {
+          "kamui-creative": {
+            "command": "npx",
+            "args": ["@kamui/mcp-creative"],
+            "env": {
+              "API_KEY": "YOUR_CREATIVE_API_KEY"
+            }
+          },
+          "kamui-dev": {
+            "command": "npx",
+            "args": ["@kamui/mcp-dev"],
+            "env": {
+              "API_KEY": "YOUR_DEV_API_KEY"
+            }
+          },
+          "kamui-business": {
+            "command": "npx",
+            "args": ["@kamui/mcp-business"],
+            "env": {
+              "API_KEY": "YOUR_BUSINESS_API_KEY"
+            }
+          }
+        }
+      }
+  
+  # アーキテクチャ図
+  mermaid: |
+    graph TD
+      A[KAMUI CODE Platform] --> B[Creative Category]
+      A --> C[Development Category]
+      A --> D[Business Category]
+      
+      B --> B1[Text→Image<br/>T2I]
+      B --> B2[Image→Image<br/>I2I]
+      B --> B3[Text→Video<br/>T2V]
+      B --> B4[Video→Video<br/>V2V]
+      
+      C --> C1[Code Generation]
+      C --> C2[Code Analysis]
+      C --> C3[Debugging]
+      C --> C4[Documentation]
+      
+      D --> D1[Translation]
+      D --> D2[Summarization]
+      D --> D3[Report Generation]
+      D --> D4[Requirement Docs]
+      
+      style A fill:#8B5CF6,stroke:#fff,stroke-width:2px,color:#fff
+      style B fill:#EC4899,stroke:#fff,stroke-width:2px,color:#fff
+      style C fill:#3B82F6,stroke:#fff,stroke-width:2px,color:#fff
+      style D fill:#10B981,stroke:#fff,stroke-width:2px,color:#fff
+  
+  # ガントチャート
+  gantt: |
+    gantt
+      title KAMUI CODE 開発スケジュール
+      dateFormat YYYY-MM-DD
+      section フェーズ1
+      要件定義 :done, req, 2025-01-01, 14d
+      基本設計 :done, design, after req, 21d
+      詳細設計 :active, detail, after design, 14d
+      section フェーズ2
+      MCPサーバー実装 :impl1, after detail, 30d
+      フロントエンド実装 :impl2, after detail, 45d
+      統合テスト :test, after impl1, 21d
+      section フェーズ3
+      性能調整 :perf, after test, 14d
+      デプロイ準備 :deploy, after perf, 7d
+      本番リリース :milestone, after deploy, 0d
+  
+  # 追加のドキュメント
+  additional_content: |
+    ## 6. API仕様
+    
+    ### エンドポイント構造
+    ```
+    https://{BASE_URL}/{category}/{vendor}/{model}/{mode}
+    ```
+    
+    ### カテゴリ別エンドポイント例
+    - **画像生成**: `{BASE_URL}/t2i/fal/flux/ultra`
+    - **動画生成**: `{BASE_URL}/t2v/fal/haiper/standard`
+    - **コード生成**: `{BASE_URL}/code/github/copilot/completion`
+    - **要件定義**: `{BASE_URL}/requirement/kamui/generator`
+    
+    ## 7. セキュリティ要件
+    
+    - **認証方式**: Bearer Token (JWT)
+    - **通信暗号化**: TLS 1.3以上
+    - **APIレート制限**: 100リクエスト/分 (ユーザー単位)
+    - **データ保護**: 個人情報のハッシュ化、定期的な監査ログ
+  
+  # クライアント実装例
+  client_samples:
+    - id: client-javascript
+      title: JavaScript/TypeScript実装例
+    - id: client-python
+      title: Python実装例
+    - id: client-claude
+      title: Claude Desktop実装例
+    - id: client-cursor
+      title: Cursor IDE実装例

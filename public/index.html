@@ -139,10 +139,11 @@
   
   <input type="text" class="search-bar" id="searchInput" placeholder="検索..." />
   
-  <button id="backToDashboard" onclick="window.location.hash=''; location.reload();" style="margin-left: auto; padding: 8px 16px; background: #4a4a4a; border: none; border-radius: 6px; color: white; cursor: pointer; font-size: 14px;">
-    ← ダッシュボードに戻る
-  </button>
-  
+  <div class="view-options">
+    <span class="theme-label">表示:</span>
+    <button class="view-btn" id="viewCards">カード</button>
+    <button class="view-btn active" id="viewList">リスト</button>
+  </div>
 </div>
 
     
@@ -4506,6 +4507,7 @@
     <h2>要件定義書</h2>
     
     
+      KAMUI CODE プラットフォームの包括的な要件定義書です。システム要件、デザイン要件、技術仕様、開発計画を網羅しています。
     
     
     
@@ -4526,6 +4528,57 @@
     
     
     
+      <div class="mermaid-wrapper">
+  <div class="mermaid">
+    graph TD
+  A[KAMUI CODE Platform] --&gt; B[Creative Category]
+  A --&gt; C[Development Category]
+  A --&gt; D[Business Category]
+  
+  B --&gt; B1[Text→Image&lt;br/&gt;T2I]
+  B --&gt; B2[Image→Image&lt;br/&gt;I2I]
+  B --&gt; B3[Text→Video&lt;br/&gt;T2V]
+  B --&gt; B4[Video→Video&lt;br/&gt;V2V]
+  
+  C --&gt; C1[Code Generation]
+  C --&gt; C2[Code Analysis]
+  C --&gt; C3[Debugging]
+  C --&gt; C4[Documentation]
+  
+  D --&gt; D1[Translation]
+  D --&gt; D2[Summarization]
+  D --&gt; D3[Report Generation]
+  D --&gt; D4[Requirement Docs]
+  
+  style A fill:#8B5CF6,stroke:#fff,stroke-width:2px,color:#fff
+  style B fill:#EC4899,stroke:#fff,stroke-width:2px,color:#fff
+  style C fill:#3B82F6,stroke:#fff,stroke-width:2px,color:#fff
+  style D fill:#10B981,stroke:#fff,stroke-width:2px,color:#fff
+
+  </div>
+</div>
+
+    
+    
+    
+      <h2 id="6-api仕様">6. API仕様</h2>
+<h3 id="エンドポイント構造">エンドポイント構造</h3>
+<pre tabindex="0"><code>https://{BASE_URL}/{category}/{vendor}/{model}/{mode}
+</code></pre><h3 id="カテゴリ別エンドポイント例">カテゴリ別エンドポイント例</h3>
+<ul>
+<li><strong>画像生成</strong>: <code>{BASE_URL}/t2i/fal/flux/ultra</code></li>
+<li><strong>動画生成</strong>: <code>{BASE_URL}/t2v/fal/haiper/standard</code></li>
+<li><strong>コード生成</strong>: <code>{BASE_URL}/code/github/copilot/completion</code></li>
+<li><strong>要件定義</strong>: <code>{BASE_URL}/requirement/kamui/generator</code></li>
+</ul>
+<h2 id="7-セキュリティ要件">7. セキュリティ要件</h2>
+<ul>
+<li><strong>認証方式</strong>: Bearer Token (JWT)</li>
+<li><strong>通信暗号化</strong>: TLS 1.3以上</li>
+<li><strong>APIレート制限</strong>: 100リクエスト/分 (ユーザー単位)</li>
+<li><strong>データ保護</strong>: 個人情報のハッシュ化、定期的な監査ログ</li>
+</ul>
+
     
     
     
@@ -4608,17 +4661,17 @@
 
 <div class="requirement-doc">
   <div class="requirement-header">
-    <h2 class="requirement-title">メディアエディタプラットフォーム 要件定義書</h2>
+    <h2 class="requirement-title">KAMUI CODE プラットフォーム 要件定義書</h2>
     <div class="requirement-meta">
-      <span>バージョン: 1.0</span>
-      <span>更新日: 2025年1月</span>
-      <span>ステータス: ドラフト</span>
+      <span>バージョン: 2.0</span>
+      <span>更新日: 2025年9月</span>
+      <span>ステータス: レビュー中</span>
     </div>
   </div>
   
   <div class="requirement-section">
     <h3>1. プロジェクト概要</h3>
-    <p>本プロジェクトは、Web上で動作する統合型メディアエディタプラットフォームの開発を目的とします。AIを活用した画像生成、ビデオ編集、ストーリーボード作成など、クリエイティブな作業を一つの環境で完結できるシステムを構築します。</p>
+    <p>KAMUI CODE は、MCP（Model Context Protocol）に準拠した複数のサーバー群を統合的に提供するプラットフォームです。クリエイティブ、開発、ビジネスの3領域を横断し、AIを活用した画像生成、ビデオ編集、コード生成、文書作成など、あらゆるデジタルコンテンツ制作を一つの環境で完結できるシステムを構築します。</p>
   </div>
   
   <div class="requirement-section">
@@ -4636,23 +4689,33 @@
       <tbody>
         <tr>
           <td>FR-001</td>
-          <td>AI画像生成</td>
-          <td>手書きスケッチから高品質な画像を生成する機能</td>
+          <td>テキスト→画像生成 (T2I)</td>
+          <td>プロンプトから高品質な画像を生成（Flux, SDXL, Dalle-3対応）</td>
         </tr>
         <tr>
           <td>FR-002</td>
-          <td>ビデオビューアー</td>
-          <td>タイムライン管理とシーン別ナビゲーション機能</td>
+          <td>画像→画像変換 (I2I)</td>
+          <td>既存画像の編集・スタイル変換・高解像度化機能</td>
         </tr>
         <tr>
           <td>FR-003</td>
-          <td>ストーリーボード表示</td>
-          <td>見開き/縦スクロールの切替表示機能</td>
+          <td>テキスト→動画生成 (T2V)</td>
+          <td>プロンプトから動画を生成（GenVideo, HaiperAI対応）</td>
         </tr>
         <tr>
           <td>FR-004</td>
-          <td>リアルタイムプレビュー</td>
-          <td>編集内容を即座に確認できるプレビュー機能</td>
+          <td>MCPサーバー統合</td>
+          <td>クリエイティブ/開発/ビジネス領域の統合API管理</td>
+        </tr>
+        <tr>
+          <td>FR-005</td>
+          <td>要件定義書生成</td>
+          <td>プロジェクト要件の自動生成・管理機能</td>
+        </tr>
+        <tr>
+          <td>FR-006</td>
+          <td>ストーリーボード作成</td>
+          <td>ビジュアルストーリーテリング支援機能</td>
         </tr>
       </tbody>
     </table>
@@ -4753,6 +4816,7 @@
       <li>AI画像生成のAPIには利用制限があるため、ユーザーごとに生成回数を制限する</li>
       <li>動画ファイルのアップロードサイズは500MBまでとする</li>
       <li>初期リリースでは日本語のみ対応とし、多言語対応は次期バージョンで検討</li>
+      <li>MCPプロトコル準拠のため、JSON-RPC 2.0形式での通信が必須</li>
     </ul>
   </div>
 </div>
@@ -4760,17 +4824,331 @@
     
     
     
+      <div class="gantt-wrapper">
+  <div class="mermaid" style="width: 1600px !important; min-width: 1600px !important; height: 500px !important;">
+gantt
+  title KAMUI CODE 開発スケジュール
+  dateFormat YYYY-MM-DD
+  section フェーズ1
+  要件定義 :done, req, 2025-01-01, 14d
+  基本設計 :done, design, after req, 21d
+  詳細設計 :active, detail, after design, 14d
+  section フェーズ2
+  MCPサーバー実装 :impl1, after detail, 30d
+  フロントエンド実装 :impl2, after detail, 45d
+  統合テスト :test, after impl1, 21d
+  section フェーズ3
+  性能調整 :perf, after test, 14d
+  デプロイ準備 :deploy, after perf, 7d
+  本番リリース :milestone, after deploy, 0d
+
+  </div>
+  <div class="mermaid-caption">図: 要件定義書</div>
+</div>
+
     
     
     
     
     
+      <pre class="code"><code>map[content:{
+  &#34;mcpServers&#34;: {
+    &#34;kamui-creative&#34;: {
+      &#34;command&#34;: &#34;npx&#34;,
+      &#34;args&#34;: [&#34;@kamui/mcp-creative&#34;],
+      &#34;env&#34;: {
+        &#34;API_KEY&#34;: &#34;YOUR_CREATIVE_API_KEY&#34;
+      }
+    },
+    &#34;kamui-dev&#34;: {
+      &#34;command&#34;: &#34;npx&#34;,
+      &#34;args&#34;: [&#34;@kamui/mcp-dev&#34;],
+      &#34;env&#34;: {
+        &#34;API_KEY&#34;: &#34;YOUR_DEV_API_KEY&#34;
+      }
+    },
+    &#34;kamui-business&#34;: {
+      &#34;command&#34;: &#34;npx&#34;,
+      &#34;args&#34;: [&#34;@kamui/mcp-business&#34;],
+      &#34;env&#34;: {
+        &#34;API_KEY&#34;: &#34;YOUR_BUSINESS_API_KEY&#34;
+      }
+    }
+  }
+}
+ language:json]</code></pre>
+
     
     
     
     
     
+      <h3>カラーパレット</h3>
+<div class="color-palette">
+  
+  <div class="color-group">
+    <h4>ダークテーマ</h4>
+    <div class="color-swatches">
+      
+      <div class="color-swatch" style="background-color: #1a1a1a; color: #ffffff;">
+        <div class="color-label">背景</div>
+        <div class="color-code">#1a1a1a</div>
+      </div>
+      
+      <div class="color-swatch" style="background-color: #ffffff; color: #ffffff;">
+        <div class="color-label">テキスト</div>
+        <div class="color-code">#ffffff</div>
+      </div>
+      
+      <div class="color-swatch" style="background-color: #2a2a2a; color: #ffffff;">
+        <div class="color-label">ボーダー</div>
+        <div class="color-code">#2a2a2a</div>
+      </div>
+      
+      <div class="color-swatch" style="background-color: #4a9eff; color: #ffffff;">
+        <div class="color-label">リンク</div>
+        <div class="color-code">#4a9eff</div>
+      </div>
+      
+    </div>
+  </div>
+  
+  <div class="color-group">
+    <h4>ライトテーマ</h4>
+    <div class="color-swatches">
+      
+      <div class="color-swatch light" style="background-color: #f7f7f8; color: #1a1a1a;">
+        <div class="color-label">背景</div>
+        <div class="color-code">#f7f7f8</div>
+      </div>
+      
+      <div class="color-swatch light" style="background-color: #1a1a1a; color: #1a1a1a;">
+        <div class="color-label">テキスト</div>
+        <div class="color-code">#1a1a1a</div>
+      </div>
+      
+      <div class="color-swatch light" style="background-color: #e4e4e7; color: #1a1a1a;">
+        <div class="color-label">ボーダー</div>
+        <div class="color-code">#e4e4e7</div>
+      </div>
+      
+      <div class="color-swatch light" style="background-color: #2563eb; color: #1a1a1a;">
+        <div class="color-label">リンク</div>
+        <div class="color-code">#2563eb</div>
+      </div>
+      
+    </div>
+  </div>
+  
+</div>
+
+<h3>カテゴリー別カラー</h3>
+<div class="category-colors">
+  
+  <div class="category-card creative">
+    <div class="category-gradient" style="background: ZgotmplZ;">
+      <h4>クリエイティブ</h4>
+      <p>画像・動画・音楽生成</p>
+    </div>
+    <div class="category-specs">
+      <span class="gradient-spec">グラデーション指定:</span>
+      <div class="color-values">
+        
+        <span class="color-val">#8B5CF6</span>
+        
+        <span class="color-val">#EC4899</span>
+        
+        <span class="color-val">#FB923C</span>
+        
+      </div>
+    </div>
+  </div>
+  
+  <div class="category-card development">
+    <div class="category-gradient" style="background: ZgotmplZ;">
+      <h4>開発</h4>
+      <p>コード生成・分析・デバッグ</p>
+    </div>
+    <div class="category-specs">
+      <span class="gradient-spec">グラデーション指定:</span>
+      <div class="color-values">
+        
+        <span class="color-val">#3B82F6</span>
+        
+        <span class="color-val">#06B6D4</span>
+        
+        <span class="color-val">#10B981</span>
+        
+      </div>
+    </div>
+  </div>
+  
+  <div class="category-card business">
+    <div class="category-gradient" style="background: ZgotmplZ;">
+      <h4>ビジネス</h4>
+      <p>翻訳・要約・レポート</p>
+    </div>
+    <div class="category-specs">
+      <span class="gradient-spec">グラデーション指定:</span>
+      <div class="color-values">
+        
+        <span class="color-val">#10B981</span>
+        
+        <span class="color-val">#14B8A6</span>
+        
+        <span class="color-val">#06B6D4</span>
+        
+      </div>
+    </div>
+  </div>
+  
+</div>
+
+<h3>タイポグラフィー</h3>
+<div class="typography-samples">
+  
+  <div class="typo-item">
+    <span class="typo-label">メインタイトル</span>
+    <div class="typo-sample" style="ZgotmplZ">KAMUI CODE ドキュメント</div>
+    <span class="typo-spec">font-size: 1.6rem; font-weight: 700;</span>
+  </div>
+  
+  <div class="typo-item">
+    <span class="typo-label">セクションヘッダー</span>
+    <div class="typo-sample" style="ZgotmplZ">1. 概要</div>
+    <span class="typo-spec">font-size: 1.1rem; font-weight: 600;</span>
+  </div>
+  
+  <div class="typo-item">
+    <span class="typo-label">本文</span>
+    <div class="typo-sample" style="ZgotmplZ">KAMUI CODE は、MCP（Model Context Protocol）に準拠した複数のサーバー群を統合的に提供します。</div>
+    <span class="typo-spec">font-size: 0.95rem; line-height: 1.7;</span>
+  </div>
+  
+  <div class="typo-item">
+    <span class="typo-label">コード</span>
+    <div class="typo-sample" style="ZgotmplZ">const result = await api.generate({ prompt: &#39;hello&#39; });</div>
+    <span class="typo-spec">font-family: ui-monospace, monospace; font-size: 0.85rem;</span>
+  </div>
+  
+</div>
+
+<h3>レイアウト構成</h3>
+<div class="layout-specs">
+  <h4>基本レイアウト</h4>
+  <ul>
     
+    <li>map[サイドバー幅:280px]</li>
+    
+    <li>map[メインコンテンツパディング:24px]</li>
+    
+    <li>map[カード間隔:18px]</li>
+    
+    <li>map[ボーダーラジウス:8px～16px]</li>
+    
+  </ul>
+</div>
+
+<h3>インタラクション</h3>
+<div class="interaction-specs">
+  <h4>アニメーション設定</h4>
+  <ul>
+    
+    <li>map[ホバーエフェクト:背景色変化、translateY(-2px)]</li>
+    
+    <li>map[トランジション:all 0.2s ease]</li>
+    
+    <li>map[スクロールビヘイビア:smooth]</li>
+    
+    <li>map[モーダル背景:rgba(0,0,0,0.6)]</li>
+    
+  </ul>
+</div>
+
+<h3>レスポンシブ対応</h3>
+<div class="responsive-specs">
+  <h4>ブレークポイント</h4>
+  <ul>
+    
+    <li>map[ブレークポイント:768px]</li>
+    
+    <li>map[モバイルサイドバー:スライド式]</li>
+    
+    <li>map[グリッド調整:3列 → 2列 → 1列]</li>
+    
+    <li>map[タッチ対応:タップ操作最適化]</li>
+    
+  </ul>
+</div>
+
+    
+    
+    
+      <h2 id="6-api仕様">6. API仕様</h2>
+<h3 id="エンドポイント構造">エンドポイント構造</h3>
+<pre tabindex="0"><code>https://{BASE_URL}/{category}/{vendor}/{model}/{mode}
+</code></pre><h3 id="カテゴリ別エンドポイント例">カテゴリ別エンドポイント例</h3>
+<ul>
+<li><strong>画像生成</strong>: <code>{BASE_URL}/t2i/fal/flux/ultra</code></li>
+<li><strong>動画生成</strong>: <code>{BASE_URL}/t2v/fal/haiper/standard</code></li>
+<li><strong>コード生成</strong>: <code>{BASE_URL}/code/github/copilot/completion</code></li>
+<li><strong>要件定義</strong>: <code>{BASE_URL}/requirement/kamui/generator</code></li>
+</ul>
+<h2 id="7-セキュリティ要件">7. セキュリティ要件</h2>
+<ul>
+<li><strong>認証方式</strong>: Bearer Token (JWT)</li>
+<li><strong>通信暗号化</strong>: TLS 1.3以上</li>
+<li><strong>APIレート制限</strong>: 100リクエスト/分 (ユーザー単位)</li>
+<li><strong>データ保護</strong>: 個人情報のハッシュ化、定期的な監査ログ</li>
+</ul>
+
+    
+    
+    
+      <div class="card-grid" id="clientSampleCards">
+  
+  <div class="card pastel" data-sample-id="client-javascript">
+    <div class="card-title">JavaScript/TypeScript実装例</div>
+    <div class="endpoint-box"><div class="endpoint">サーバー定義数: -</div></div>
+    <div style="display:flex;gap:8px;margin-top:8px;">
+      <button class="view-btn" data-open-client="client-javascript">サンプルを見る</button>
+      <button class="view-btn" data-copy-client="client-javascript">コピー</button>
+    </div>
+  </div>
+  <script type="application/json" id="client-javascript"></script>
+  
+  <div class="card pastel" data-sample-id="client-python">
+    <div class="card-title">Python実装例</div>
+    <div class="endpoint-box"><div class="endpoint">サーバー定義数: -</div></div>
+    <div style="display:flex;gap:8px;margin-top:8px;">
+      <button class="view-btn" data-open-client="client-python">サンプルを見る</button>
+      <button class="view-btn" data-copy-client="client-python">コピー</button>
+    </div>
+  </div>
+  <script type="application/json" id="client-python"></script>
+  
+  <div class="card pastel" data-sample-id="client-claude">
+    <div class="card-title">Claude Desktop実装例</div>
+    <div class="endpoint-box"><div class="endpoint">サーバー定義数: -</div></div>
+    <div style="display:flex;gap:8px;margin-top:8px;">
+      <button class="view-btn" data-open-client="client-claude">サンプルを見る</button>
+      <button class="view-btn" data-copy-client="client-claude">コピー</button>
+    </div>
+  </div>
+  <script type="application/json" id="client-claude"></script>
+  
+  <div class="card pastel" data-sample-id="client-cursor">
+    <div class="card-title">Cursor IDE実装例</div>
+    <div class="endpoint-box"><div class="endpoint">サーバー定義数: -</div></div>
+    <div style="display:flex;gap:8px;margin-top:8px;">
+      <button class="view-btn" data-open-client="client-cursor">サンプルを見る</button>
+      <button class="view-btn" data-copy-client="client-cursor">コピー</button>
+    </div>
+  </div>
+  <script type="application/json" id="client-cursor"></script>
+  
+</div>
+
     
   </section>
   
