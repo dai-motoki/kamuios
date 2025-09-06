@@ -1,0 +1,297 @@
+<style>
+  /* Requirements Document specific layout */
+  .req-doc {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+  .req-toc {
+    position: sticky;
+    top: 80px;
+    background: var(--sidebar-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+  }
+  .req-toc-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 6px 8px 10px;
+    color: var(--text);
+  }
+  .req-toc a {
+    display: block;
+    padding: 8px 10px;
+    border-radius: 8px;
+    color: var(--text-weak);
+    text-decoration: none;
+    transition: background 0.2s ease, color 0.2s ease;
+    font-size: 0.92rem;
+  }
+  .req-toc a:hover { background: var(--card); color: var(--text); }
+  .req-toc a.active { background: var(--card-strong); color: var(--text); font-weight: 600; }
+
+  .req-content { min-width: 0; }
+  .req-section { scroll-margin-top: 72px; margin-bottom: 28px; }
+  .req-section h3 { font-size: 1.15rem; margin: 8px 0 14px; }
+  .meta-inline {
+    display: inline-flex; gap: 12px; flex-wrap: wrap; font-size: 0.85rem; color: var(--text-weak);
+    background: var(--sidebar-bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; margin: 8px 0 12px;
+  }
+  .cards-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+  .card h4 { margin: 0 0 8px; font-size: 1rem; }
+  .muted { color: var(--text-weak); }
+  .table { width: 100%; border-collapse: collapse; }
+  .table th, .table td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; }
+  .table th { background: var(--sidebar-bg); }
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+
+  .persona { display: grid; grid-template-columns: 48px 1fr; gap: 10px; align-items: start; }
+  .persona .emoji { font-size: 28px; line-height: 1; }
+  .persona h5 { margin: 0; font-size: 1rem; }
+  .persona small { color: var(--text-weak); }
+  .persona ul { margin: 6px 0 0; padding-left: 18px; }
+</style>
+
+<div class="req-doc" id="reqDoc">
+  <nav class="req-toc" id="reqToc">
+    <div class="req-toc-title">目次（要件定義書）</div>
+    {{- range .tabs }}
+      <a href="#req-{{ .id }}" data-target="req-{{ .id }}">{{ .label }}</a>
+    {{- end }}
+  </nav>
+
+  <div class="req-content">
+    <!-- Overview -->
+    <section class="req-section" id="req-overview">
+      <h3>概要</h3>
+      {{ with .header_info }}
+      <div class="meta-inline">
+        <span>版: {{ .version }}</span>
+        <span>日付: {{ .date }}</span>
+        <span>状態: {{ .status }}</span>
+      </div>
+      {{ end }}
+      {{ with .image }}
+      <div class="section-image">
+        <img src="{{ . }}" alt="{{ $.title }}">
+      </div>
+      {{ end }}
+      {{ with .overview_cards }}
+      <div class="cards-3">
+        {{ range . }}
+          <div class="card">
+            <h4>{{ .icon }} {{ .title }}</h4>
+            <div class="muted">{{ .content | markdownify }}</div>
+          </div>
+        {{ end }}
+      </div>
+      {{ end }}
+      {{/* Extra overview section items if defined */}}
+      {{ with .sections }}
+        {{ range . }}
+          {{ if eq .type "overview" }}
+          <div class="card" style="margin-top:12px;">{{ .content | markdownify }}</div>
+          {{ end }}
+        {{ end }}
+      {{ end }}
+    </section>
+
+    <!-- Users -->
+    <section class="req-section" id="req-users">
+      <h3>ユーザー分析</h3>
+      {{ with .user_personas }}
+      <div class="grid-2">
+        {{ range . }}
+        <div class="card persona">
+          <div class="emoji">{{ .icon }}</div>
+          <div>
+            <h5>{{ .name }} <small>({{ .age }} / {{ .role }})</small></h5>
+            <div class="grid-2">
+              <div>
+                <strong>目標</strong>
+                <ul>{{ range .goals }}<li>{{ . }}</li>{{ end }}</ul>
+              </div>
+              <div>
+                <strong>課題</strong>
+                <ul>{{ range .pain_points }}<li>{{ . }}</li>{{ end }}</ul>
+              </div>
+              <div>
+                <strong>ニーズ</strong>
+                <ul>{{ range .needs }}<li>{{ . }}</li>{{ end }}</ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        {{ end }}
+      </div>
+      {{ end }}
+      {{ with .business_model_canvas }}
+      <div style="margin-top: 14px;">{{ partial "business-model-canvas" . }}</div>
+      {{ end }}
+
+      {{ with .user_voices }}
+      <div style="margin-top: 14px;">{{ partial "user-voices" . }}</div>
+      {{ end }}
+
+      {{ with .journey_section }}
+      <div class="card" style="margin-top: 14px;">
+        <h4 style="margin:0 0 6px;">{{ .title }}</h4>
+        {{ with .description }}<div class="muted">{{ . }}</div>{{ end }}
+      </div>
+      {{ end }}
+      {{ with .customer_journey }}
+      <div style="margin-top: 12px;">{{ partial "customer-journey" . }}</div>
+      {{ end }}
+    </section>
+
+    <!-- Requirements -->
+    <section class="req-section" id="req-requirements">
+      <h3>要件定義</h3>
+      {{ with .functional_requirements }}
+      <h4>機能要件</h4>
+      <table class="table">
+        <thead><tr><th>ID</th><th>名称</th><th>説明</th><th>優先度</th></tr></thead>
+        <tbody>
+        {{ range . }}
+          <tr><td>{{ .id }}</td><td>{{ .name }}</td><td>{{ .description }}</td><td>{{ .priority }}</td></tr>
+        {{ end }}
+        </tbody>
+      </table>
+      {{ end }}
+
+      {{ with .non_functional_requirements }}
+      <h4 style="margin-top:14px;">非機能要件</h4>
+      <div class="grid-2">
+        {{ range . }}
+        <div class="card">
+          <h4 style="margin:0 0 6px;">{{ .category }}</h4>
+          <ul class="muted" style="margin: 8px 0 0; padding-left: 18px;">{{ range .requirements }}<li>{{ . }}</li>{{ end }}</ul>
+        </div>
+        {{ end }}
+      </div>
+      {{ end }}
+
+      {{ with .sections }}
+        {{ range . }}
+          {{ if eq .type "requirements" }}
+          {{ with .table }}
+          <div style="margin-top:14px;">
+            <table class="table">
+              <thead><tr>{{ range .headers }}<th>{{ . }}</th>{{ end }}</tr></thead>
+              <tbody>
+              {{ range .rows }}
+                <tr>{{ range . }}<td>{{ . }}</td>{{ end }}</tr>
+              {{ end }}
+              </tbody>
+            </table>
+          </div>
+          {{ end }}
+          {{ end }}
+        {{ end }}
+      {{ end }}
+    </section>
+
+    <!-- Architecture -->
+    <section class="req-section" id="req-architecture">
+      <h3>アーキテクチャ</h3>
+      {{ with .tech_stack }}
+      <div class="grid-2">
+        <div class="card">
+          <h4>フロントエンド</h4>
+          <ul class="muted" style="margin:8px 0 0; padding-left:18px;">
+            {{ range .frontend }}<li>{{ .name }} {{ with .version }}<small>({{ . }})</small>{{ end }} — {{ .purpose }}</li>{{ end }}
+          </ul>
+        </div>
+        <div class="card">
+          <h4>バックエンド</h4>
+          <ul class="muted" style="margin:8px 0 0; padding-left:18px;">
+            {{ range .backend }}<li>{{ .name }} {{ with .version }}<small>({{ . }})</small>{{ end }} — {{ .purpose }}</li>{{ end }}
+          </ul>
+        </div>
+        <div class="card">
+          <h4>AI/ML</h4>
+          <ul class="muted" style="margin:8px 0 0; padding-left:18px;">
+            {{ range .ai_ml }}<li>{{ .name }} {{ with .version }}<small>({{ . }})</small>{{ end }} — {{ .purpose }}</li>{{ end }}
+          </ul>
+        </div>
+      </div>
+      {{ end }}
+
+      {{ with .design_specs }}
+      <div style="margin-top: 16px;">{{ partial "design-specs" . }}</div>
+      {{ end }}
+
+      {{ with .mermaid }}
+      <div style="margin-top: 12px;">{{ partial "mermaid" . }}</div>
+      {{ end }}
+      {{ with .additional_mermaid }}
+        {{ range . }}
+          {{ partial "mermaid-with-caption" . }}
+        {{ end }}
+      {{ end }}
+    </section>
+
+    <!-- Implementation -->
+    <section class="req-section" id="req-implementation">
+      <h3>実装</h3>
+      {{ with .code }}
+      <div class="card">{{ partial "code" . }}</div>
+      {{ end }}
+      {{ with .flow_diagram }}
+      <div style="margin-top: 12px;">{{ partial "ui-flow" $ }}</div>
+      {{ end }}
+      {{ with .gantt }}
+      <div style="margin-top: 12px;">{{ partial "gantt" $ }}</div>
+      {{ end }}
+      {{ with .dynamic_table }}
+      <div style="margin-top: 12px;">{{ partial "dynamic-table" $ }}</div>
+      {{ end }}
+      {{ with .client_samples }}
+      <div style="margin-top: 12px;">{{ partial "client-samples" . }}</div>
+      {{ end }}
+    </section>
+
+    <!-- Operations -->
+    <section class="req-section" id="req-operations">
+      <h3>運用</h3>
+      {{ with .additional_content }}
+      <div class="card">{{ . | markdownify }}</div>
+      {{ end }}
+      {{ with .mcp_section }}
+      <div style="margin-top: 12px;">{{ partial "mcp-section" $ }}</div>
+      {{ end }}
+    </section>
+  </div>
+</div>
+
+<script>
+  (function(){
+    const nav = document.getElementById('reqToc');
+    if (!nav) return;
+    const links = Array.from(nav.querySelectorAll('a[data-target]'));
+    function setActive(id){
+      links.forEach(a => a.classList.toggle('active', a.getAttribute('data-target') === id));
+    }
+    // Click → smooth scroll
+    links.forEach(a => {
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        const id = a.getAttribute('data-target');
+        const el = document.getElementById(id);
+        if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); setActive(id); }
+      });
+    });
+    // Observe sections to update active link
+    const obs = new IntersectionObserver(entries => {
+      const visible = entries.filter(e => e.isIntersecting)
+        .sort((a,b) => a.boundingClientRect.top - b.boundingClientRect.top);
+      if (visible[0]) setActive(visible[0].target.id);
+    }, { rootMargin: '-25% 0px -65% 0px', threshold: [0, 0.1, 0.5, 1] });
+    ['req-overview','req-users','req-requirements','req-architecture','req-implementation','req-operations'].forEach(id => {
+      const el = document.getElementById(id); if (el) obs.observe(el);
+    });
+  })();
+</script>

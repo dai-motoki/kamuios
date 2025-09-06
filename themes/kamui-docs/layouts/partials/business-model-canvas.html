@@ -1,0 +1,24 @@
+{{/* Business Model Canvas partial: expects raw HTML string */}}
+<style>
+  /* Force consistent theme colors inside the canvas block */
+  .canvas-container { 
+    color: var(--text) !important; 
+    background: var(--card) !important; 
+    border: 1px solid var(--border) !important; 
+    border-radius: 12px; 
+  }
+  .canvas-container h3,
+  .canvas-container h4,
+  .canvas-container p,
+  .canvas-container li { color: var(--text) !important; }
+  /* Normalize inner white cards to theme panels */
+  .canvas-container [style*="background: white"] {
+    background: var(--sidebar-bg) !important;
+    border-color: var(--border) !important;
+  }
+  /* Light yellow value-prop column keeps readable text */
+  .canvas-container [style*="#FEF3C7"] { color: #92400e !important; }
+  [data-theme="dark"] .canvas-container { background: #111827 !important; }
+  [data-theme="dark"] .canvas-container [style*="background: white"] { background: #1f2937 !important; }
+</style>
+{{ . | safeHTML }}

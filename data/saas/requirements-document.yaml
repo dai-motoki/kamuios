@@ -210,6 +210,27 @@
         - プロジェクト分析
         - レポート作成支援
   
+  # ユーザーの声（Testimonials）
+  user_voices:
+    - name: 佐藤 健
+      role: プロダクトマネージャー
+      company: SaaSスタートアップ
+      rating: 5
+      comment: |
+        KAMUI CODE の統合APIと要件定義書テンプレートで、初期フェーズの立ち上げが圧倒的に早くなりました。チーム内の合意形成もスムーズです。
+    - name: 山本 花
+      role: フロントエンドエンジニア
+      company: 受託開発
+      rating: 4
+      comment: |
+        UIフローとデザイン仕様が明確にまとまっているので、実装の迷いが減りました。Mermaidやガントの埋め込みも便利です。
+    - name: 李 俊
+      role: 機械学習エンジニア
+      company: 研究開発部門
+      rating: 5
+      comment: |
+        画像・動画生成の要件と運用面の整理が一箇所で完結します。モデル比較やAPIエンドポイントの表も実務で役立っています。
+  
   # ビジネスモデルキャンバス
   business_model_canvas: |
     <div class="canvas-container" style="background: #f8f9fa; padding: 20px; border-radius: 12px; margin: 20px 0;">

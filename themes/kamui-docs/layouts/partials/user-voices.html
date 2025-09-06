@@ -1,0 +1,37 @@
+<style>
+  .voices-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+  .voice-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+  .voice-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .voice-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--media-bg); border: 1px solid var(--border); overflow: hidden; display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--text-weak); }
+  .voice-name { font-weight: 600; }
+  .voice-role { color: var(--text-weak); font-size: 0.85rem; }
+  .voice-body { color: var(--text); font-size: 0.95rem; line-height: 1.6; }
+  .voice-rating { color: #f59e0b; font-size: 0.92rem; margin-top: 6px; }
+</style>
+
+<div>
+  <h3 style="margin: 8px 0 10px;">ユーザーの声</h3>
+  {{ $voices := . }}
+  <div class="voices-grid">
+    {{ range $voices }}
+    <div class="voice-card">
+      <div class="voice-head">
+        <div class="voice-avatar">
+          {{ if .avatar }}<img src="{{ .avatar }}" alt="{{ .name }}" style="width:100%; height:100%; object-fit:cover;">{{ else }}{{ substr .name 0 1 }}{{ end }}
+        </div>
+        <div>
+          <div class="voice-name">{{ .name }}</div>
+          <div class="voice-role">{{ .role }}{{ with .company }} ・ {{ . }}{{ end }}</div>
+        </div>
+      </div>
+      <div class="voice-body">{{ .comment }}</div>
+      {{ with .rating }}
+        {{ $r := . }}
+        <div class="voice-rating">
+          {{ range $i, $_ := (seq 5) }}{{ if lt $i $r }}★{{ else }}☆{{ end }}{{ end }}
+        </div>
+      {{ end }}
+    </div>
+    {{ end }}
+  </div>
+</div>

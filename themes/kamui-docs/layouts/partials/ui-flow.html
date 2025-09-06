@@ -1,0 +1,7 @@
+{{/* Wrapper partial to render the UI flow using existing flow-diagram partial and page context */}}
+{{ if .flow_diagram }}
+  {{ partial "flow-diagram" . }}
+{{ else }}
+  <div class="doc-meta">UIフローのデータが見つかりません。</div>
+{{ end }}
+
