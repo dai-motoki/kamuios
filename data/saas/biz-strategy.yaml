@@ -6,11 +6,6 @@
   title: 戦略
   content: ""
   custom_html: |
-    <div style="margin-bottom: 20px;">
-      <button onclick="window.location.hash=''; location.reload();" style="padding: 8px 16px; background: #4a4a4a; border: none; border-radius: 6px; color: white; cursor: pointer; font-size: 14px;">
-        ← ダッシュボードに戻る
-      </button>
-    </div>
     <style>
       .biz-doc { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
       .biz-doc h3 { color: var(--link); margin-top: 16px; }

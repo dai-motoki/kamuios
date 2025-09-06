@@ -2,18 +2,18 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://example.org/categories/</loc>
+    <loc>http://localhost:62545/categories/</loc>
   </url><url>
-    <loc>https://example.org/</loc>
+    <loc>http://localhost:62545/</loc>
   </url><url>
-    <loc>https://example.org/pages/</loc>
+    <loc>http://localhost:62545/pages/</loc>
   </url><url>
-    <loc>https://example.org/tags/</loc>
+    <loc>http://localhost:62545/tags/</loc>
   </url><url>
-    <loc>https://example.org/pages/saas-storyboard-viewer/</loc>
+    <loc>http://localhost:62545/pages/saas-storyboard-viewer/</loc>
   </url><url>
-    <loc>https://example.org/pages/saas-storyboard/</loc>
+    <loc>http://localhost:62545/pages/saas-storyboard/</loc>
   </url><url>
-    <loc>https://example.org/pages/requirements-document/</loc>
+    <loc>http://localhost:62545/pages/requirements-document/</loc>
   </url>
 </urlset>

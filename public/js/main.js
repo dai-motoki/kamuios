@@ -23,7 +23,7 @@ function buildToc(){
     // ダッシュボードの配下セクションはTOCから除外（重複回避）
     .filter(sec => sec.id !== 'saas-applications-overview');
   const groups = new Map(); // catValue -> { name, items: [{id,title}] }
-  // ダッシュボードのダミー章を追加（子無し）
+  // ダッシュボードカテゴリを追加
   groups.set(1, { name: 'ダッシュボード', items: [] });
   sections.forEach(sec => {
     const catVal = Number(sec.dataset.cat || '0');
@@ -34,8 +34,8 @@ function buildToc(){
     title = title.replace(/^\s*\d+[.\-]\s*/, '');
     // ダッシュボード項目は除外
     if (id === '#saas-applications-overview') return;
-    // 章1（ダッシュボード）配下の項目はTOCに入れない
-    if (catVal === 1) return;
+    // 章1（ダッシュボード）配下の項目もTOCに含める
+    // if (catVal === 1) return;
     if (!groups.has(catVal)) groups.set(catVal, { name: catName, items: [] });
     // 重複IDを除外
     const grp = groups.get(catVal);
@@ -75,15 +75,21 @@ function buildToc(){
       item.appendChild(label);
       children.appendChild(item);
     });
+    // カテゴリラベルクリックでトグル
+    catLabel.addEventListener('click', () => {
+      children.classList.toggle('expanded');
+      toggle.classList.toggle('expanded');
+      toggle.textContent = children.classList.contains('expanded') ? '▼' : '▶';
+    });
     catItem.appendChild(catLabel);
     catItem.appendChild(children);
     tocList.appendChild(catItem);
   });
-  // Ensure the first category (dashboard) has no children
-  const firstCat = tocList.querySelector('.tree-label.category');
-  if (firstCat && firstCat.nextElementSibling) {
-    firstCat.nextElementSibling.innerHTML = '';
-  }
+  // ダッシュボードカテゴリにも子要素を表示する
+  // const firstCat = tocList.querySelector('.tree-label.category');
+  // if (firstCat && firstCat.nextElementSibling) {
+  //   firstCat.nextElementSibling.innerHTML = '';
+  // }
   return Array.from(tocList.querySelectorAll('.tree-label[data-target]'));
 }
 

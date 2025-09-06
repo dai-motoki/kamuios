@@ -4,12 +4,6 @@
   title: Dynamic Media Gallery
   content: ""
   custom_html: |
-    <div style="margin-bottom: 20px;">
-      <button onclick="window.location.hash=''; location.reload();" style="padding: 8px 16px; background: #4a4a4a; border: none; border-radius: 6px; color: white; cursor: pointer; font-size: 14px;">
-        ← ダッシュボードに戻る
-      </button>
-    </div>
-    
     <div style="background: #0f0f0f; border-radius: 12px; overflow: hidden; margin: 20px 0; min-height: 800px; position: relative;">
       <!-- ギャラリー埋め込み -->
       <iframe 
