@@ -15,11 +15,13 @@ hugo server -D -p 1313
 ### Dynamic Media Gallery の起動
 
 メディアギャラリー機能を使用する場合は、追加でNode.jsサーバーを起動します：
+SCAN_PATHを設定してください。SCAN_PATHはメディアファイルの置き場所です。
 
 ```bash
 # 初回のみ: 環境設定（プロジェクトルートで実行）
 cp .env.sample .env
 # .envを編集してSCAN_PATHを設定（例: /Users/yourname/kamuios/static/images）
+
 
 # 別のターミナルで実行
 cd backend
