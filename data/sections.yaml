@@ -252,9 +252,9 @@
       </div>
     </div>
     
-    <!-- プロンプト置き場セクション -->
+    <!-- エージェントセクション -->
     <div class="dashboard-sections">
-      <h2 class="dashboard-section-title">プロンプト置き場</h2>
+      <h2 class="dashboard-section-title">エージェント</h2>
       <div class="dashboard-links">
         <a href="#prompts-repo" class="saas-app-card" onclick="showSectionById('prompts-repo'); return false;">
           <div class="saas-app-title">

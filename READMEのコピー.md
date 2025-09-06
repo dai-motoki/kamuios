@@ -49,7 +49,7 @@ mcp-saas-handwriteref/
 ### create-new-page.md
 既存の章に新しいページを追加する際のプロンプトテンプレート。単一のページを既存のカテゴリに追加できます。
 
-### プロンプト置き場（参照ファイルの場所）
+### エージェント（参照ファイルの場所）
 - 表示ページ: `http://localhost:1313/#prompts-repo`
 - 参照ファイルの置き場所: `requirement-docs/static/data/prompts/`
   - 例: `requirement-docs/static/data/prompts/create-new-page.v2.md`

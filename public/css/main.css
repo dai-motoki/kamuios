@@ -163,7 +163,7 @@ table.menu-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
 pre.code { background: var(--code-bg); border: 1px solid var(--code-border); border-radius: 8px; padding: 12px; overflow: auto; font-size: 0.85rem; line-height: 1.6; }
 pre.code code { color: var(--text); }
 
-/* Markdown rendering (プロンプト置き場など) */
+/* Markdown rendering (エージェントなど) */
 .markdown-body { color: var(--text); line-height: 1.9; }
 .markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4 { color: var(--text); margin: 14px 0 10px; font-weight: 800; }
 .markdown-body h2 { font-size: 1.2rem; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
