@@ -7,6 +7,7 @@
   markdown_file: static/data/prompts/create-new-page.v2.md
   markdown_files:
     - static/data/prompts/media-assets-guidelines.md
+    - static/data/prompts/requirements-docs-agent.md
   custom_html: |
     <style>
       .prompt-md { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
@@ -66,6 +67,10 @@
           if (/create-new-page\.v2\.md$/.test(it.path||'')) {
             img = '<video class="card-video" src="/images/agent-male-hero-video.mp4" autoplay loop muted playsinline></video>'+
                   '<span class="card-name">拓海</span>';
+          }
+          if (/requirements-docs-agent\.md$/.test(it.path||'')) {
+            img = '<video class="card-video" src="/videos/agent_card_video_square.mp4" autoplay loop muted playsinline></video>'+
+                  '<span class="card-name">エミリー</span>';
           }
           card.innerHTML = `<div class="card-title">${it.title}</div>${img}`;
           card.addEventListener('click', () => showDoc(it.id));

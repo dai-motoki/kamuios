@@ -1,0 +1,108 @@
+# SNSマーケティング ダッシュボード要件定義書
+
+- id: requirements-sns-marketing
+  category: 7
+  category_name: SNS・マーケティング
+  title: SNSマーケティング ダッシュボード要件定義書
+  content: |
+    各SNSチャネルの運用・計測・レポートを1画面で把握するためのダッシュボードの要件を定義します。
+    既存ページの運用メモを土台に、KPIとワークフローに直結するUI/データ設計へ落とし込みます。
+
+  image: /images/sns_marketing_card.png
+
+  tabs:
+    - id: overview
+      label: 概要
+      icon: 📊
+      active: true
+    - id: requirements
+      label: 要件定義
+      icon: 📝
+    - id: architecture
+      label: アーキテクチャ
+      icon: 🏗️
+    - id: implementation
+      label: 実装
+      icon: 💻
+    - id: operations
+      label: 運用
+      icon: ⚙️
+
+  header_info:
+    version: "1.0"
+    date: "2025-09"
+    status: "草案"
+
+  overview_cards:
+    - title: 目的
+      icon: 🎯
+      content: |
+        - 主要KPI（到達・保存/共有・LP流入・CV）を単一ダッシュボードで可視化
+        - 投稿計画と実績を同一画面で管理（カレンダー/ボード）
+        - マルチチャネル（X/IG/YT/TikTok/LinkedIn）に対応
+    - title: 対象ユーザー
+      icon: 👥
+      content: |
+        - マーケ責任者（週次レビュー）
+        - オペレーター（投稿運用/下書き管理）
+        - 分析担当（KPIトレンド/仮説検証）
+
+  functional_requirements:
+    - id: SNS-001
+      name: チャネル連携
+      description: X/IG/YT/TikTok/LinkedIn のメトリクス取り込み（API/CSV/手動）
+      priority: 必須
+    - id: SNS-002
+      name: KPIダッシュボード
+      description: 到達・エンゲージ・リンククリック・LP流入・CV の指標を可視化（期間比較）
+      priority: 必須
+    - id: SNS-003
+      name: 投稿カレンダー
+      description: 予定/下書き/公開/リサイクルの状態管理とテンプレート化
+      priority: 必須
+    - id: SNS-004
+      name: コンテンツ資産管理
+      description: 画像/動画のバージョンとUTMを紐付け、二次利用を支援
+      priority: 推奨
+    - id: SNS-005
+      name: レポート出力
+      description: 週次/月次のPDF/スライド出力、注記/考察を含む
+      priority: 推奨
+
+  non_functional_requirements:
+    - category: データ鮮度
+      requirements:
+        - API 取得は日次、CSV/手動は即時反映
+        - 欠損時は前回値/注記で補完
+    - category: セキュリティ
+      requirements:
+        - アクセストークンは安全に保管（.env/Secret Manager）
+        - 権限は閲覧/編集/管理の3階層
+    - category: 可用性
+      requirements:
+        - 主要画面は3秒以内に描画
+        - APIレート制限を考慮したバックオフ
+
+  sections:
+    - type: requirements
+      title: KPI/ビュー定義
+      table:
+        headers: ["ビュー", "指標", "活用例"]
+        rows:
+          - ["サマリー", "到達/保存/シェア/LP流入/CV", "経営レビュー用"]
+          - ["チャネル別", "インプレッション/ER/クリック", "施策別の伸びを確認"]
+          - ["コンテンツ別", "保存/シェア/視聴完了", "良質コンテンツを特定"]
+          - ["カレンダー", "予定/公開/担当/タグ", "運用管理/抜け漏れ防止"]
+
+  mermaid: |
+    flowchart LR
+      A[Ingestion\nAPI/CSV/手動] --> B[データストア]
+      B --> C[KPI集計]
+      C --> D[Dashboard UI]
+      D --> E[レポート出力]
+      D --> F[投稿カレンダー]
+
+  additional_content: |
+    - 当面はCSV/手動入力から開始し、各チャネルAPI連携は段階導入。
+    - 既存の「SNS・マーケティング」ページの運用方針をダッシュボードUIの要件へ反映する。
+

@@ -25,13 +25,14 @@
   {{ range $all }}
   <section class="doc-section" id="{{ .id }}" data-cat="{{ .category }}" data-cat-name="{{ .category_name }}">
     <h2>{{ .title }}</h2>
-    {{ if eq .id "requirements-document" }}
+    {{ if hasPrefix .id "requirements-" }}
       {{ $item := . }}
+      {{ $secId := .id }}
       {{/* 初期はカードのみ表示し、クリックで要件定義書本体を表示 */}}
-      <div id="requirementsDocCard" class="dashboard-links" style="margin-top: 8px;">
-        <a href="#requirements-document" class="saas-app-card" onclick="(function(){
-          var card = document.getElementById('requirementsDocCard');
-          var body = document.getElementById('requirementsDocBody');
+      <div id="requirementsDocCard-{{ $secId }}" class="dashboard-links" style="margin-top: 8px;">
+        <a href="#{{ $secId }}" class="saas-app-card" onclick="(function(){
+          var card = document.getElementById('requirementsDocCard-{{ $secId }}');
+          var body = document.getElementById('requirementsDocBody-{{ $secId }}');
           if(card && body){ card.style.display='none'; body.style.display='block'; window.scrollTo(0,0); }
         })(); return false;">
           {{ with .image }}
@@ -50,9 +51,80 @@
             • アーキテクチャ・実装・運用
           </div>
         </a>
+
+        {{ if eq $secId "requirements-document" }}
+        <a href="#requirements-kamui-os" class="saas-app-card" onclick="(function(){
+          if (window.showRequirements) {
+            window.showRequirements('kamui-os');
+            setTimeout(function(){
+              var c = document.getElementById('requirementsDocCard-requirements-kamui-os');
+              var b = document.getElementById('requirementsDocBody-requirements-kamui-os');
+              if (c && b) { c.style.display='none'; b.style.display='block'; window.scrollTo(0,0); }
+            }, 0);
+          }
+        })(); return false;">
+          <img src="/images/requirements_doc_card.png" alt="KAMUI OS 要件定義書" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;">
+          <div class="saas-app-title">
+            KAMUI OS 要件定義書
+            <span class="saas-app-arrow">→</span>
+          </div>
+          <div class="saas-app-description">KAMUI OS 本体の要件定義書</div>
+          <div class="saas-app-features">
+            • プラットフォーム概要<br>
+            • コア機能・非機能要件<br>
+            • 技術スタック・運用
+          </div>
+        </a>
+
+        <a href="#requirements-kamui-os-npm" class="saas-app-card" onclick="(function(){
+          if (window.showRequirements) {
+            window.showRequirements('kamui-os-npm');
+            setTimeout(function(){
+              var c = document.getElementById('requirementsDocCard-requirements-kamui-os-npm');
+              var b = document.getElementById('requirementsDocBody-requirements-kamui-os-npm');
+              if (c && b) { c.style.display='none'; b.style.display='block'; window.scrollTo(0,0); }
+            }, 0);
+          }
+        })(); return false;">
+          <img src="/images/requirements_doc_card.png" alt="KAMUI OS NPM 要件定義書" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;">
+          <div class="saas-app-title">
+            KAMUI OS NPM 要件定義書
+            <span class="saas-app-arrow">→</span>
+          </div>
+          <div class="saas-app-description">KAMUI OS の npm パッケージ化に関する要件定義書</div>
+          <div class="saas-app-features">
+            • CLI/テンプレート同期<br>
+            • 型定義/プラグイン<br>
+            • 配布/互換性
+          </div>
+        </a>
+
+        <a href="#requirements-sns-marketing" class="saas-app-card" onclick="(function(){
+          if (window.showRequirements) {
+            window.showRequirements('sns-marketing');
+            setTimeout(function(){
+              var c = document.getElementById('requirementsDocCard-requirements-sns-marketing');
+              var b = document.getElementById('requirementsDocBody-requirements-sns-marketing');
+              if (c && b) { c.style.display='none'; b.style.display='block'; window.scrollTo(0,0); }
+            }, 0);
+          }
+        })(); return false;">
+          <img src="/images/sns_marketing_card.png" alt="SNSマーケティング ダッシュボード要件" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;">
+          <div class="saas-app-title">
+            SNSマーケティング ダッシュボード要件
+            <span class="saas-app-arrow">→</span>
+          </div>
+          <div class="saas-app-description">SNS運用のKPI/投稿カレンダー/レポート要件</div>
+          <div class="saas-app-features">
+            • KPIダッシュボード<br>
+            • 投稿カレンダー<br>
+            • 連携/API/CSV
+          </div>
+        </a>
+        {{ end }}
       </div>
 
-      <div id="requirementsDocBody" style="display:none;">
+      <div id="requirementsDocBody-{{ $secId }}" style="display:none;">
         {{ partial "requirements-document" . }}
       </div>
     {{ else }}

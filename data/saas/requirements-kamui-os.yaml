@@ -1,0 +1,113 @@
+# KAMUI OS 自体の要件定義書
+
+- id: requirements-kamui-os
+  category: 2
+  category_name: 要件定義・開発
+  title: KAMUI OS 要件定義書
+  content: |
+    KAMUI OS 本体の要件定義書。ドキュメントサイト、ダッシュボード、動的ギャラリー、
+    要件ドキュメント描画エンジンを含むプロジェクトの全体像を定義します。
+
+  image: /images/kamui-gradient-soft-1.png
+
+  tabs:
+    - id: overview
+      label: 概要
+      icon: 📋
+      active: true
+    - id: requirements
+      label: 要件定義
+      icon: 📝
+    - id: architecture
+      label: アーキテクチャ
+      icon: 🏗️
+    - id: implementation
+      label: 実装
+      icon: 💻
+    - id: operations
+      label: 運用
+      icon: ⚙️
+
+  header_info:
+    version: "1.0"
+    date: "2025年9月"
+    status: "草案"
+
+  overview_cards:
+    - title: プロジェクト概要
+      icon: 📦
+      content: |
+        Hugo ベースのドキュメントサイトとカスタムテーマ「kamui-docs」により、
+        データ駆動でセクションを合成。要件定義書は YAML + 部分テンプレートで描画します。
+    - title: 対象範囲
+      icon: 🎯
+      content: |
+        - 静的サイト生成と配信
+        - ダッシュボード/カード UI
+        - 動的メディアギャラリー
+        - 要件定義書レンダラー
+    - title: 成果物
+      icon: ✅
+      content: |
+        - 章立てドキュメントサイト
+        - UI/要件の統合ビュー
+        - MCP 連携の下地
+
+  functional_requirements:
+    - id: FR-OS-001
+      name: データ駆動レンダリング
+      description: "`data/` 以下の YAML を集約してセクションを自動描画"
+      priority: 必須
+    - id: FR-OS-002
+      name: 要件定義書テンプレート
+      description: 再利用可能な要件定義書パーシャルで複数ドキュメントに対応
+      priority: 必須
+    - id: FR-OS-003
+      name: ダッシュボードカード
+      description: 主要機能へのカードリンクと状態遷移の統一
+      priority: 必須
+    - id: FR-OS-004
+      name: 動的メディアギャラリー
+      description: Node サーバーによるスキャンとフロント表示
+      priority: 推奨
+
+  non_functional_requirements:
+    - category: パフォーマンス
+      requirements:
+        - 初回描画は1秒以内（ローカル）
+        - 画像遅延読み込みで体感速度を最適化
+    - category: 可用性
+      requirements:
+        - ビルドは再現可能（固定データで決定論）
+        - セクションの追加はノーコード（YAML 追加のみ）
+    - category: セキュリティ
+      requirements:
+        - 静的配信を基本とし攻撃面を最小化
+
+  tech_stack:
+    frontend:
+      - name: Hugo
+        version: "0.125+"
+        purpose: 静的サイト生成
+      - name: Vanilla JS/CSS
+        version: "—"
+        purpose: 目次/遷移/モーダル等
+    backend:
+      - name: Node.js
+        version: "20.x"
+        purpose: 動的メディアギャラリー API
+    ai_ml:
+      - name: —
+        version: "—"
+        purpose: —
+
+  sections:
+    - type: requirements
+      title: 主要システム要件
+      table:
+        headers: ["要件ID", "カテゴリ", "説明", "優先度"]
+        rows:
+          - ["REQ-OS-001", "機能要件", "YAMLベースで複数要件書を描画", "必須"]
+          - ["REQ-OS-002", "機能要件", "ダッシュボードカードからの遷移統一", "必須"]
+          - ["REQ-OS-003", "非機能要件", "ビルドの再現性と表示速度", "必須"]
+          - ["REQ-OS-004", "運用", "簡易な追加/削除が可能な構造", "必須"]

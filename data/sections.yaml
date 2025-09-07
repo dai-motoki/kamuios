@@ -127,6 +127,21 @@
     <div class="dashboard-sections">
       <h2 class="dashboard-section-title">要件定義・開発</h2>
       <div class="dashboard-links">
+              <a href="#requirements-kamui-os" class="saas-app-card" onclick="showRequirements('kamui-os'); return false;">
+        <img src="/images/requirements_doc_card.png" alt="KAMUI OS 要件定義書" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;">
+        <div class="saas-app-title">
+          KAMUI OS 要件定義書
+          <span class="saas-app-arrow">→</span>
+        </div>
+        <div class="saas-app-description">
+          KAMUI OS 本体の要件定義書
+        </div>
+        <div class="saas-app-features">
+          • プラットフォーム概要<br>
+          • コア機能・非機能要件<br>
+          • 技術スタック・運用
+        </div>
+      </a>
               <a href="#requirements-document" class="saas-app-card" onclick="showRequirements('document'); return false;">
         <img src="/images/requirements_doc_card.png" alt="要件定義書" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;">
         <div class="saas-app-title">
@@ -335,15 +350,22 @@
         
         // 対象セクションを決定
         let targetId = '';
-        if (docId === 'document') {
-          targetId = 'requirements-document';
-        } else if (docId === 'views') {
+        if (docId === 'views') {
           targetId = 'ui-views';
+        } else {
+          targetId = 'requirements-' + docId; // e.g., document, kamui-os, kamui-os-npm, sns-marketing
         }
         
         const targetSection = document.getElementById(targetId);
         if (targetSection) {
           targetSection.style.display = 'block';
+          // 要件定義書セクション内の表示状態を初期化（常にカード優先）
+          if (targetId.startsWith('requirements-')) {
+            const card = document.getElementById('requirementsDocCard-' + targetId);
+            const body = document.getElementById('requirementsDocBody-' + targetId);
+            if (card) card.style.display = 'block';
+            if (body) body.style.display = 'none';
+          }
           
           // URLを更新
           window.history.pushState({ requirements: docId }, '', '#' + targetId);

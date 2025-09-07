@@ -46,6 +46,8 @@
   /* 強制的にカード内のテキスト色を高コントラストに */
   .req-doc .card, .req-doc .card * { color: var(--text) !important; }
   .req-doc .card a { color: var(--link) !important; }
+  .req-doc a.card { text-decoration: none; display: block; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+  .req-doc a.card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.15); }
   .table { width: 100%; border-collapse: collapse; }
   .table th, .table td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; }
   .table th { background: var(--sidebar-bg); color: var(--text); }
@@ -90,6 +92,28 @@
             <h4>{{ .icon }} {{ .title }}</h4>
             <div>{{ .content | markdownify }}</div>
           </div>
+        {{ end }}
+      </div>
+      {{ end }}
+
+      {{ with .related_docs }}
+      <div class="cards-3" style="margin-top:12px;">
+        {{ range . }}
+          <a class="card" href="#{{ .target }}" onclick="(function(){
+            if (window.showRequirements) {
+              window.showRequirements('{{ .docId }}');
+              {{ if .open_body }}
+              setTimeout(function(){
+                var c = document.getElementById('requirementsDocCard-{{ .target }}');
+                var b = document.getElementById('requirementsDocBody-{{ .target }}');
+                if (c && b) { c.style.display='none'; b.style.display='block'; window.scrollTo(0,0);} 
+              }, 0);
+              {{ end }}
+            }
+          })(); return false;">
+            <h4>{{ .icon }} {{ .title }}</h4>
+            <div class="muted">{{ .description }}</div>
+          </a>
         {{ end }}
       </div>
       {{ end }}

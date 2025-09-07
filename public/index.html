@@ -206,6 +206,18 @@
         
       
     
+      
+        
+      
+    
+      
+        
+      
+    
+      
+        
+      
+    
   
 
   
@@ -357,6 +369,21 @@
 <div class="dashboard-sections">
   <h2 class="dashboard-section-title">要件定義・開発</h2>
   <div class="dashboard-links">
+          <a href="#requirements-kamui-os" class="saas-app-card" onclick="showRequirements('kamui-os'); return false;">
+    <img src="/images/requirements_doc_card.png" alt="KAMUI OS 要件定義書" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;">
+    <div class="saas-app-title">
+      KAMUI OS 要件定義書
+      <span class="saas-app-arrow">→</span>
+    </div>
+    <div class="saas-app-description">
+      KAMUI OS 本体の要件定義書
+    </div>
+    <div class="saas-app-features">
+      • プラットフォーム概要<br>
+      • コア機能・非機能要件<br>
+      • 技術スタック・運用
+    </div>
+  </a>
           <a href="#requirements-document" class="saas-app-card" onclick="showRequirements('document'); return false;">
     <img src="/images/requirements_doc_card.png" alt="要件定義書" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;">
     <div class="saas-app-title">
@@ -565,15 +592,22 @@
     
     // 対象セクションを決定
     let targetId = '';
-    if (docId === 'document') {
-      targetId = 'requirements-document';
-    } else if (docId === 'views') {
+    if (docId === 'views') {
       targetId = 'ui-views';
+    } else {
+      targetId = 'requirements-' + docId; // e.g., document, kamui-os, kamui-os-npm, sns-marketing
     }
     
     const targetSection = document.getElementById(targetId);
     if (targetSection) {
       targetSection.style.display = 'block';
+      // 要件定義書セクション内の表示状態を初期化（常にカード優先）
+      if (targetId.startsWith('requirements-')) {
+        const card = document.getElementById('requirementsDocCard-' + targetId);
+        const body = document.getElementById('requirementsDocBody-' + targetId);
+        if (card) card.style.display = 'block';
+        if (body) body.style.display = 'none';
+      }
       
       // URLを更新
       window.history.pushState({ requirements: docId }, '', '#' + targetId);
@@ -4395,6 +4429,87 @@
 </ul>
           </div>
         
+          <div class="markdown-body" data-path="static/data/prompts/requirements-docs-agent.md">
+            <h1 id="要件定義執筆担当kamui-os--kamui-code">要件定義執筆担当（KAMUI OS / KAMUI CODE）</h1>
+<blockquote>
+<p>役割: 本リポジトリの要件定義書（KAMUI CODE / KAMUI OS）を編集・追加・導線調整する担当。ディレクトリ構成と表示ロジックを理解し、最短手順で改修を行う。</p></blockquote>
+<h2 id="ディレクトリ構成要点">ディレクトリ構成（要点）</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>data/
+</span></span><span style="display:flex;"><span>  sections.yaml                        # ダッシュボードHTML + 遷移関数（showRequirements 等）
+</span></span><span style="display:flex;"><span>  saas/
+</span></span><span style="display:flex;"><span>    requirements-document.yaml         # 2-1 要件定義書（KAMUI CODE）
+</span></span><span style="display:flex;"><span>    requirements-kamui-os.yaml         # KAMUI OS 要件定義書
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>themes/kamui-docs/
+</span></span><span style="display:flex;"><span>  layouts/
+</span></span><span style="display:flex;"><span>    index.html                         # セクション合成と「カード→本文」切替
+</span></span><span style="display:flex;"><span>    partials/requirements-document.html# 要件定義書の共通テンプレート
+</span></span><span style="display:flex;"><span>  static/
+</span></span><span style="display:flex;"><span>    js/main.js                         # 目次生成（2-1配下に 2-1-1/2-1-2 を追加）
+</span></span><span style="display:flex;"><span>    css/main.css                       # 共通スタイル
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>static/
+</span></span><span style="display:flex;"><span>  images/                              # カード画像等（requirements_doc_card.png ほか）
+</span></span><span style="display:flex;"><span>  data/prompts/                        # 本ページのプロンプトMarkdown置き場
+</span></span></code></pre></div><h2 id="主要ルール">主要ルール</h2>
+<ul>
+<li>要件書データは <code>data/saas/*.yaml</code> に1要素の配列で定義（<code>id</code>, <code>title</code>, <code>tabs</code>, <code>functional_requirements</code> 等）。</li>
+<li>描画は <code>partials/requirements-document.html</code>（同一テンプレで複数ドキュメント対応）。</li>
+<li><code>index.html</code> は該当セクションを「カード→本文」の二段表示にする（DOM id: <code>requirementsDocCard-&lt;sectionId&gt;</code>, <code>requirementsDocBody-&lt;sectionId&gt;</code>）。</li>
+<li>TOCは <code>main.js</code> が生成し、2-1の子としてサブ項目を追加。クリックで本文を自動展開。</li>
+<li>新しい「要件定義書（requirements-&hellip;）」は原則「2-1. 要件定義書」の配下サブ項目として登録し、トップレベルには出さない（重複防止）。</li>
+</ul>
+<h2 id="よく使う改修">よく使う改修</h2>
+<ul>
+<li>KAMUI OS 要件書を編集: <code>data/saas/requirements-kamui-os.yaml</code></li>
+<li>KAMUI CODE 要件書を編集: <code>data/saas/requirements-document.yaml</code></li>
+<li>2-1 内のカード表示を調整: <code>themes/kamui-docs/layouts/index.html</code>（requirements-document ブロック）</li>
+<li>TOCの並び/子項目: <code>themes/kamui-docs/static/js/main.js</code>（buildToc の特別処理）</li>
+</ul>
+<h2 id="手順テンプレート新しい要件書を追加">手順テンプレート（新しい要件書を追加）</h2>
+<ol>
+<li><code>data/saas/requirements-&lt;slug&gt;.yaml</code> を作成（既存YAMLをコピーし <code>id</code>, <code>title</code>, <code>tabs</code> を調整）</li>
+<li>画像は <code>static/images/</code> に配置し、YAMLの <code>image:</code> にパスを設定</li>
+<li>初期導線を追加したい場合は <code>index.html</code> の requirements-document ブロックにカードを追加</li>
+<li>必要に応じて TOC の子項目に追加（<code>main.js</code> のサブ項目配列に <code>&lt;slug&gt;</code> を追記）</li>
+<li><code>hugo server -D</code> で <code>#requirements-&lt;slug&gt;</code> を確認</li>
+</ol>
+<h2 id="受け入れ基準">受け入れ基準</h2>
+<ul>
+<li>2-1 の下に新規要件書のタイトルが <code>2-1-N</code> として表示され、クリックで本文が直接開く</li>
+<li>直リンク <code>#requirements-&lt;slug&gt;</code> で「カード→本文」構造が機能し、本文に到達できる</li>
+<li>ダッシュボードのカード導線（必要な場合）が正しく遷移（<code>showRequirements('&lt;slug&gt;')</code>）</li>
+</ul>
+<h2 id="トラブルシュート">トラブルシュート</h2>
+<ul>
+<li>YAML文法エラー → バッククォートやコロンを含む場合は値をダブルクォートで囲む</li>
+<li>目次の重複 → <code>main.js</code> の並べ替え時に重複除外済み。新規子追加時はIDの重複に注意</li>
+<li>直リンクで本文が開かない → <code>requirementsDocCard-&lt;sectionId&gt;</code> と <code>requirementsDocBody-&lt;sectionId&gt;</code> のID整合を確認</li>
+</ul>
+<h2 id="依頼テンプレート本件の要望">依頼テンプレート（本件の要望）</h2>
+<ul>
+<li>
+<ol>
+<li>KAMUI OS の npm パッケージ化に関する要件定義書を作成してください。</li>
+</ol>
+<ul>
+<li><code>id: requirements-kamui-os-npm</code>、カテゴリは「要件定義・開発」</li>
+<li>目的/対象/機能要件（CLI, テンプレ同期, 型定義, プラグイン）/非機能/構成表/Mermaid/利用例コードを含むこと</li>
+</ul>
+</li>
+<li>
+<ol start="2">
+<li>SNS マーケティングのためのダッシュボード要件定義書を作成してください。</li>
+</ol>
+<ul>
+<li><code>id: requirements-sns-marketing</code>、カテゴリは「SNS・マーケティング」</li>
+<li>既存の運用方針を、KPIダッシュボード/投稿カレンダー/レポート出力に落とし込むこと</li>
+<li>チャネル（X, IG, YT, TikTok, LinkedIn）と取り込み方式（API/CSV/手動）を明記</li>
+</ul>
+</li>
+</ul>
+          </div>
+        
       
       
       
@@ -4475,6 +4590,10 @@
         img = '<video class="card-video" src="/images/agent-male-hero-video.mp4" autoplay loop muted playsinline></video>'+
               '<span class="card-name">拓海</span>';
       }
+      if (/requirements-docs-agent\.md$/.test(it.path||'')) {
+        img = '<video class="card-video" src="/videos/agent_card_video_square.mp4" autoplay loop muted playsinline></video>'+
+              '<span class="card-name">エミリー</span>';
+      }
       card.innerHTML = `<div class="card-title">${it.title}</div>${img}`;
       card.addEventListener('click', () => showDoc(it.id));
       // 右クリックで相対パスをクリップボードへコピー
@@ -4524,10 +4643,11 @@
     
       
       
-      <div id="requirementsDocCard" class="dashboard-links" style="margin-top: 8px;">
+      
+      <div id="requirementsDocCard-requirements-document" class="dashboard-links" style="margin-top: 8px;">
         <a href="#requirements-document" class="saas-app-card" onclick="(function(){
-          var card = document.getElementById('requirementsDocCard');
-          var body = document.getElementById('requirementsDocBody');
+          var card = document.getElementById('requirementsDocCard-requirements-document');
+          var body = document.getElementById('requirementsDocBody-requirements-document');
           if(card && body){ card.style.display='none'; body.style.display='block'; window.scrollTo(0,0); }
         })(); return false;">
           
@@ -4546,9 +4666,80 @@
             • アーキテクチャ・実装・運用
           </div>
         </a>
+
+        
+        <a href="#requirements-kamui-os" class="saas-app-card" onclick="(function(){
+          if (window.showRequirements) {
+            window.showRequirements('kamui-os');
+            setTimeout(function(){
+              var c = document.getElementById('requirementsDocCard-requirements-kamui-os');
+              var b = document.getElementById('requirementsDocBody-requirements-kamui-os');
+              if (c && b) { c.style.display='none'; b.style.display='block'; window.scrollTo(0,0); }
+            }, 0);
+          }
+        })(); return false;">
+          <img src="/images/requirements_doc_card.png" alt="KAMUI OS 要件定義書" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;">
+          <div class="saas-app-title">
+            KAMUI OS 要件定義書
+            <span class="saas-app-arrow">→</span>
+          </div>
+          <div class="saas-app-description">KAMUI OS 本体の要件定義書</div>
+          <div class="saas-app-features">
+            • プラットフォーム概要<br>
+            • コア機能・非機能要件<br>
+            • 技術スタック・運用
+          </div>
+        </a>
+
+        <a href="#requirements-kamui-os-npm" class="saas-app-card" onclick="(function(){
+          if (window.showRequirements) {
+            window.showRequirements('kamui-os-npm');
+            setTimeout(function(){
+              var c = document.getElementById('requirementsDocCard-requirements-kamui-os-npm');
+              var b = document.getElementById('requirementsDocBody-requirements-kamui-os-npm');
+              if (c && b) { c.style.display='none'; b.style.display='block'; window.scrollTo(0,0); }
+            }, 0);
+          }
+        })(); return false;">
+          <img src="/images/requirements_doc_card.png" alt="KAMUI OS NPM 要件定義書" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;">
+          <div class="saas-app-title">
+            KAMUI OS NPM 要件定義書
+            <span class="saas-app-arrow">→</span>
+          </div>
+          <div class="saas-app-description">KAMUI OS の npm パッケージ化に関する要件定義書</div>
+          <div class="saas-app-features">
+            • CLI/テンプレート同期<br>
+            • 型定義/プラグイン<br>
+            • 配布/互換性
+          </div>
+        </a>
+
+        <a href="#requirements-sns-marketing" class="saas-app-card" onclick="(function(){
+          if (window.showRequirements) {
+            window.showRequirements('sns-marketing');
+            setTimeout(function(){
+              var c = document.getElementById('requirementsDocCard-requirements-sns-marketing');
+              var b = document.getElementById('requirementsDocBody-requirements-sns-marketing');
+              if (c && b) { c.style.display='none'; b.style.display='block'; window.scrollTo(0,0); }
+            }, 0);
+          }
+        })(); return false;">
+          <img src="/images/sns_marketing_card.png" alt="SNSマーケティング ダッシュボード要件" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;">
+          <div class="saas-app-title">
+            SNSマーケティング ダッシュボード要件
+            <span class="saas-app-arrow">→</span>
+          </div>
+          <div class="saas-app-description">SNS運用のKPI/投稿カレンダー/レポート要件</div>
+          <div class="saas-app-features">
+            • KPIダッシュボード<br>
+            • 投稿カレンダー<br>
+            • 連携/API/CSV
+          </div>
+        </a>
+        
       </div>
 
-      <div id="requirementsDocBody" style="display:none;">
+      <div id="requirementsDocBody-requirements-document" style="display:none;">
         <style>
    
   .req-doc {
@@ -4597,6 +4788,8 @@
    
   .req-doc .card, .req-doc .card * { color: var(--text) !important; }
   .req-doc .card a { color: var(--link) !important; }
+  .req-doc a.card { text-decoration: none; display: block; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+  .req-doc a.card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.15); }
   .table { width: 100%; border-collapse: collapse; }
   .table th, .table td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; }
   .table th { background: var(--sidebar-bg); color: var(--text); }
@@ -4668,6 +4861,8 @@
           </div>
         
       </div>
+      
+
       
       
       
@@ -5027,149 +5222,6 @@
 </div>
       
 
-      
-      <div style="margin-top: 14px;">
-<style>
-   
-  .canvas-container { 
-    color: var(--text) !important; 
-    background: var(--card) !important; 
-    border: 1px solid var(--border) !important; 
-    border-radius: 12px; 
-  }
-  .canvas-container h3,
-  .canvas-container h4,
-  .canvas-container p,
-  .canvas-container li { color: var(--text) !important; }
-   
-  .canvas-container [style*="background: white"] {
-    background: var(--sidebar-bg) !important;
-    border-color: var(--border) !important;
-  }
-   
-  .canvas-container [style*="#FEF3C7"] { color: #92400e !important; }
-  [data-theme="dark"] .canvas-container { background: #111827 !important; }
-  [data-theme="dark"] .canvas-container [style*="background: white"] { background: #1f2937 !important; }
-</style>
-<div class="canvas-container" style="background: #f8f9fa; padding: 20px; border-radius: 12px; margin: 20px 0;">
-  <h3 style="text-align: center; margin-bottom: 20px;">KAMUI CODE ビジネスモデルキャンバス</h3>
-  <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;">
-    <!-- 第1列 -->
-    <div style="grid-row: span 2; background: white; border: 2px solid #e9ecef; border-radius: 8px; padding: 15px;">
-      <h4 style="color: #8B5CF6; margin-bottom: 10px;">🤝 主要パートナー</h4>
-      <ul style="font-size: 0.9em; margin: 0; padding-left: 20px;">
-        <li>AIモデルプロバイダー（OpenAI, Anthropic等）</li>
-        <li>クラウドインフラ（AWS, GCP）</li>
-        <li>開発者コミュニティ</li>
-        <li>技術パートナー企業</li>
-      </ul>
-    </div>
-    
-    <!-- 第2列 -->
-    <div style="background: white; border: 2px solid #e9ecef; border-radius: 8px; padding: 15px;">
-      <h4 style="color: #3B82F6; margin-bottom: 10px;">🎯 主要活動</h4>
-      <ul style="font-size: 0.9em; margin: 0; padding-left: 20px;">
-        <li>MCPサーバー開発・保守</li>
-        <li>AIモデル統合</li>
-        <li>ユーザーサポート</li>
-        <li>継続的な機能改善</li>
-      </ul>
-    </div>
-    
-    <div style="background: white; border: 2px solid #e9ecef; border-radius: 8px; padding: 15px;">
-      <h4 style="color: #3B82F6; margin-bottom: 10px;">🔑 主要リソース</h4>
-      <ul style="font-size: 0.9em; margin: 0; padding-left: 20px;">
-        <li>技術チーム</li>
-        <li>AIモデルアクセス</li>
-        <li>サーバーインフラ</li>
-        <li>知的財産</li>
-      </ul>
-    </div>
-    
-    <!-- 第3列 -->
-    <div style="grid-row: span 2; background: #FEF3C7; border: 2px solid #FDE68A; border-radius: 8px; padding: 15px;">
-      <h4 style="color: #F59E0B; margin-bottom: 10px;">💎 価値提案</h4>
-      <ul style="font-size: 0.9em; margin: 0; padding-left: 20px;">
-        <li><strong>統合プラットフォーム</strong><br>3領域を1つのインターフェースで</li>
-        <li><strong>MCP準拠</strong><br>標準化されたプロトコル</li>
-        <li><strong>30+AIモデル</strong><br>最適なモデルを選択可能</li>
-        <li><strong>開発効率向上</strong><br>作業時間を最大80%削減</li>
-      </ul>
-    </div>
-    
-    <!-- 第4列 -->
-    <div style="background: white; border: 2px solid #e9ecef; border-radius: 8px; padding: 15px;">
-      <h4 style="color: #10B981; margin-bottom: 10px;">🤝 顧客関係</h4>
-      <ul style="font-size: 0.9em; margin: 0; padding-left: 20px;">
-        <li>セルフサービス</li>
-        <li>コミュニティサポート</li>
-        <li>専用サポート（Enterprise）</li>
-        <li>定期的なウェビナー</li>
-      </ul>
-    </div>
-    
-    <div style="background: white; border: 2px solid #e9ecef; border-radius: 8px; padding: 15px;">
-      <h4 style="color: #10B981; margin-bottom: 10px;">📢 チャネル</h4>
-      <ul style="font-size: 0.9em; margin: 0; padding-left: 20px;">
-        <li>公式ウェブサイト</li>
-        <li>開発者フォーラム</li>
-        <li>SNS・技術ブログ</li>
-        <li>パートナー経由</li>
-      </ul>
-    </div>
-    
-    <!-- 第5列 -->
-    <div style="grid-row: span 2; background: white; border: 2px solid #e9ecef; border-radius: 8px; padding: 15px;">
-      <h4 style="color: #EC4899; margin-bottom: 10px;">👥 顧客セグメント</h4>
-      <ul style="font-size: 0.9em; margin: 0; padding-left: 20px;">
-        <li><strong>個人開発者</strong><br>効率化を求める</li>
-        <li><strong>スタートアップ</strong><br>少人数で高速開発</li>
-        <li><strong>エンタープライズ</strong><br>大規模プロジェクト</li>
-        <li><strong>クリエイター</strong><br>コンテンツ制作者</li>
-      </ul>
-    </div>
-    
-    <!-- 下段：コスト構造と収益の流れ -->
-    <div style="grid-column: span 2; background: #FEE2E2; border: 2px solid #FCA5A5; border-radius: 8px; padding: 15px;">
-      <h4 style="color: #EF4444; margin-bottom: 10px;">💰 コスト構造</h4>
-      <ul style="font-size: 0.9em; margin: 0; padding-left: 20px;">
-        <li>AIモデル利用料（変動費）</li>
-        <li>インフラコスト（サーバー、ストレージ）</li>
-        <li>開発・運用人件費</li>
-        <li>マーケティング費用</li>
-      </ul>
-    </div>
-    
-    <div style="grid-column: span 3; background: #D1FAE5; border: 2px solid #6EE7B7; border-radius: 8px; padding: 15px;">
-      <h4 style="color: #10B981; margin-bottom: 10px;">💵 収益の流れ</h4>
-      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; font-size: 0.9em;">
-        <div>
-          <strong>フリーミアム</strong>
-          <ul style="margin: 5px 0; padding-left: 20px;">
-            <li>基本機能無料</li>
-            <li>有料アップグレード</li>
-          </ul>
-        </div>
-        <div>
-          <strong>従量課金</strong>
-          <ul style="margin: 5px 0; padding-left: 20px;">
-            <li>API利用量</li>
-            <li>原価+マージン</li>
-          </ul>
-        </div>
-        <div>
-          <strong>サブスクリプション</strong>
-          <ul style="margin: 5px 0; padding-left: 20px;">
-            <li>月額/年額プラン</li>
-            <li>Enterprise契約</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-</div>
       
     </section>
 
@@ -5915,6 +5967,1029 @@ gantt
 <script type="application/json" id="mcpPlaylistsInline"></script>
 <script type="application/json" id="mcpCatalogInline"></script>
 </div>
+      
+    </section>
+  </div>
+</div>
+
+<script>
+  (function(){
+    const nav = document.getElementById('reqToc');
+    if (!nav) return;
+    const links = Array.from(nav.querySelectorAll('a[data-target]'));
+    function setActive(id){
+      links.forEach(a => a.classList.toggle('active', a.getAttribute('data-target') === id));
+    }
+    
+    links.forEach(a => {
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        const id = a.getAttribute('data-target');
+        const el = document.getElementById(id);
+        if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); setActive(id); }
+      });
+    });
+    
+    const obs = new IntersectionObserver(entries => {
+      const visible = entries.filter(e => e.isIntersecting)
+        .sort((a,b) => a.boundingClientRect.top - b.boundingClientRect.top);
+      if (visible[0]) setActive(visible[0].target.id);
+    }, { rootMargin: '-25% 0px -65% 0px', threshold: [0, 0.1, 0.5, 1] });
+    ['req-overview','req-users','req-requirements','req-architecture','req-implementation','req-operations'].forEach(id => {
+      const el = document.getElementById(id); if (el) obs.observe(el);
+    });
+  })();
+</script>
+
+      </div>
+    
+  </section>
+  
+  <section class="doc-section" id="requirements-kamui-os" data-cat="2" data-cat-name="要件定義・開発">
+    <h2>KAMUI OS 要件定義書</h2>
+    
+      
+      
+      
+      <div id="requirementsDocCard-requirements-kamui-os" class="dashboard-links" style="margin-top: 8px;">
+        <a href="#requirements-kamui-os" class="saas-app-card" onclick="(function(){
+          var card = document.getElementById('requirementsDocCard-requirements-kamui-os');
+          var body = document.getElementById('requirementsDocBody-requirements-kamui-os');
+          if(card && body){ card.style.display='none'; body.style.display='block'; window.scrollTo(0,0); }
+        })(); return false;">
+          
+            <img src="/images/kamui-gradient-soft-1.png" alt="KAMUI OS 要件定義書" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;">
+          
+          <div class="saas-app-title">
+            KAMUI OS 要件定義書
+            <span class="saas-app-arrow">→</span>
+          </div>
+          
+          <div class="saas-app-description">KAMUI OS 本体の要件定義書。ドキュメントサイト、ダッシュボード、動的ギャラリー、
+要件ドキュメント描画エンジンを含むプロジェクトの全体像を定義します。</div>
+          
+          <div class="saas-app-features">
+            • 概要・ユーザー分析<br>
+            • 機能要件・非機能要件<br>
+            • アーキテクチャ・実装・運用
+          </div>
+        </a>
+
+        
+      </div>
+
+      <div id="requirementsDocBody-requirements-kamui-os" style="display:none;">
+        <style>
+   
+  .req-doc {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+  .req-toc {
+    position: sticky;
+    top: 80px;
+    background: var(--sidebar-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+  }
+  .req-toc-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 6px 8px 10px;
+    color: var(--text);
+  }
+  .req-toc a {
+    display: block;
+    padding: 8px 10px;
+    border-radius: 8px;
+    color: var(--text-weak);
+    text-decoration: none;
+    transition: background 0.2s ease, color 0.2s ease;
+    font-size: 0.92rem;
+  }
+  .req-toc a:hover { background: var(--card); color: var(--text); }
+  .req-toc a.active { background: var(--card-strong); color: var(--text); font-weight: 600; }
+
+  .req-content { min-width: 0; }
+  .req-section { scroll-margin-top: 72px; margin-bottom: 28px; }
+  .req-section h3 { font-size: 1.15rem; margin: 8px 0 14px; }
+  .meta-inline {
+    display: inline-flex; gap: 12px; flex-wrap: wrap; font-size: 0.85rem; color: var(--text-weak);
+    background: var(--sidebar-bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; margin: 8px 0 12px;
+  }
+  .cards-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+  .card h4 { margin: 0 0 8px; font-size: 1rem; }
+  .muted { color: var(--text-weak); }
+   
+  .req-doc .card, .req-doc .card * { color: var(--text) !important; }
+  .req-doc .card a { color: var(--link) !important; }
+  .req-doc a.card { text-decoration: none; display: block; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+  .req-doc a.card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.15); }
+  .table { width: 100%; border-collapse: collapse; }
+  .table th, .table td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; }
+  .table th { background: var(--sidebar-bg); color: var(--text); }
+  .table td { color: var(--text); }
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+
+  .persona { display: grid; grid-template-columns: 48px 1fr; gap: 10px; align-items: start; }
+  .persona .emoji { font-size: 28px; line-height: 1; }
+  .persona h5 { margin: 0; font-size: 1rem; }
+  .persona small { color: var(--text-weak); }
+  .persona ul { margin: 6px 0 0; padding-left: 18px; }
+</style>
+
+<div class="req-doc" id="reqDoc">
+  <nav class="req-toc" id="reqToc">
+    <div class="req-toc-title">目次（要件定義書）</div>
+      <a href="#req-overview" data-target="req-overview">概要</a>
+      <a href="#req-requirements" data-target="req-requirements">要件定義</a>
+      <a href="#req-architecture" data-target="req-architecture">アーキテクチャ</a>
+      <a href="#req-implementation" data-target="req-implementation">実装</a>
+      <a href="#req-operations" data-target="req-operations">運用</a>
+  </nav>
+
+  <div class="req-content">
+    
+    <section class="req-section" id="req-overview">
+      <h3>概要</h3>
+      
+      <div class="meta-inline">
+        <span>版: 1.0</span>
+        <span>日付: 2025年9月</span>
+        <span>状態: 草案</span>
+      </div>
+      
+      
+      <div class="section-image">
+        <img src="/images/kamui-gradient-soft-1.png" alt="KAMUI OS 要件定義書">
+      </div>
+      
+      
+      <div class="cards-3">
+        
+          <div class="card">
+            <h4>📦 プロジェクト概要</h4>
+            <div>Hugo ベースのドキュメントサイトとカスタムテーマ「kamui-docs」により、
+データ駆動でセクションを合成。要件定義書は YAML + 部分テンプレートで描画します。</div>
+          </div>
+        
+          <div class="card">
+            <h4>🎯 対象範囲</h4>
+            <div><ul>
+<li>静的サイト生成と配信</li>
+<li>ダッシュボード/カード UI</li>
+<li>動的メディアギャラリー</li>
+<li>要件定義書レンダラー</li>
+</ul>
+</div>
+          </div>
+        
+          <div class="card">
+            <h4>✅ 成果物</h4>
+            <div><ul>
+<li>章立てドキュメントサイト</li>
+<li>UI/要件の統合ビュー</li>
+<li>MCP 連携の下地</li>
+</ul>
+</div>
+          </div>
+        
+      </div>
+      
+
+      
+      
+      
+        
+          
+        
+      
+    </section>
+
+    
+    <section class="req-section" id="req-users">
+      <h3>ユーザー分析</h3>
+      
+      
+      
+
+      
+
+      
+    </section>
+
+    
+    <section class="req-section" id="req-requirements">
+      <h3>要件定義</h3>
+      
+      <h4>機能要件</h4>
+      <table class="table">
+        <thead><tr><th>ID</th><th>名称</th><th>説明</th><th>優先度</th></tr></thead>
+        <tbody>
+        
+          <tr><td>FR-OS-001</td><td>データ駆動レンダリング</td><td>`data/` 以下の YAML を集約してセクションを自動描画</td><td>必須</td></tr>
+        
+          <tr><td>FR-OS-002</td><td>要件定義書テンプレート</td><td>再利用可能な要件定義書パーシャルで複数ドキュメントに対応</td><td>必須</td></tr>
+        
+          <tr><td>FR-OS-003</td><td>ダッシュボードカード</td><td>主要機能へのカードリンクと状態遷移の統一</td><td>必須</td></tr>
+        
+          <tr><td>FR-OS-004</td><td>動的メディアギャラリー</td><td>Node サーバーによるスキャンとフロント表示</td><td>推奨</td></tr>
+        
+        </tbody>
+      </table>
+      
+
+      
+      <h4 style="margin-top:14px;">非機能要件</h4>
+      <div class="grid-2">
+        
+        <div class="card">
+          <h4 style="margin:0 0 6px;">パフォーマンス</h4>
+          <ul class="muted" style="margin: 8px 0 0; padding-left: 18px;"><li>初回描画は1秒以内（ローカル）</li><li>画像遅延読み込みで体感速度を最適化</li></ul>
+        </div>
+        
+        <div class="card">
+          <h4 style="margin:0 0 6px;">可用性</h4>
+          <ul class="muted" style="margin: 8px 0 0; padding-left: 18px;"><li>ビルドは再現可能（固定データで決定論）</li><li>セクションの追加はノーコード（YAML 追加のみ）</li></ul>
+        </div>
+        
+        <div class="card">
+          <h4 style="margin:0 0 6px;">セキュリティ</h4>
+          <ul class="muted" style="margin: 8px 0 0; padding-left: 18px;"><li>静的配信を基本とし攻撃面を最小化</li></ul>
+        </div>
+        
+      </div>
+      
+
+      
+        
+          
+          
+          <div style="margin-top:14px;">
+            <table class="table">
+              <thead><tr><th>要件ID</th><th>カテゴリ</th><th>説明</th><th>優先度</th></tr></thead>
+              <tbody>
+              
+                <tr><td>REQ-OS-001</td><td>機能要件</td><td>YAMLベースで複数要件書を描画</td><td>必須</td></tr>
+              
+                <tr><td>REQ-OS-002</td><td>機能要件</td><td>ダッシュボードカードからの遷移統一</td><td>必須</td></tr>
+              
+                <tr><td>REQ-OS-003</td><td>非機能要件</td><td>ビルドの再現性と表示速度</td><td>必須</td></tr>
+              
+                <tr><td>REQ-OS-004</td><td>運用</td><td>簡易な追加/削除が可能な構造</td><td>必須</td></tr>
+              
+              </tbody>
+            </table>
+          </div>
+          
+          
+        
+      
+    </section>
+
+    
+    <section class="req-section" id="req-architecture">
+      <h3>アーキテクチャ</h3>
+      
+      
+      <div class="grid-2">
+        <div class="card">
+          <h4>フロントエンド</h4>
+          <ul class="muted" style="margin:8px 0 0; padding-left:18px;">
+            <li>Hugo <small>(0.125&#43;)</small> — 静的サイト生成</li><li>Vanilla JS/CSS <small>(—)</small> — 目次/遷移/モーダル等</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4>バックエンド</h4>
+          <ul class="muted" style="margin:8px 0 0; padding-left:18px;">
+            <li>Node.js <small>(20.x)</small> — 動的メディアギャラリー API</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4>AI/ML</h4>
+          <ul class="muted" style="margin:8px 0 0; padding-left:18px;">
+            <li>— <small>(—)</small> — —</li>
+          </ul>
+        </div>
+      </div>
+      
+
+      
+
+      
+      
+    </section>
+
+    
+    <section class="req-section" id="req-implementation">
+      <h3>実装</h3>
+      
+      
+      
+      
+      
+    </section>
+
+    
+    <section class="req-section" id="req-operations">
+      <h3>運用</h3>
+      
+      
+    </section>
+  </div>
+</div>
+
+<script>
+  (function(){
+    const nav = document.getElementById('reqToc');
+    if (!nav) return;
+    const links = Array.from(nav.querySelectorAll('a[data-target]'));
+    function setActive(id){
+      links.forEach(a => a.classList.toggle('active', a.getAttribute('data-target') === id));
+    }
+    
+    links.forEach(a => {
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        const id = a.getAttribute('data-target');
+        const el = document.getElementById(id);
+        if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); setActive(id); }
+      });
+    });
+    
+    const obs = new IntersectionObserver(entries => {
+      const visible = entries.filter(e => e.isIntersecting)
+        .sort((a,b) => a.boundingClientRect.top - b.boundingClientRect.top);
+      if (visible[0]) setActive(visible[0].target.id);
+    }, { rootMargin: '-25% 0px -65% 0px', threshold: [0, 0.1, 0.5, 1] });
+    ['req-overview','req-users','req-requirements','req-architecture','req-implementation','req-operations'].forEach(id => {
+      const el = document.getElementById(id); if (el) obs.observe(el);
+    });
+  })();
+</script>
+
+      </div>
+    
+  </section>
+  
+  <section class="doc-section" id="requirements-kamui-os-npm" data-cat="2" data-cat-name="要件定義・開発">
+    <h2>KAMUI OS NPM パッケージ要件定義書</h2>
+    
+      
+      
+      
+      <div id="requirementsDocCard-requirements-kamui-os-npm" class="dashboard-links" style="margin-top: 8px;">
+        <a href="#requirements-kamui-os-npm" class="saas-app-card" onclick="(function(){
+          var card = document.getElementById('requirementsDocCard-requirements-kamui-os-npm');
+          var body = document.getElementById('requirementsDocBody-requirements-kamui-os-npm');
+          if(card && body){ card.style.display='none'; body.style.display='block'; window.scrollTo(0,0); }
+        })(); return false;">
+          
+            <img src="/images/kamui-gradient-soft-2.png" alt="KAMUI OS NPM パッケージ要件定義書" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;">
+          
+          <div class="saas-app-title">
+            KAMUI OS NPM パッケージ要件定義書
+            <span class="saas-app-arrow">→</span>
+          </div>
+          
+          <div class="saas-app-description">KAMUI OS を npm パッケージとして配布し、プロジェクトへの導入・拡張・更新を容易にします。
+CLI・テンプレート・ランタイム（テーマ/JS）をまとめて提供し、最小コマンドで環境を構築できることを目指します。</div>
+          
+          <div class="saas-app-features">
+            • 概要・ユーザー分析<br>
+            • 機能要件・非機能要件<br>
+            • アーキテクチャ・実装・運用
+          </div>
+        </a>
+
+        
+      </div>
+
+      <div id="requirementsDocBody-requirements-kamui-os-npm" style="display:none;">
+        <style>
+   
+  .req-doc {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+  .req-toc {
+    position: sticky;
+    top: 80px;
+    background: var(--sidebar-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+  }
+  .req-toc-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 6px 8px 10px;
+    color: var(--text);
+  }
+  .req-toc a {
+    display: block;
+    padding: 8px 10px;
+    border-radius: 8px;
+    color: var(--text-weak);
+    text-decoration: none;
+    transition: background 0.2s ease, color 0.2s ease;
+    font-size: 0.92rem;
+  }
+  .req-toc a:hover { background: var(--card); color: var(--text); }
+  .req-toc a.active { background: var(--card-strong); color: var(--text); font-weight: 600; }
+
+  .req-content { min-width: 0; }
+  .req-section { scroll-margin-top: 72px; margin-bottom: 28px; }
+  .req-section h3 { font-size: 1.15rem; margin: 8px 0 14px; }
+  .meta-inline {
+    display: inline-flex; gap: 12px; flex-wrap: wrap; font-size: 0.85rem; color: var(--text-weak);
+    background: var(--sidebar-bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; margin: 8px 0 12px;
+  }
+  .cards-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+  .card h4 { margin: 0 0 8px; font-size: 1rem; }
+  .muted { color: var(--text-weak); }
+   
+  .req-doc .card, .req-doc .card * { color: var(--text) !important; }
+  .req-doc .card a { color: var(--link) !important; }
+  .req-doc a.card { text-decoration: none; display: block; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+  .req-doc a.card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.15); }
+  .table { width: 100%; border-collapse: collapse; }
+  .table th, .table td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; }
+  .table th { background: var(--sidebar-bg); color: var(--text); }
+  .table td { color: var(--text); }
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+
+  .persona { display: grid; grid-template-columns: 48px 1fr; gap: 10px; align-items: start; }
+  .persona .emoji { font-size: 28px; line-height: 1; }
+  .persona h5 { margin: 0; font-size: 1rem; }
+  .persona small { color: var(--text-weak); }
+  .persona ul { margin: 6px 0 0; padding-left: 18px; }
+</style>
+
+<div class="req-doc" id="reqDoc">
+  <nav class="req-toc" id="reqToc">
+    <div class="req-toc-title">目次（要件定義書）</div>
+      <a href="#req-overview" data-target="req-overview">概要</a>
+      <a href="#req-requirements" data-target="req-requirements">要件定義</a>
+      <a href="#req-architecture" data-target="req-architecture">アーキテクチャ</a>
+      <a href="#req-implementation" data-target="req-implementation">実装</a>
+      <a href="#req-operations" data-target="req-operations">運用</a>
+  </nav>
+
+  <div class="req-content">
+    
+    <section class="req-section" id="req-overview">
+      <h3>概要</h3>
+      
+      <div class="meta-inline">
+        <span>版: 0.1.0</span>
+        <span>日付: 2025-09</span>
+        <span>状態: 草案</span>
+      </div>
+      
+      
+      <div class="section-image">
+        <img src="/images/kamui-gradient-soft-2.png" alt="KAMUI OS NPM パッケージ要件定義書">
+      </div>
+      
+      
+      <div class="cards-3">
+        
+          <div class="card">
+            <h4>🎯 目的</h4>
+            <div><ul>
+<li>インストール1行で KAMUI OS を導入</li>
+<li>設定/データ/YAML からサイトを構築</li>
+<li>テーマとJSをパッケージで配布し再利用性を向上</li>
+</ul>
+</div>
+          </div>
+        
+          <div class="card">
+            <h4>👥 対象</h4>
+            <div><ul>
+<li>ドキュメントサイトを素早く立ち上げたいチーム</li>
+<li>要件定義書テンプレを使い回したいプロジェクト</li>
+</ul>
+</div>
+          </div>
+        
+          <div class="card">
+            <h4>✅ 成果物</h4>
+            <div><ul>
+<li>npm パッケージ <code>@kamui/os</code></li>
+<li>CLI <code>kamui</code>（init/build/serve）</li>
+<li>TypeScript 型と API ドキュメント</li>
+</ul>
+</div>
+          </div>
+        
+      </div>
+      
+
+      
+      
+      
+        
+          
+        
+      
+    </section>
+
+    
+    <section class="req-section" id="req-users">
+      <h3>ユーザー分析</h3>
+      
+      
+      
+
+      
+
+      
+    </section>
+
+    
+    <section class="req-section" id="req-requirements">
+      <h3>要件定義</h3>
+      
+      <h4>機能要件</h4>
+      <table class="table">
+        <thead><tr><th>ID</th><th>名称</th><th>説明</th><th>優先度</th></tr></thead>
+        <tbody>
+        
+          <tr><td>NPM-001</td><td>CLI 初期化</td><td>`kamui init` で雛形作成（config, data/saas, static, themes設定）</td><td>必須</td></tr>
+        
+          <tr><td>NPM-002</td><td>ビルド/サーブ</td><td>`kamui build` / `kamui serve -p 1313` を提供（Hugo 起動をラップ）</td><td>必須</td></tr>
+        
+          <tr><td>NPM-003</td><td>テンプレート同期</td><td>テーマ/partials/JS/CSS をパッケージから同期（差分上書き/上書き禁止の選択）</td><td>必須</td></tr>
+        
+          <tr><td>NPM-004</td><td>型定義</td><td>data/saas/*.yaml の型（Zod/TypeScript）を提供</td><td>必須</td></tr>
+        
+          <tr><td>NPM-005</td><td>プラグイン</td><td>カード/TOC/ダッシュボードの拡張ポイント（フック）</td><td>推奨</td></tr>
+        
+        </tbody>
+      </table>
+      
+
+      
+      <h4 style="margin-top:14px;">非機能要件</h4>
+      <div class="grid-2">
+        
+        <div class="card">
+          <h4 style="margin:0 0 6px;">パフォーマンス</h4>
+          <ul class="muted" style="margin: 8px 0 0; padding-left: 18px;"><li>初回 init は10秒以内、serve の起動は3秒以内</li><li>テーマ同期は差分のみ（上書き対象を表示）</li></ul>
+        </div>
+        
+        <div class="card">
+          <h4 style="margin:0 0 6px;">配布/互換性</h4>
+          <ul class="muted" style="margin: 8px 0 0; padding-left: 18px;"><li>Node.js 20.x 以上、macOS/Linux/Windows</li><li>セマンティックバージョニング（SemVer）</li></ul>
+        </div>
+        
+        <div class="card">
+          <h4 style="margin:0 0 6px;">セキュリティ</h4>
+          <ul class="muted" style="margin: 8px 0 0; padding-left: 18px;"><li>依存ライブラリの定期スキャン</li><li>生成物に秘密情報を含めない</li></ul>
+        </div>
+        
+      </div>
+      
+
+      
+        
+          
+          
+          <div style="margin-top:14px;">
+            <table class="table">
+              <thead><tr><th>コンポーネント</th><th>内容</th><th>備考</th></tr></thead>
+              <tbody>
+              
+                <tr><td>templates</td><td>themes/kamui-docs の同期対象</td><td>部分上書き可</td></tr>
+              
+                <tr><td>scripts</td><td>build/serve/init ラッパー</td><td>Hugo を内部起動</td></tr>
+              
+                <tr><td>types</td><td>data/saas 用 TypeScript 型</td><td>Zod で検証</td></tr>
+              
+                <tr><td>examples</td><td>最小スターター</td><td>CI 用の検証にも使用</td></tr>
+              
+              </tbody>
+            </table>
+          </div>
+          
+          
+        
+      
+    </section>
+
+    
+    <section class="req-section" id="req-architecture">
+      <h3>アーキテクチャ</h3>
+      
+      
+      <div class="grid-2">
+        <div class="card">
+          <h4>フロントエンド</h4>
+          <ul class="muted" style="margin:8px 0 0; padding-left:18px;">
+            <li>Hugo <small>(0.148&#43;)</small> — 静的サイト生成</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4>バックエンド</h4>
+          <ul class="muted" style="margin:8px 0 0; padding-left:18px;">
+            <li>Node.js <small>(20.x)</small> — CLI/同期ユーティリティ</li><li>TypeScript <small>(5.x)</small> — 型・開発体験</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4>AI/ML</h4>
+          <ul class="muted" style="margin:8px 0 0; padding-left:18px;">
+            <li>— <small>(—)</small> — —</li>
+          </ul>
+        </div>
+      </div>
+      
+
+      
+
+      
+      <div style="margin-top: 12px;"><div class="mermaid-wrapper">
+  <div class="mermaid">
+    flowchart LR
+  A[kamui init] --&gt; B[雛形生成]
+  B --&gt; C[編集]
+  C --&gt; D[kamui serve]
+  C --&gt; E[kamui build]
+  subgraph pkg[@kamui/os]
+    T[templates]
+    S[scripts]
+    Y[types]
+  end
+  pkg --&gt; A
+  pkg --&gt; D
+  pkg --&gt; E
+
+  </div>
+</div>
+</div>
+      
+      
+    </section>
+
+    
+    <section class="req-section" id="req-implementation">
+      <h3>実装</h3>
+      
+      <div class="card">
+
+
+
+<pre class="code" data-lang="bash"><code># インストール
+npm i -D @kamui/os
+# 初期化
+npx kamui init my-docs &amp;&amp; cd my-docs
+# 起動
+npx kamui serve -p 1313
+</code></pre>
+</div>
+      
+      
+      
+      
+      
+    </section>
+
+    
+    <section class="req-section" id="req-operations">
+      <h3>運用</h3>
+      
+      
+    </section>
+  </div>
+</div>
+
+<script>
+  (function(){
+    const nav = document.getElementById('reqToc');
+    if (!nav) return;
+    const links = Array.from(nav.querySelectorAll('a[data-target]'));
+    function setActive(id){
+      links.forEach(a => a.classList.toggle('active', a.getAttribute('data-target') === id));
+    }
+    
+    links.forEach(a => {
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        const id = a.getAttribute('data-target');
+        const el = document.getElementById(id);
+        if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); setActive(id); }
+      });
+    });
+    
+    const obs = new IntersectionObserver(entries => {
+      const visible = entries.filter(e => e.isIntersecting)
+        .sort((a,b) => a.boundingClientRect.top - b.boundingClientRect.top);
+      if (visible[0]) setActive(visible[0].target.id);
+    }, { rootMargin: '-25% 0px -65% 0px', threshold: [0, 0.1, 0.5, 1] });
+    ['req-overview','req-users','req-requirements','req-architecture','req-implementation','req-operations'].forEach(id => {
+      const el = document.getElementById(id); if (el) obs.observe(el);
+    });
+  })();
+</script>
+
+      </div>
+    
+  </section>
+  
+  <section class="doc-section" id="requirements-sns-marketing" data-cat="7" data-cat-name="SNS・マーケティング">
+    <h2>SNSマーケティング ダッシュボード要件定義書</h2>
+    
+      
+      
+      
+      <div id="requirementsDocCard-requirements-sns-marketing" class="dashboard-links" style="margin-top: 8px;">
+        <a href="#requirements-sns-marketing" class="saas-app-card" onclick="(function(){
+          var card = document.getElementById('requirementsDocCard-requirements-sns-marketing');
+          var body = document.getElementById('requirementsDocBody-requirements-sns-marketing');
+          if(card && body){ card.style.display='none'; body.style.display='block'; window.scrollTo(0,0); }
+        })(); return false;">
+          
+            <img src="/images/sns_marketing_card.png" alt="SNSマーケティング ダッシュボード要件定義書" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;">
+          
+          <div class="saas-app-title">
+            SNSマーケティング ダッシュボード要件定義書
+            <span class="saas-app-arrow">→</span>
+          </div>
+          
+          <div class="saas-app-description">各SNSチャネルの運用・計測・レポートを1画面で把握するためのダッシュボードの要件を定義します。
+既存ページの運用メモを土台に、KPIとワークフローに直結するUI/データ設計へ落とし込みます。</div>
+          
+          <div class="saas-app-features">
+            • 概要・ユーザー分析<br>
+            • 機能要件・非機能要件<br>
+            • アーキテクチャ・実装・運用
+          </div>
+        </a>
+
+        
+      </div>
+
+      <div id="requirementsDocBody-requirements-sns-marketing" style="display:none;">
+        <style>
+   
+  .req-doc {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+  .req-toc {
+    position: sticky;
+    top: 80px;
+    background: var(--sidebar-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+  }
+  .req-toc-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 6px 8px 10px;
+    color: var(--text);
+  }
+  .req-toc a {
+    display: block;
+    padding: 8px 10px;
+    border-radius: 8px;
+    color: var(--text-weak);
+    text-decoration: none;
+    transition: background 0.2s ease, color 0.2s ease;
+    font-size: 0.92rem;
+  }
+  .req-toc a:hover { background: var(--card); color: var(--text); }
+  .req-toc a.active { background: var(--card-strong); color: var(--text); font-weight: 600; }
+
+  .req-content { min-width: 0; }
+  .req-section { scroll-margin-top: 72px; margin-bottom: 28px; }
+  .req-section h3 { font-size: 1.15rem; margin: 8px 0 14px; }
+  .meta-inline {
+    display: inline-flex; gap: 12px; flex-wrap: wrap; font-size: 0.85rem; color: var(--text-weak);
+    background: var(--sidebar-bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; margin: 8px 0 12px;
+  }
+  .cards-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+  .card h4 { margin: 0 0 8px; font-size: 1rem; }
+  .muted { color: var(--text-weak); }
+   
+  .req-doc .card, .req-doc .card * { color: var(--text) !important; }
+  .req-doc .card a { color: var(--link) !important; }
+  .req-doc a.card { text-decoration: none; display: block; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+  .req-doc a.card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.15); }
+  .table { width: 100%; border-collapse: collapse; }
+  .table th, .table td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; }
+  .table th { background: var(--sidebar-bg); color: var(--text); }
+  .table td { color: var(--text); }
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+
+  .persona { display: grid; grid-template-columns: 48px 1fr; gap: 10px; align-items: start; }
+  .persona .emoji { font-size: 28px; line-height: 1; }
+  .persona h5 { margin: 0; font-size: 1rem; }
+  .persona small { color: var(--text-weak); }
+  .persona ul { margin: 6px 0 0; padding-left: 18px; }
+</style>
+
+<div class="req-doc" id="reqDoc">
+  <nav class="req-toc" id="reqToc">
+    <div class="req-toc-title">目次（要件定義書）</div>
+      <a href="#req-overview" data-target="req-overview">概要</a>
+      <a href="#req-requirements" data-target="req-requirements">要件定義</a>
+      <a href="#req-architecture" data-target="req-architecture">アーキテクチャ</a>
+      <a href="#req-implementation" data-target="req-implementation">実装</a>
+      <a href="#req-operations" data-target="req-operations">運用</a>
+  </nav>
+
+  <div class="req-content">
+    
+    <section class="req-section" id="req-overview">
+      <h3>概要</h3>
+      
+      <div class="meta-inline">
+        <span>版: 1.0</span>
+        <span>日付: 2025-09</span>
+        <span>状態: 草案</span>
+      </div>
+      
+      
+      <div class="section-image">
+        <img src="/images/sns_marketing_card.png" alt="SNSマーケティング ダッシュボード要件定義書">
+      </div>
+      
+      
+      <div class="cards-3">
+        
+          <div class="card">
+            <h4>🎯 目的</h4>
+            <div><ul>
+<li>主要KPI（到達・保存/共有・LP流入・CV）を単一ダッシュボードで可視化</li>
+<li>投稿計画と実績を同一画面で管理（カレンダー/ボード）</li>
+<li>マルチチャネル（X/IG/YT/TikTok/LinkedIn）に対応</li>
+</ul>
+</div>
+          </div>
+        
+          <div class="card">
+            <h4>👥 対象ユーザー</h4>
+            <div><ul>
+<li>マーケ責任者（週次レビュー）</li>
+<li>オペレーター（投稿運用/下書き管理）</li>
+<li>分析担当（KPIトレンド/仮説検証）</li>
+</ul>
+</div>
+          </div>
+        
+      </div>
+      
+
+      
+      
+      
+        
+          
+        
+      
+    </section>
+
+    
+    <section class="req-section" id="req-users">
+      <h3>ユーザー分析</h3>
+      
+      
+      
+
+      
+
+      
+    </section>
+
+    
+    <section class="req-section" id="req-requirements">
+      <h3>要件定義</h3>
+      
+      <h4>機能要件</h4>
+      <table class="table">
+        <thead><tr><th>ID</th><th>名称</th><th>説明</th><th>優先度</th></tr></thead>
+        <tbody>
+        
+          <tr><td>SNS-001</td><td>チャネル連携</td><td>X/IG/YT/TikTok/LinkedIn のメトリクス取り込み（API/CSV/手動）</td><td>必須</td></tr>
+        
+          <tr><td>SNS-002</td><td>KPIダッシュボード</td><td>到達・エンゲージ・リンククリック・LP流入・CV の指標を可視化（期間比較）</td><td>必須</td></tr>
+        
+          <tr><td>SNS-003</td><td>投稿カレンダー</td><td>予定/下書き/公開/リサイクルの状態管理とテンプレート化</td><td>必須</td></tr>
+        
+          <tr><td>SNS-004</td><td>コンテンツ資産管理</td><td>画像/動画のバージョンとUTMを紐付け、二次利用を支援</td><td>推奨</td></tr>
+        
+          <tr><td>SNS-005</td><td>レポート出力</td><td>週次/月次のPDF/スライド出力、注記/考察を含む</td><td>推奨</td></tr>
+        
+        </tbody>
+      </table>
+      
+
+      
+      <h4 style="margin-top:14px;">非機能要件</h4>
+      <div class="grid-2">
+        
+        <div class="card">
+          <h4 style="margin:0 0 6px;">データ鮮度</h4>
+          <ul class="muted" style="margin: 8px 0 0; padding-left: 18px;"><li>API 取得は日次、CSV/手動は即時反映</li><li>欠損時は前回値/注記で補完</li></ul>
+        </div>
+        
+        <div class="card">
+          <h4 style="margin:0 0 6px;">セキュリティ</h4>
+          <ul class="muted" style="margin: 8px 0 0; padding-left: 18px;"><li>アクセストークンは安全に保管（.env/Secret Manager）</li><li>権限は閲覧/編集/管理の3階層</li></ul>
+        </div>
+        
+        <div class="card">
+          <h4 style="margin:0 0 6px;">可用性</h4>
+          <ul class="muted" style="margin: 8px 0 0; padding-left: 18px;"><li>主要画面は3秒以内に描画</li><li>APIレート制限を考慮したバックオフ</li></ul>
+        </div>
+        
+      </div>
+      
+
+      
+        
+          
+          
+          <div style="margin-top:14px;">
+            <table class="table">
+              <thead><tr><th>ビュー</th><th>指標</th><th>活用例</th></tr></thead>
+              <tbody>
+              
+                <tr><td>サマリー</td><td>到達/保存/シェア/LP流入/CV</td><td>経営レビュー用</td></tr>
+              
+                <tr><td>チャネル別</td><td>インプレッション/ER/クリック</td><td>施策別の伸びを確認</td></tr>
+              
+                <tr><td>コンテンツ別</td><td>保存/シェア/視聴完了</td><td>良質コンテンツを特定</td></tr>
+              
+                <tr><td>カレンダー</td><td>予定/公開/担当/タグ</td><td>運用管理/抜け漏れ防止</td></tr>
+              
+              </tbody>
+            </table>
+          </div>
+          
+          
+        
+      
+    </section>
+
+    
+    <section class="req-section" id="req-architecture">
+      <h3>アーキテクチャ</h3>
+      
+      
+
+      
+
+      
+      <div style="margin-top: 12px;"><div class="mermaid-wrapper">
+  <div class="mermaid">
+    flowchart LR
+  A[Ingestion\nAPI/CSV/手動] --&gt; B[データストア]
+  B --&gt; C[KPI集計]
+  C --&gt; D[Dashboard UI]
+  D --&gt; E[レポート出力]
+  D --&gt; F[投稿カレンダー]
+
+  </div>
+</div>
+</div>
+      
+      
+    </section>
+
+    
+    <section class="req-section" id="req-implementation">
+      <h3>実装</h3>
+      
+      
+      
+      
+      
+    </section>
+
+    
+    <section class="req-section" id="req-operations">
+      <h3>運用</h3>
+      
+      <div class="card"><ul>
+<li>当面はCSV/手動入力から開始し、各チャネルAPI連携は段階導入。</li>
+<li>既存の「SNS・マーケティング」ページの運用方針をダッシュボードUIの要件へ反映する。</li>
+</ul>
+</div>
+      
       
     </section>
   </div>
@@ -7738,6 +8813,18 @@ gantt
         
           
             { id: "\"requirements-document\"", title: "\"要件定義書\"", category:  2 , category_name: "\"要件定義・開発\"" },
+          
+        
+          
+            { id: "\"requirements-kamui-os\"", title: "\"KAMUI OS 要件定義書\"", category:  2 , category_name: "\"要件定義・開発\"" },
+          
+        
+          
+            { id: "\"requirements-kamui-os-npm\"", title: "\"KAMUI OS NPM パッケージ要件定義書\"", category:  2 , category_name: "\"要件定義・開発\"" },
+          
+        
+          
+            { id: "\"requirements-sns-marketing\"", title: "\"SNSマーケティング ダッシュボード要件定義書\"", category:  7 , category_name: "\"SNS・マーケティング\"" },
           
         
           

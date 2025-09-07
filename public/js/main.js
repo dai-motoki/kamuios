@@ -21,7 +21,9 @@ function buildToc(){
   tocList.innerHTML = '';
   const sections = Array.from(document.querySelectorAll('.doc-section'))
     // ダッシュボードの配下セクションはTOCから除外（重複回避）
-    .filter(sec => sec.id !== 'saas-applications-overview');
+    .filter(sec => sec.id !== 'saas-applications-overview')
+    // 特定の要件定義書は 2-1 の配下にサブ項目として表示するため、トップレベルからは除外
+    .filter(sec => !['requirements-kamui-os','requirements-kamui-os-npm','requirements-sns-marketing'].includes(sec.id));
   const groups = new Map(); // catValue -> { name, items: [{id,title}] }
   // ダッシュボードカテゴリを追加
   groups.set(1, { name: 'ダッシュボード', items: [] });
@@ -53,15 +55,15 @@ function buildToc(){
     const catLabel = document.createElement('div');
     catLabel.className = 'tree-label category';
     const toggle = document.createElement('span');
-    toggle.className = 'tree-toggle expanded';
-    toggle.textContent = '▼';
+    toggle.className = 'tree-toggle';
+    toggle.textContent = '▶';
     const name = document.createElement('span');
     name.className = 'tree-name';
     name.textContent = `${catNo}. ${cat.name}`;
     catLabel.appendChild(toggle);
     catLabel.appendChild(name);
     const children = document.createElement('div');
-    children.className = 'tree-children expanded';
+    children.className = 'tree-children';
     cat.items.forEach((it, i) => {
       const item = document.createElement('div');
       item.className = 'tree-item';
@@ -74,6 +76,45 @@ function buildToc(){
       label.appendChild(nm);
       item.appendChild(label);
       children.appendChild(item);
+
+      // 特別: 2-1 要件定義書の配下にサブ項目（KAMUI CODE/KAMUI OS）を追加
+      if (it.id === '#requirements-document') {
+        const sub = document.createElement('div');
+        sub.className = 'tree-children';
+        const subItems = [
+          { id: '#requirements-document',        title: 'KAMUI CODE 要件定義書',            openBody: true },
+          { id: '#requirements-kamui-os',       title: 'KAMUI OS 要件定義書',              openBody: true },
+          { id: '#requirements-kamui-os-npm',   title: 'KAMUI OS NPM 要件定義書',          openBody: true },
+          { id: '#requirements-sns-marketing',  title: 'SNSマーケティング ダッシュボード要件', openBody: true }
+        ];
+        // 折りたたみトグル（2-1 の子を開閉）
+        const subToggle = document.createElement('span');
+        subToggle.className = 'tree-toggle';
+        subToggle.textContent = '▶';
+        // ラベル先頭にトグルを差し込む
+        label.insertBefore(subToggle, label.firstChild);
+        subToggle.addEventListener('click', (e) => {
+          e.stopPropagation();
+          sub.classList.toggle('expanded');
+          subToggle.classList.toggle('expanded');
+          subToggle.textContent = sub.classList.contains('expanded') ? '▼' : '▶';
+        });
+        subItems.forEach((sit, si) => {
+          const sItem = document.createElement('div');
+          sItem.className = 'tree-item';
+          const sLabel = document.createElement('div');
+          sLabel.className = 'tree-label';
+          sLabel.setAttribute('data-target', sit.id);
+          sLabel.setAttribute('data-open-body', sit.openBody ? 'true' : 'false');
+          const sName = document.createElement('span');
+          sName.className = 'tree-name';
+          sName.textContent = `${catNo}-${i+1}-${si+1}. ${sit.title}`;
+          sLabel.appendChild(sName);
+          sItem.appendChild(sLabel);
+          sub.appendChild(sItem);
+        });
+        item.appendChild(sub);
+      }
     });
     // カテゴリラベルクリックでトグル
     catLabel.addEventListener('click', () => {
@@ -101,9 +142,12 @@ function reorderBodySectionsToMatchToc(){
   document.querySelectorAll('.doc-section').forEach(sec => {
     if (sec.id) secNodes.set(`#${sec.id}`, sec);
   });
-  const orderedIds = Array.from(document.querySelectorAll('#tocList .tree-label[data-target]'))
-    .map(l => l.getAttribute('data-target'))
-    .filter(Boolean);
+  const orderedIds = [];
+  const seen = new Set();
+  document.querySelectorAll('#tocList .tree-label[data-target]').forEach(l => {
+    const id = l.getAttribute('data-target');
+    if (id && !seen.has(id)) { seen.add(id); orderedIds.push(id); }
+  });
   const frag = document.createDocumentFragment();
   // 先頭にダッシュボードを固定配置
   const dash = secNodes.get('#saas-applications-overview');
@@ -156,6 +200,7 @@ itemLabels.forEach(l => {
   l.addEventListener('click', (e) => {
     e.stopPropagation();
     const target = l.getAttribute('data-target');
+    const openBody = l.getAttribute('data-open-body') === 'true';
     if (target) {
       // 擬似遷移: すべて非表示にして対象のみ表示 + URLハッシュ更新
       if (target.startsWith('#saas-')) {
@@ -169,6 +214,14 @@ itemLabels.forEach(l => {
         const docId = target.replace('#requirements-', '');
         if (window.showRequirements) {
           window.showRequirements(docId);
+          if (openBody) {
+            setTimeout(() => {
+              const secId = 'requirements-' + docId; // 'document' or 'kamui-os'
+              const card = document.getElementById('requirementsDocCard-' + secId);
+              const body = document.getElementById('requirementsDocBody-' + secId);
+              if (card && body) { card.style.display = 'none'; body.style.display = 'block'; window.scrollTo(0, 0); }
+            }, 0);
+          }
         }
         return;
       } else if (target === '#biz-strategy' || target === '#biz-finance' || target === '#prompts-repo') {

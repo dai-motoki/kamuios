@@ -1,0 +1,142 @@
+# KAMUI OS NPM パッケージ要件定義書
+
+- id: requirements-kamui-os-npm
+  category: 2
+  category_name: 要件定義・開発
+  title: KAMUI OS NPM パッケージ要件定義書
+  content: |
+    KAMUI OS を npm パッケージとして配布し、プロジェクトへの導入・拡張・更新を容易にします。
+    CLI・テンプレート・ランタイム（テーマ/JS）をまとめて提供し、最小コマンドで環境を構築できることを目指します。
+
+  image: /images/kamui-gradient-soft-2.png
+
+  tabs:
+    - id: overview
+      label: 概要
+      icon: 📦
+      active: true
+    - id: requirements
+      label: 要件定義
+      icon: 📝
+    - id: architecture
+      label: アーキテクチャ
+      icon: 🏗️
+    - id: implementation
+      label: 実装
+      icon: 💻
+    - id: operations
+      label: 運用
+      icon: ⚙️
+
+  header_info:
+    version: "0.1.0"
+    date: "2025-09"
+    status: "草案"
+
+  overview_cards:
+    - title: 目的
+      icon: 🎯
+      content: |
+        - インストール1行で KAMUI OS を導入
+        - 設定/データ/YAML からサイトを構築
+        - テーマとJSをパッケージで配布し再利用性を向上
+    - title: 対象
+      icon: 👥
+      content: |
+        - ドキュメントサイトを素早く立ち上げたいチーム
+        - 要件定義書テンプレを使い回したいプロジェクト
+    - title: 成果物
+      icon: ✅
+      content: |
+        - npm パッケージ `@kamui/os`
+        - CLI `kamui`（init/build/serve）
+        - TypeScript 型と API ドキュメント
+
+  functional_requirements:
+    - id: NPM-001
+      name: CLI 初期化
+      description: "`kamui init` で雛形作成（config, data/saas, static, themes設定）"
+      priority: 必須
+    - id: NPM-002
+      name: ビルド/サーブ
+      description: "`kamui build` / `kamui serve -p 1313` を提供（Hugo 起動をラップ）"
+      priority: 必須
+    - id: NPM-003
+      name: テンプレート同期
+      description: テーマ/partials/JS/CSS をパッケージから同期（差分上書き/上書き禁止の選択）
+      priority: 必須
+    - id: NPM-004
+      name: 型定義
+      description: "data/saas/*.yaml の型（Zod/TypeScript）を提供"
+      priority: 必須
+    - id: NPM-005
+      name: プラグイン
+      description: カード/TOC/ダッシュボードの拡張ポイント（フック）
+      priority: 推奨
+
+  non_functional_requirements:
+    - category: パフォーマンス
+      requirements:
+        - 初回 init は10秒以内、serve の起動は3秒以内
+        - テーマ同期は差分のみ（上書き対象を表示）
+    - category: 配布/互換性
+      requirements:
+        - Node.js 20.x 以上、macOS/Linux/Windows
+        - セマンティックバージョニング（SemVer）
+    - category: セキュリティ
+      requirements:
+        - 依存ライブラリの定期スキャン
+        - 生成物に秘密情報を含めない
+
+  tech_stack:
+    frontend:
+      - name: Hugo
+        version: "0.148+"
+        purpose: 静的サイト生成
+    backend:
+      - name: Node.js
+        version: "20.x"
+        purpose: CLI/同期ユーティリティ
+      - name: TypeScript
+        version: "5.x"
+        purpose: 型・開発体験
+    ai_ml:
+      - name: —
+        version: "—"
+        purpose: —
+
+  sections:
+    - type: requirements
+      title: パッケージ構成
+      table:
+        headers: ["コンポーネント", "内容", "備考"]
+        rows:
+          - ["templates", "themes/kamui-docs の同期対象", "部分上書き可"]
+          - ["scripts", "build/serve/init ラッパー", "Hugo を内部起動"]
+          - ["types", "data/saas 用 TypeScript 型", "Zod で検証"]
+          - ["examples", "最小スターター", "CI 用の検証にも使用"]
+
+  mermaid: |
+    flowchart LR
+      A[kamui init] --> B[雛形生成]
+      B --> C[編集]
+      C --> D[kamui serve]
+      C --> E[kamui build]
+      subgraph pkg[@kamui/os]
+        T[templates]
+        S[scripts]
+        Y[types]
+      end
+      pkg --> A
+      pkg --> D
+      pkg --> E
+
+  code:
+    language: bash
+    content: |
+      # インストール
+      npm i -D @kamui/os
+      # 初期化
+      npx kamui init my-docs && cd my-docs
+      # 起動
+      npx kamui serve -p 1313
