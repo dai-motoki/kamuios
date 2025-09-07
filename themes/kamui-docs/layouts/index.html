@@ -29,7 +29,14 @@
       {{ $item := . }}
       {{ $secId := .id }}
       {{/* 初期はカードのみ表示し、クリックで要件定義書本体を表示 */}}
-      <div id="requirementsDocCard-{{ $secId }}" class="dashboard-links" style="margin-top: 8px;">
+      <style>
+        /* 2列レイアウト（要件定義書のカード専用） */
+        #requirementsDocCard-{{ $secId }} { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+        #requirementsDocCard-{{ $secId }} > * { min-width: 0; }
+        #requirementsDocCard-{{ $secId }} a.saas-app-card { min-width: 0; }
+        @media (max-width: 900px){ #requirementsDocCard-{{ $secId }} { grid-template-columns: 1fr; } }
+      </style>
+      <div id="requirementsDocCard-{{ $secId }}" class="dashboard-links" style="margin-top: 8px; display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px;">
         <a href="#{{ $secId }}" class="saas-app-card" onclick="(function(){
           var card = document.getElementById('requirementsDocCard-{{ $secId }}');
           var body = document.getElementById('requirementsDocBody-{{ $secId }}');

@@ -279,6 +279,18 @@ pre.code code { color: var(--text); }
 .gantt-wrapper { margin: 20px 0; padding: 20px; background: var(--code-bg); border: 1px solid var(--code-border); border-radius: 8px; overflow-x: auto; min-width: 100%; }
 .gantt-wrapper .mermaid { display: block; min-width: 1600px !important; width: 1600px !important; min-height: 500px; }
 
+/* 2-1 要件定義書のカードは2列 */
+#requirements-document .dashboard-links {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 20px !important;
+}
+#requirements-document .dashboard-links > * { min-width: 0 !important; }
+#requirements-document .dashboard-links a.saas-app-card { min-width: 0 !important; }
+@media (max-width: 900px){
+  #requirements-document .dashboard-links { grid-template-columns: 1fr !important; }
+}
+
 /* Inspector overlay */
 .inspect-overlay { position: fixed; pointer-events: none; z-index: 3000; border: 2px solid #4a9eff; outline: 2000px solid rgba(74,158,255,0.12); outline-offset: -2000px; background: rgba(74,158,255,0.12); border-radius: 6px; transition: all .05s linear; }
 .inspect-tip { position: fixed; z-index: 3001; min-width: 220px; max-width: 360px; background: rgba(2,6,23,0.6); border: 1px solid rgba(255,255,255,0.08); color: var(--text); border-radius: 12px; padding: 10px 12px; font-size: 12px; line-height: 1.4; box-shadow: 0 10px 30px rgba(0,0,0,0.35); backdrop-filter: blur(10px) saturate(1.1); -webkit-backdrop-filter: blur(10px) saturate(1.1); }

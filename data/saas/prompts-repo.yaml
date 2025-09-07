@@ -9,6 +9,7 @@
     - static/data/prompts/media-assets-guidelines.md
     - static/data/prompts/requirements-docs-agent.md
     - static/data/prompts/hiring-agent.md
+    - static/data/prompts/designer-agent.md
   custom_html: |
     <style>
       .prompt-md { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
@@ -85,10 +86,15 @@
               { title: 'SNSカード素材', status: 'todo' },
               { title: 'OG画像更新', status: 'todo' }
             ]},
-            { name: 'トム', role: '採用担当', tasks: [
+            { name: 'サラ', role: '採用担当', tasks: [
               { title: '求人担当の詳細仕様決定完了', status: 'done' },
               { title: 'KAMUI CODE 実装担当採用', status: 'todo' },
               { title: 'KAMUI 実装担当採用', status: 'todo' }
+            ]},
+            { name: 'トム', role: 'デザイナー', tasks: [
+              { title: 'UIコンポーネント整理', status: 'doing' },
+              { title: 'ガラス調モーダル調整', status: 'todo' },
+              { title: '2列グリッドのレスポンシブ最適化', status: 'todo' }
             ]},
             { name: 'エミリー', role: '要件定義執筆', tasks: [
               { title: 'KAMUI OS 要件定義書 執筆', status: 'doing' },
@@ -120,8 +126,8 @@
           el.dataset.docId = id;
           return { id, title, path, el };
         });
-        // 並び順: 拓海, ミナ, 採用担当, エミリー（エミリーを右端に）
-        const order = ['create-new-page.v2.md','media-assets-guidelines.md','hiring-agent.md','requirements-docs-agent.md'];
+        // 並び順: 拓海, ミナ, 採用担当, デザイナー, エミリー（エミリーを右端に）
+        const order = ['create-new-page.v2.md','media-assets-guidelines.md','hiring-agent.md','designer-agent.md','requirements-docs-agent.md'];
         items.sort((a,b)=>{
           const aIdx = order.findIndex(k => (a.path||'').endsWith(k));
           const bIdx = order.findIndex(k => (b.path||'').endsWith(k));
@@ -131,6 +137,7 @@
         const nameMap = new Map([
           ['create-new-page.v2.md','新規ページ追加（外部YAML基準）'],
           ['media-assets-guidelines.md','画像/動画アセットの置き場所と参照ルール'],
+          ['designer-agent.md','デザイナー（UI/ビジュアル）'],
           ['hiring-agent.md','採用担当（Recruiter）'],
           ['requirements-docs-agent.md','要件定義執筆担当（KAMUI OS / KAMUI CODE）']
         ]);
@@ -170,7 +177,11 @@
                   '<span class="card-name">エミリー</span>';
           }
           if (/hiring-agent\.md$/.test(it.path||'')) {
-            img = '<video class="card-video" src="/videos/recruiter_1_video.mp4" poster="/images/agent_card.png" autoplay loop muted playsinline></video>'+
+            img = '<video class="card-video" src="/videos/recruiter_card_video_square.mp4" poster="/images/agent_card.png" autoplay loop muted playsinline></video>'+
+                  '<span class="card-name">サラ</span>';
+          }
+          if (/designer-agent\.md$/.test(it.path||'')) {
+            img = '<video class="card-video" src="/videos/designer_card_video_square.mp4" poster="/images/agent_card.png" autoplay loop muted playsinline></video>'+
                   '<span class="card-name">トム</span>';
           }
           card.innerHTML = `<div class="card-title">${it.title}</div>${img}`;
