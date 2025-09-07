@@ -436,6 +436,110 @@ function openImgModal(src, title){
 window.openJsonModal = openJsonModal;
 window.openImgModal = openImgModal;
 
+// 要素情報の収集（簡易 Inspector）
+function cssPath(el){
+  if (!el || el.nodeType !== 1) return '';
+  if (el.id) return `#${el.id}`;
+  const parts = [];
+  let node = el;
+  while (node && node.nodeType === 1 && node !== document.body){
+    let sel = node.nodeName.toLowerCase();
+    if (node.classList && node.classList.length){
+      const c = Array.from(node.classList).slice(0,3).join('.');
+      if (c) sel += `.${c}`;
+    }
+    const parent = node.parentElement;
+    if (parent){
+      const siblings = Array.from(parent.children).filter(n => n.nodeName === node.nodeName);
+      if (siblings.length > 1){
+        const idx = siblings.indexOf(node) + 1;
+        sel += `:nth-of-type(${idx})`;
+      }
+    }
+    parts.unshift(sel);
+    node = node.parentElement;
+  }
+  return parts.join(' > ');
+}
+
+function pickAttrs(el){
+  const obj = {};
+  if (!el || !el.attributes) return obj;
+  Array.from(el.attributes).forEach(a => { obj[a.name] = a.value; });
+  return obj;
+}
+
+function nearestSection(el){
+  const sec = el.closest('.doc-section');
+  if (!sec) return null;
+  const h2 = sec.querySelector('h2');
+  return { id: sec.id || '', category: sec.dataset.cat || '', category_name: sec.dataset.catName || '', title: h2 ? (h2.innerText||'').trim() : '' };
+}
+
+function collectElementInfo(el){
+  const rect = el.getBoundingClientRect();
+  const styles = window.getComputedStyle(el);
+  const styleKeys = ['display','position','zIndex','color','backgroundColor','fontSize','fontWeight','margin','padding','border','borderRadius'];
+  const styleObj = {};
+  styleKeys.forEach(k => { styleObj[k] = styles[k]; });
+  const info = {
+    page: { url: location.href, title: document.title, hash: location.hash },
+    section: nearestSection(el),
+    selector: cssPath(el),
+    element: {
+      tag: el.tagName.toLowerCase(),
+      id: el.id || '',
+      classes: Array.from(el.classList||[]),
+      attributes: pickAttrs(el),
+      dataset: { ...el.dataset },
+      text: (el.textContent||'').trim().slice(0, 240)
+    },
+    box: {
+      width: Math.round(rect.width), height: Math.round(rect.height),
+      top: Math.round(rect.top + window.scrollY), left: Math.round(rect.left + window.scrollX)
+    },
+    computed: styleObj,
+    time: new Date().toISOString()
+  };
+  return info;
+}
+
+// Alt(Option) + 右クリックで要素情報を取得
+document.addEventListener('contextmenu', (e) => {
+  try {
+    // 右クリックで発火（特定ターゲットのみ）
+    const target = e.target.closest('.saas-app-card, .card, .tree-label, .req-section, .doc-section, [data-path], [class]');
+    if (!target) return; // 対象外は通常のコンテキストメニュー
+    e.preventDefault();
+    // 一時ハイライト
+    const prevOutline = target.style.outline;
+    const prevOffset = target.style.outlineOffset;
+    target.style.outline = '2px solid #4a9eff';
+    target.style.outlineOffset = '2px';
+    setTimeout(() => { target.style.outline = prevOutline; target.style.outlineOffset = prevOffset; }, 1200);
+    const json = JSON.stringify(collectElementInfo(target), null, 2);
+    openJsonModal(json, 'Inspector');
+    // 自動コピー
+    (async () => {
+      try {
+        await navigator.clipboard.writeText(json);
+        const btn = document.getElementById('jsonCopyBtn');
+        if (btn) {
+          const org = btn.textContent;
+          btn.textContent = 'コピー済み';
+          setTimeout(() => { btn.textContent = org || 'コピー'; }, 1500);
+        }
+      } catch(err) {
+        try {
+          const ta = document.createElement('textarea');
+          ta.value = json; document.body.appendChild(ta); ta.select();
+          document.execCommand('copy'); document.body.removeChild(ta);
+        } catch(e) { console.warn('Auto-copy failed'); }
+      }
+    })();
+  } catch(err) { console.error('Inspector failed', err); }
+});
+
 // UI遷移図の初期化
 function initUIFlow() {
   const nodes = [

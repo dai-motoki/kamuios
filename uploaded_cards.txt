@@ -1,0 +1,12 @@
+agent_card.png|https://v3.fal.media/files/rabbit/NdmMT8549GgH6lH21TE89_agent_card.png
+ai_portrait_card.png|https://v3.fal.media/files/elephant/_EiZ_Wu7LvONtvJKuphmG_ai_portrait_card.png
+dashboard_card.png|https://v3.fal.media/files/monkey/9KF4lX71nQjVlIT6e31Ms_dashboard_card.png
+finance_card.png|https://v3.fal.media/files/panda/EcKS2ePcEafzo8-X3z2ww_finance_card.png
+media_gallery_card.png|https://v3.fal.media/files/panda/JDbDs0pLYQtZrzqgXOE3k_media_gallery_card.png
+requirements_doc_card.png|https://v3.fal.media/files/rabbit/sHTh5amurD9SArD4abEc__requirements_doc_card.png
+slide_editor_card.png|https://v3.fal.media/files/rabbit/wnsN36W9S5Uhru8kv9oaW_slide_editor_card.png
+sns_marketing_card.png|https://v3.fal.media/files/elephant/W8M7vinn8gpQbA8dcPqy-_sns_marketing_card.png
+storyboard_viewer_card.png|https://v3.fal.media/files/penguin/DiovH_FtUUFv8tt2Y0Bzz_storyboard_viewer_card.png
+strategy_card.png|https://v3.fal.media/files/zebra/BHJGEP95HaGumlOm5-enn_strategy_card.png
+ui_viewer_card.png|https://v3.fal.media/files/tiger/P2mrA-La0MToIspJ6kjI9_ui_viewer_card.png
+video_viewer_card.png|https://v3.fal.media/files/penguin/5m1xqbWU7wHFusB9KMFmU_video_viewer_card.png
