@@ -90,6 +90,7 @@
       <h2 class="dashboard-section-title">ダッシュボード</h2>
       <div class="dashboard-links">
         <a href="#" class="saas-app-card" onclick="window.location.hash=''; location.reload(); return false;">
+          <img src="/images/dashboard_card.png" alt="メインダッシュボード" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;">
           <div class="saas-app-title">
             メインダッシュボード
             <span class="saas-app-arrow">→</span>
@@ -105,6 +106,7 @@
         </a>
         
         <a href="#dynamic-media-gallery" class="saas-app-card" onclick="showSectionById('dynamic-media-gallery'); return false;">
+          <img src="/images/media_gallery_card.png" alt="Dynamic Media Gallery" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;">
           <div class="saas-app-title">
             Dynamic Media Gallery
             <span class="saas-app-arrow">→</span>
@@ -126,6 +128,7 @@
       <h2 class="dashboard-section-title">要件定義・開発</h2>
       <div class="dashboard-links">
               <a href="#requirements-document" class="saas-app-card" onclick="showRequirements('document'); return false;">
+        <img src="/images/requirements_doc_card.png" alt="要件定義書" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;">
         <div class="saas-app-title">
           要件定義書
           <span class="saas-app-arrow">→</span>
@@ -141,6 +144,7 @@
       </a>
       
       <a href="#ui-views" class="saas-app-card" onclick="showRequirements('views'); return false;">
+        <img src="/images/ui_viewer_card.png" alt="UIビュー一覧" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;">
         <div class="saas-app-title">
           UIビュー一覧
           <span class="saas-app-arrow">→</span>
@@ -162,6 +166,7 @@
       <h2 class="dashboard-section-title">メディアエディタ</h2>
       <div class="dashboard-links">
         <a href="#saas-ai-portrait" class="saas-app-card" onclick="showSaasApp('ai-portrait'); return false;">
+          <img src="/images/ai_portrait_card.png" alt="AI Portrait Generator" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;">
           <div class="saas-app-title">
             1. AI Portrait Generator
             <span class="saas-app-arrow">→</span>
@@ -177,6 +182,7 @@
         </a>
         
         <a href="#saas-storyboard" class="saas-app-card" onclick="showSaasApp('storyboard'); return false;">
+          <img src="/images/video_viewer_card.png" alt="ビデオビューアー" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;">
           <div class="saas-app-title">
             2. ビデオビューアー
             <span class="saas-app-arrow">→</span>
@@ -192,6 +198,7 @@
         </a>
         
         <a href="#saas-storyboard-viewer" class="saas-app-card" onclick="showSaasApp('storyboard-viewer'); return false;">
+          <img src="/images/storyboard_viewer_card.png" alt="ストーリーボードビューアー" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;">
           <div class="saas-app-title">
             3. ストーリーボードビューアー
             <span class="saas-app-arrow">→</span>
@@ -213,6 +220,7 @@
       <h2 class="dashboard-section-title">事業構築</h2>
       <div class="dashboard-links">
         <a href="#biz-strategy" class="saas-app-card" onclick="showSectionById('biz-strategy'); return false;">
+          <img src="/images/strategy_card.png" alt="戦略" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;">
           <div class="saas-app-title">
             戦略
             <span class="saas-app-arrow">→</span>
@@ -221,6 +229,7 @@
           <div class="saas-app-features">• ターゲット/価値• チャネル・価格• ロードマップ</div>
         </a>
         <a href="#biz-finance" class="saas-app-card" onclick="showSectionById('biz-finance'); return false;">
+          <img src="/images/finance_card.png" alt="財務" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;">
           <div class="saas-app-title">
             財務
             <span class="saas-app-arrow">→</span>
@@ -236,6 +245,7 @@
       <h2 class="dashboard-section-title">ビジネスツール</h2>
       <div class="dashboard-links">
         <a href="#slide-generator" class="saas-app-card" onclick="showBusinessTool('slide-generator'); return false;">
+          <img src="/images/slide_editor_card.png" alt="スライドエディタ" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;">
           <div class="saas-app-title">
             スライドエディタ
             <span class="saas-app-arrow">→</span>
@@ -257,6 +267,7 @@
       <h2 class="dashboard-section-title">エージェント</h2>
       <div class="dashboard-links">
         <a href="#prompts-repo" class="saas-app-card" onclick="showSectionById('prompts-repo'); return false;">
+          <img src="/images/agent_card.png" alt="create-new-page.md" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;">
           <div class="saas-app-title">
             create-new-page.md
             <span class="saas-app-arrow">→</span>
@@ -272,6 +283,7 @@
       <h2 class="dashboard-section-title">SNS・マーケティング</h2>
       <div class="dashboard-links">
         <a href="#sns-marketing" class="saas-app-card" onclick="showSectionById('sns-marketing'); return false;">
+          <img src="/images/sns_marketing_card.png" alt="SNS・マーケティング" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;">
           <div class="saas-app-title">
             SNS・マーケティング
             <span class="saas-app-arrow">→</span>

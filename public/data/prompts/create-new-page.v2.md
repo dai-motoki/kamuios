@@ -18,8 +18,6 @@
 ## 出力・編集すべきファイル（tree）
 
 ```text
-mcp-saas-handwriteref/
-└── requirement-docs/
     ├── data/
     │   ├── saas/
     │   │   └── <page-id>.yaml              # 必須: ページ本体定義

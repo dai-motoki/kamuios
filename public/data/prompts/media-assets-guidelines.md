@@ -5,7 +5,6 @@
 ## 配置場所（基本）
 
 ```text
-requirement-docs/
 └── static/
     ├── images/                 # 画像（PNG/JPG/GIF/SVG/WebP）
     ├── videos/                 # 動画（MP4/WEBM など）※必要に応じて作成

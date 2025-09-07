@@ -26,7 +26,35 @@
   <section class="doc-section" id="{{ .id }}" data-cat="{{ .category }}" data-cat-name="{{ .category_name }}">
     <h2>{{ .title }}</h2>
     {{ if eq .id "requirements-document" }}
-      {{ partial "requirements-document" . }}
+      {{ $item := . }}
+      {{/* 初期はカードのみ表示し、クリックで要件定義書本体を表示 */}}
+      <div id="requirementsDocCard" class="dashboard-links" style="margin-top: 8px;">
+        <a href="#requirements-document" class="saas-app-card" onclick="(function(){
+          var card = document.getElementById('requirementsDocCard');
+          var body = document.getElementById('requirementsDocBody');
+          if(card && body){ card.style.display='none'; body.style.display='block'; window.scrollTo(0,0); }
+        })(); return false;">
+          {{ with .image }}
+            <img src="{{ . }}" alt="{{ $item.title }}" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;">
+          {{ end }}
+          <div class="saas-app-title">
+            {{ .title }}
+            <span class="saas-app-arrow">→</span>
+          </div>
+          {{ with .content }}
+          <div class="saas-app-description">{{ . | markdownify }}</div>
+          {{ end }}
+          <div class="saas-app-features">
+            • 概要・ユーザー分析<br>
+            • 機能要件・非機能要件<br>
+            • アーキテクチャ・実装・運用
+          </div>
+        </a>
+      </div>
+
+      <div id="requirementsDocBody" style="display:none;">
+        {{ partial "requirements-document" . }}
+      </div>
     {{ else }}
       {{ if .content }}
         {{ .content | markdownify }}
