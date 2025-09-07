@@ -4620,7 +4620,32 @@
           </div>
         
           <div class="markdown-body" data-path="static/data/prompts/designer-agent.md">
-            
+            <h1 id="デザイナーuiビジュアル">デザイナー（UI/ビジュアル）</h1>
+<blockquote>
+<p>役割: KAMUI OS のUI/ビジュアルデザイン全般。コンポーネント設計、テーマ/トークン整備、モーダル・カード等の質感調整、レスポンシブ最適化。</p></blockquote>
+<h2 id="出力編集すべきファイルtree">出力・編集すべきファイル（tree）</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>kamuios/
+</span></span><span style="display:flex;"><span>├── themes/kamui-docs/
+</span></span><span style="display:flex;"><span>│   ├── static/css/main.css                 # テーマ/トークン/コンポーネントのベースCSS
+</span></span><span style="display:flex;"><span>│   ├── static/js/main.js                   # DevTools/インタラクション（必要時）
+</span></span><span style="display:flex;"><span>│   └── layouts/partials/requirements-document.html # 要件定義書UIのレイアウト
+</span></span><span style="display:flex;"><span>├── data/sections.yaml                      # ダッシュボード/カードのHTML+スタイル
+</span></span><span style="display:flex;"><span>├── static/images/                          # 画像アセット
+</span></span><span style="display:flex;"><span>└── static/videos/                          # カード用動画（例: designer_card_video_square.mp4）
+</span></span></code></pre></div><h2 id="メモ">メモ</h2>
+<ul>
+<li>ダーク基調＋ブルーアクセント、ガラス調モーダルの質感維持。</li>
+<li>Grid が列化しない場合は、項目に <code>min-width: 0;</code> を付与。</li>
+<li>画像/動画は <code>/images/...</code> <code>/videos/...</code> の絶対パス参照。</li>
+</ul>
+<hr>
+<p>直近タスク（例）</p>
+<ul>
+<li>UIコンポーネントの整理/命名規則見直し</li>
+<li>ガラス調モーダルのコントラスト最適化</li>
+<li>2列グリッドのブレークポイントとギャップ調整</li>
+</ul>
+
           </div>
         
       
@@ -4810,7 +4835,7 @@
               '<span class="card-name">エミリー</span>';
       }
       if (/hiring-agent\.md$/.test(it.path||'')) {
-        img = '<video class="card-video" src="/videos/recruiter_card_video_square.mp4" poster="/images/agent_card.png" autoplay loop muted playsinline></video>'+
+        img = '<video class="card-video" src="/videos/recruiter_1_video.mp4" poster="/images/agent_card.png" autoplay loop muted playsinline></video>'+
               '<span class="card-name">サラ</span>';
       }
       if (/designer-agent\.md$/.test(it.path||'')) {

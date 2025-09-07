@@ -177,7 +177,7 @@
                   '<span class="card-name">エミリー</span>';
           }
           if (/hiring-agent\.md$/.test(it.path||'')) {
-            img = '<video class="card-video" src="/videos/recruiter_card_video_square.mp4" poster="/images/agent_card.png" autoplay loop muted playsinline></video>'+
+            img = '<video class="card-video" src="/videos/recruiter_1_video.mp4" poster="/images/agent_card.png" autoplay loop muted playsinline></video>'+
                   '<span class="card-name">サラ</span>';
           }
           if (/designer-agent\.md$/.test(it.path||'')) {
