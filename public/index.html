@@ -4522,7 +4522,22 @@
             <h1 id="採用担当recruiter">採用担当（Recruiter）</h1>
 <blockquote>
 <p>役割: 採用活動の設計と運用（求人票テンプレ、候補者DB、面談スケジュール、同意管理）。従業員カードとダッシュボードにタスクを可視化します。</p></blockquote>
-<h2 id="追加編集するファイル">追加・編集するファイル</h2>
+<h2 id="出力編集すべきファイルtree">出力・編集すべきファイル（tree）</h2>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-text" data-lang="text"><span style="display:flex;"><span>kamuios/
+</span></span><span style="display:flex;"><span>├── data/
+</span></span><span style="display:flex;"><span>│   └── saas/
+</span></span><span style="display:flex;"><span>│       └── prompts-repo.yaml               # カード並び順/動画割当/チームダッシュボードに採用担当を追記
+</span></span><span style="display:flex;"><span>├── static/
+</span></span><span style="display:flex;"><span>│   ├── data/
+</span></span><span style="display:flex;"><span>│   │   └── prompts/
+</span></span><span style="display:flex;"><span>│   │       └── hiring-agent.md             # 本ファイル（採用担当のプロンプト本文）
+</span></span><span style="display:flex;"><span>│   ├── videos/
+</span></span><span style="display:flex;"><span>│   │   └── recruiter_card_video_square.mp4 # 仮動画（差し替え予定）
+</span></span><span style="display:flex;"><span>│   └── images/
+</span></span><span style="display:flex;"><span>│       └── agent_card.png                  # 任意: ポスター画像
+</span></span><span style="display:flex;"><span>└── themes/kamui-docs/
+</span></span><span style="display:flex;"><span>    └── static/js/main.js                   # DevTools/右クリックInspector（必要に応じて）
+</span></span></code></pre></div><h2 id="追加編集するファイル">追加・編集するファイル</h2>
 <ul>
 <li>カード（従業員セクション）
 <ul>
