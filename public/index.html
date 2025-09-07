@@ -218,6 +218,10 @@
         
       
     
+      
+        
+      
+    
   
 
   
@@ -329,7 +333,6 @@
 
 <!-- ダッシュボードセクション -->
 <div class="dashboard-sections">
-  <h2 class="dashboard-section-title">ダッシュボード</h2>
   <div class="dashboard-links">
     <a href="#" class="saas-app-card" onclick="window.location.hash=''; location.reload(); return false;">
       <img src="/images/dashboard_card.png" alt="メインダッシュボード" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;">
@@ -369,22 +372,7 @@
 <div class="dashboard-sections">
   <h2 class="dashboard-section-title">要件定義・開発</h2>
   <div class="dashboard-links">
-          <a href="#requirements-kamui-os" class="saas-app-card" onclick="showRequirements('kamui-os'); return false;">
-    <img src="/images/requirements_doc_card.png" alt="KAMUI OS 要件定義書" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;">
-    <div class="saas-app-title">
-      KAMUI OS 要件定義書
-      <span class="saas-app-arrow">→</span>
-    </div>
-    <div class="saas-app-description">
-      KAMUI OS 本体の要件定義書
-    </div>
-    <div class="saas-app-features">
-      • プラットフォーム概要<br>
-      • コア機能・非機能要件<br>
-      • 技術スタック・運用
-    </div>
-  </a>
-          <a href="#requirements-document" class="saas-app-card" onclick="showRequirements('document'); return false;">
+    <a href="#requirements-document" class="saas-app-card" onclick="showRequirements('document'); return false;">
     <img src="/images/requirements_doc_card.png" alt="要件定義書" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;">
     <div class="saas-app-title">
       要件定義書
@@ -519,9 +507,9 @@
   </div>
 </div>
 
-<!-- エージェントセクション -->
+<!-- 従業員セクション -->
 <div class="dashboard-sections">
-  <h2 class="dashboard-section-title">エージェント</h2>
+  <h2 class="dashboard-section-title">従業員</h2>
   <div class="dashboard-links">
     <a href="#prompts-repo" class="saas-app-card" onclick="showSectionById('prompts-repo'); return false;">
       <img src="/images/agent_card.png" alt="create-new-page.md" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;">
@@ -4292,8 +4280,8 @@
     
   </section>
   
-  <section class="doc-section" id="prompts-repo" data-cat="5" data-cat-name="エージェント">
-    <h2>エージェント</h2>
+  <section class="doc-section" id="prompts-repo" data-cat="5" data-cat-name="従業員">
+    <h2>従業員</h2>
     
       
       
@@ -4458,6 +4446,7 @@
 <li><code>index.html</code> は該当セクションを「カード→本文」の二段表示にする（DOM id: <code>requirementsDocCard-&lt;sectionId&gt;</code>, <code>requirementsDocBody-&lt;sectionId&gt;</code>）。</li>
 <li>TOCは <code>main.js</code> が生成し、2-1の子としてサブ項目を追加。クリックで本文を自動展開。</li>
 <li>新しい「要件定義書（requirements-&hellip;）」は原則「2-1. 要件定義書」の配下サブ項目として登録し、トップレベルには出さない（重複防止）。</li>
+<li>2-1 セクションの初期ビューは「カード一覧」を必ず表示する。新規要件書を追加した場合は、2-1 のカード一覧にもリンクカードを追加する（計4件以上になってもOK）。</li>
 </ul>
 <h2 id="よく使う改修">よく使う改修</h2>
 <ul>
@@ -4470,7 +4459,7 @@
 <ol>
 <li><code>data/saas/requirements-&lt;slug&gt;.yaml</code> を作成（既存YAMLをコピーし <code>id</code>, <code>title</code>, <code>tabs</code> を調整）</li>
 <li>画像は <code>static/images/</code> に配置し、YAMLの <code>image:</code> にパスを設定</li>
-<li>初期導線を追加したい場合は <code>index.html</code> の requirements-document ブロックにカードを追加</li>
+<li>2-1 のカード一覧にリンクカードを追加（<code>themes/kamui-docs/layouts/index.html</code> の requirements-document ブロック）</li>
 <li>必要に応じて TOC の子項目に追加（<code>main.js</code> のサブ項目配列に <code>&lt;slug&gt;</code> を追記）</li>
 <li><code>hugo server -D</code> で <code>#requirements-&lt;slug&gt;</code> を確認</li>
 </ol>
@@ -4505,6 +4494,17 @@
 <li><code>id: requirements-sns-marketing</code>、カテゴリは「SNS・マーケティング」</li>
 <li>既存の運用方針を、KPIダッシュボード/投稿カレンダー/レポート出力に落とし込むこと</li>
 <li>チャネル（X, IG, YT, TikTok, LinkedIn）と取り込み方式（API/CSV/手動）を明記</li>
+</ul>
+</li>
+<li>
+<ol start="3">
+<li>ネコカフェの要件定義書を新規作成してください（いつも通り）。</li>
+</ol>
+<ul>
+<li><code>id: requirements-neko-cafe</code>、カテゴリは「要件定義・開発」</li>
+<li>想定: 地域密着の猫カフェサービス。予約/在籍猫プロフィール/グッズEC/SNS連携/店舗運営を含む。</li>
+<li>含める要素: 概要カード、ユーザーペルソナ（来店客/スタッフ/店長）、機能要件（予約/在庫/決済/通知/レポート等）、非機能（稼働/保守/セキュリティ）、UIフロー（Mermaid）、実装計画（ガント）</li>
+<li>配置ルール: 2-1 の配下サブ項目として登録し（2-1-N）、2-1 のカード一覧にもカードを追加すること（画像は <code>/images/requirements_doc_card.png</code> で可）。</li>
 </ul>
 </li>
 </ul>
@@ -4548,23 +4548,77 @@
   .prompt-cards-wrap .card { position: relative; }
 </style>
 <div class="prompt-cards-wrap">
-  <div class="card-grid" id="promptCardGrid"></div>
+  <style>
+    .team-dash { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap: 12px; margin-bottom: 14px; }
+    .task-card { background: var(--card); border:1px solid var(--border); border-radius:12px; padding:12px; }
+    .task-card h4 { margin: 0 0 8px; font-size: 0.98rem; }
+    .task { display:flex; align-items:center; gap:8px; padding:6px 8px; border-radius:8px; margin:4px 0; background: var(--sidebar-bg); border: 1px solid var(--border); }
+    .task .status { width:18px; height:18px; display:inline-flex; align-items:center; justify-content:center; border-radius:4px; border:1px solid var(--border); font-size:12px; }
+    .task.done .status { background:#10b98133; border-color:#10b98166; color:#10b981; }
+    .task.doing .status { background:#f59e0b22; border-color:#f59e0b66; color:#f59e0b; }
+    .task.todo .status { background:transparent; color:var(--text-weak); }
+    .task .name { flex:1; color:var(--text); }
+    .task small { color:var(--text-weak); }
+  </style>
+<div class="card-grid" id="promptCardGrid"></div>
+  <div class="team-dash" id="teamDash"></div>
 </div>
 <div class="prompt-viewer" id="promptDocViewer"></div>
 <script>
   (function(){
     const sec = document.getElementById('prompts-repo');
     const grid = sec.querySelector('#promptCardGrid');
+    const teamDash = sec.querySelector('#teamDash');
     const viewer = sec.querySelector('#promptDocViewer');
     if (!grid || !viewer) return;
+    // 簡易チームダッシュボード（カード3つの下に表示）
+    if (teamDash) {
+      const team = [
+        { name: 'エミリー', role: '要件定義執筆', tasks: [
+          { title: 'ネコカフェ要件書 章立て', status: 'done' },
+          { title: 'KAMUI OS NPM 要件書 追記', status: 'doing' },
+          { title: 'SNSダッシュボード KPI表', status: 'todo' }
+        ]},
+        { name: 'タクミ', role: 'テンプレ/JS', tasks: [
+          { title: 'TOC 折りたたみ実装', status: 'done' },
+          { title: 'カード4枚化', status: 'done' },
+          { title: '直リンク時の初期化', status: 'doing' }
+        ]},
+        { name: 'ミナ', role: 'アセット/動画', tasks: [
+          { title: 'エージェント動画差替', status: 'done' },
+          { title: 'SNSカード素材', status: 'todo' },
+          { title: 'OG画像更新', status: 'todo' }
+        ]}
+      ];
+      const icon = (s)=> s==='done'?'✅':(s==='doing'?'🟧':'⬜️');
+      team.forEach(member => {
+        const box = document.createElement('div');
+        box.className = 'task-card';
+        box.innerHTML = `<h4>${member.name} <small style="color:var(--text-weak);">${member.role}</small></h4>`;
+        member.tasks.forEach(t => {
+          const row = document.createElement('div');
+          row.className = `task ${t.status}`;
+          row.innerHTML = `<span class="status">${icon(t.status)}</span><div class="name">${t.title}</div>`;
+          box.appendChild(row);
+        });
+        teamDash.appendChild(box);
+      });
+    }
     const docs = Array.from(sec.querySelectorAll('.markdown-body'));
     if (!docs.length) return;
-    const items = docs.map((el, i) => {
+    let items = docs.map((el, i) => {
       const title = (el.querySelector('h1,h2')?.textContent || `ドキュメント ${i+1}`).trim();
       const id = `prompt-doc-${i}`;
       const path = el.getAttribute('data-path') || '';
       el.dataset.docId = id;
       return { id, title, path, el };
+    });
+    // 並び順: 拓海, ミナ, エミリー（エミリーを右端に）
+    const order = ['create-new-page.v2.md','media-assets-guidelines.md','requirements-docs-agent.md'];
+    items.sort((a,b)=>{
+      const aIdx = order.findIndex(k => (a.path||'').endsWith(k));
+      const bIdx = order.findIndex(k => (b.path||'').endsWith(k));
+      return (aIdx<0?99:aIdx) - (bIdx<0?99:bIdx);
     });
     // ビューア初期化
     function showDoc(id){
@@ -4734,6 +4788,29 @@
             • KPIダッシュボード<br>
             • 投稿カレンダー<br>
             • 連携/API/CSV
+          </div>
+        </a>
+
+        <a href="#requirements-neko-cafe" class="saas-app-card" onclick="(function(){
+          if (window.showRequirements) {
+            window.showRequirements('neko-cafe');
+            setTimeout(function(){
+              var c = document.getElementById('requirementsDocCard-requirements-neko-cafe');
+              var b = document.getElementById('requirementsDocBody-requirements-neko-cafe');
+              if (c && b) { c.style.display='none'; b.style.display='block'; window.scrollTo(0,0); }
+            }, 0);
+          }
+        })(); return false;">
+          <img src="/images/requirements_doc_card.png" alt="ネコカフェ 要件定義書" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;">
+          <div class="saas-app-title">
+            ネコカフェ 要件定義書
+            <span class="saas-app-arrow">→</span>
+          </div>
+          <div class="saas-app-description">地域密着の猫カフェサービスの要件定義書</div>
+          <div class="saas-app-features">
+            • 予約/在籍猫プロフィール<br>
+            • グッズEC/通知/レポート<br>
+            • SNS連携/店舗運営
           </div>
         </a>
         
@@ -5934,7 +6011,7 @@ gantt
 </li>
 <li><strong>クライアント機能</strong>:
 <ul>
-<li>Sampling（サーバー主導のエージェント動作）</li>
+<li>Sampling（サーバー主導の従業員動作）</li>
 <li>Roots（URI/ファイルシステム境界の問い合わせ）</li>
 <li>Elicitation（ユーザーからの追加情報リクエスト）</li>
 </ul>
@@ -6657,6 +6734,454 @@ npx kamui serve -p 1313
 </div>
       
       
+      
+      
+      
+    </section>
+
+    
+    <section class="req-section" id="req-operations">
+      <h3>運用</h3>
+      
+      
+    </section>
+  </div>
+</div>
+
+<script>
+  (function(){
+    const nav = document.getElementById('reqToc');
+    if (!nav) return;
+    const links = Array.from(nav.querySelectorAll('a[data-target]'));
+    function setActive(id){
+      links.forEach(a => a.classList.toggle('active', a.getAttribute('data-target') === id));
+    }
+    
+    links.forEach(a => {
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        const id = a.getAttribute('data-target');
+        const el = document.getElementById(id);
+        if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); setActive(id); }
+      });
+    });
+    
+    const obs = new IntersectionObserver(entries => {
+      const visible = entries.filter(e => e.isIntersecting)
+        .sort((a,b) => a.boundingClientRect.top - b.boundingClientRect.top);
+      if (visible[0]) setActive(visible[0].target.id);
+    }, { rootMargin: '-25% 0px -65% 0px', threshold: [0, 0.1, 0.5, 1] });
+    ['req-overview','req-users','req-requirements','req-architecture','req-implementation','req-operations'].forEach(id => {
+      const el = document.getElementById(id); if (el) obs.observe(el);
+    });
+  })();
+</script>
+
+      </div>
+    
+  </section>
+  
+  <section class="doc-section" id="requirements-neko-cafe" data-cat="2" data-cat-name="要件定義・開発">
+    <h2>ネコカフェ 要件定義書</h2>
+    
+      
+      
+      
+      <div id="requirementsDocCard-requirements-neko-cafe" class="dashboard-links" style="margin-top: 8px;">
+        <a href="#requirements-neko-cafe" class="saas-app-card" onclick="(function(){
+          var card = document.getElementById('requirementsDocCard-requirements-neko-cafe');
+          var body = document.getElementById('requirementsDocBody-requirements-neko-cafe');
+          if(card && body){ card.style.display='none'; body.style.display='block'; window.scrollTo(0,0); }
+        })(); return false;">
+          
+            <img src="/images/requirements_doc_card.png" alt="ネコカフェ 要件定義書" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;">
+          
+          <div class="saas-app-title">
+            ネコカフェ 要件定義書
+            <span class="saas-app-arrow">→</span>
+          </div>
+          
+          <div class="saas-app-description">地域密着の「ネコカフェ」サービスの要件定義書です。来店予約、在籍猫のプロフィール、
+店内メニュー、グッズEC、SNS連携、店舗運営（勤怠/在庫/日報）までを対象にします。</div>
+          
+          <div class="saas-app-features">
+            • 概要・ユーザー分析<br>
+            • 機能要件・非機能要件<br>
+            • アーキテクチャ・実装・運用
+          </div>
+        </a>
+
+        
+      </div>
+
+      <div id="requirementsDocBody-requirements-neko-cafe" style="display:none;">
+        <style>
+   
+  .req-doc {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+  .req-toc {
+    position: sticky;
+    top: 80px;
+    background: var(--sidebar-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+  }
+  .req-toc-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 6px 8px 10px;
+    color: var(--text);
+  }
+  .req-toc a {
+    display: block;
+    padding: 8px 10px;
+    border-radius: 8px;
+    color: var(--text-weak);
+    text-decoration: none;
+    transition: background 0.2s ease, color 0.2s ease;
+    font-size: 0.92rem;
+  }
+  .req-toc a:hover { background: var(--card); color: var(--text); }
+  .req-toc a.active { background: var(--card-strong); color: var(--text); font-weight: 600; }
+
+  .req-content { min-width: 0; }
+  .req-section { scroll-margin-top: 72px; margin-bottom: 28px; }
+  .req-section h3 { font-size: 1.15rem; margin: 8px 0 14px; }
+  .meta-inline {
+    display: inline-flex; gap: 12px; flex-wrap: wrap; font-size: 0.85rem; color: var(--text-weak);
+    background: var(--sidebar-bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; margin: 8px 0 12px;
+  }
+  .cards-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+  .card h4 { margin: 0 0 8px; font-size: 1rem; }
+  .muted { color: var(--text-weak); }
+   
+  .req-doc .card, .req-doc .card * { color: var(--text) !important; }
+  .req-doc .card a { color: var(--link) !important; }
+  .req-doc a.card { text-decoration: none; display: block; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+  .req-doc a.card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.15); }
+  .table { width: 100%; border-collapse: collapse; }
+  .table th, .table td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; }
+  .table th { background: var(--sidebar-bg); color: var(--text); }
+  .table td { color: var(--text); }
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+
+  .persona { display: grid; grid-template-columns: 48px 1fr; gap: 10px; align-items: start; }
+  .persona .emoji { font-size: 28px; line-height: 1; }
+  .persona h5 { margin: 0; font-size: 1rem; }
+  .persona small { color: var(--text-weak); }
+  .persona ul { margin: 6px 0 0; padding-left: 18px; }
+</style>
+
+<div class="req-doc" id="reqDoc">
+  <nav class="req-toc" id="reqToc">
+    <div class="req-toc-title">目次（要件定義書）</div>
+      <a href="#req-overview" data-target="req-overview">概要</a>
+      <a href="#req-users" data-target="req-users">ユーザー分析</a>
+      <a href="#req-requirements" data-target="req-requirements">要件定義</a>
+      <a href="#req-architecture" data-target="req-architecture">アーキテクチャ</a>
+      <a href="#req-implementation" data-target="req-implementation">実装</a>
+      <a href="#req-operations" data-target="req-operations">運用</a>
+  </nav>
+
+  <div class="req-content">
+    
+    <section class="req-section" id="req-overview">
+      <h3>概要</h3>
+      
+      <div class="meta-inline">
+        <span>版: 1.0</span>
+        <span>日付: 2025年9月</span>
+        <span>状態: 草案</span>
+      </div>
+      
+      
+      <div class="section-image">
+        <img src="/images/requirements_doc_card.png" alt="ネコカフェ 要件定義書">
+      </div>
+      
+      
+      <div class="cards-3">
+        
+          <div class="card">
+            <h4>🎯 目的</h4>
+            <div><ul>
+<li>来店体験とオンライン体験（予約/EC/SNS）を統合</li>
+<li>在籍猫の健康・紹介情報を正確に管理</li>
+<li>スタッフの運用負荷を下げ、可視化を強化</li>
+</ul>
+</div>
+          </div>
+        
+          <div class="card">
+            <h4>📦 対象範囲</h4>
+            <div><ul>
+<li>予約/チェックイン、在籍猫プロフィール</li>
+<li>メニュー/決済、グッズEC</li>
+<li>SNS連携、店舗運営（勤怠/在庫/日報）</li>
+</ul>
+</div>
+          </div>
+        
+          <div class="card">
+            <h4>✅ 成果物</h4>
+            <div><ul>
+<li>要件定義書/画面一覧/運用フロー</li>
+<li>KPI・レポート項目の定義</li>
+</ul>
+</div>
+          </div>
+        
+      </div>
+      
+
+      
+      
+      
+        
+          
+        
+      
+    </section>
+
+    
+    <section class="req-section" id="req-users">
+      <h3>ユーザー分析</h3>
+      
+      <div class="grid-2">
+        
+        <div class="card persona">
+          <div class="emoji">🧑🏻‍🦰</div>
+          <div>
+            <h5>みなみ <small>(26歳 / 来店客（動物好き/写真好き）)</small></h5>
+            <div class="grid-2">
+              <div>
+                <strong>目標</strong>
+                <ul><li>癒やしの時間</li><li>推し猫の写真</li><li>予約の取りやすさ</li></ul>
+              </div>
+              <div>
+                <strong>課題</strong>
+                <ul><li>混雑時の待ち時間</li><li>猫の体調による会えないリスク</li><li>決済の手間</li></ul>
+              </div>
+              <div>
+                <strong>ニーズ</strong>
+                <ul><li>事前予約/混雑状況表示</li><li>推し猫フォロー</li><li>キャッシュレス</li></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card persona">
+          <div class="emoji">🧑🏻‍💼</div>
+          <div>
+            <h5>アキラ <small>(21歳 / 学生アルバイト（スタッフ）)</small></h5>
+            <div class="grid-2">
+              <div>
+                <strong>目標</strong>
+                <ul><li>シフトの見える化</li><li>業務の簡素化</li><li>猫の健康管理</li></ul>
+              </div>
+              <div>
+                <strong>課題</strong>
+                <ul><li>紙ベース連絡</li><li>在庫ロス</li><li>日報が面倒</li></ul>
+              </div>
+              <div>
+                <strong>ニーズ</strong>
+                <ul><li>モバイル日報</li><li>チェックリスト</li><li>在庫アラート</li></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="card persona">
+          <div class="emoji">👩🏻‍💼</div>
+          <div>
+            <h5>店長 <small>(35歳 / 店長（運営/採用/会計）)</small></h5>
+            <div class="grid-2">
+              <div>
+                <strong>目標</strong>
+                <ul><li>稼働最大化</li><li>安全運営</li><li>再来店の増加</li></ul>
+              </div>
+              <div>
+                <strong>課題</strong>
+                <ul><li>来店/ECの分断</li><li>猫の体調把握</li><li>人手依存</li></ul>
+              </div>
+              <div>
+                <strong>ニーズ</strong>
+                <ul><li>統合ダッシュボード</li><li>猫カルテ</li><li>集客施策の可視化</li></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+      
+      
+      
+
+      
+
+      
+    </section>
+
+    
+    <section class="req-section" id="req-requirements">
+      <h3>要件定義</h3>
+      
+      <h4>機能要件</h4>
+      <table class="table">
+        <thead><tr><th>ID</th><th>名称</th><th>説明</th><th>優先度</th></tr></thead>
+        <tbody>
+        
+          <tr><td>NC-001</td><td>予約/チェックイン</td><td>日時/人数/推し猫の選択、QRチェックイン、混雑状況の可視化</td><td>必須</td></tr>
+        
+          <tr><td>NC-002</td><td>在籍猫プロフィール</td><td>名前/性格/相性/健康情報、フォロー/里親募集（任意）</td><td>必須</td></tr>
+        
+          <tr><td>NC-003</td><td>メニュー/決済</td><td>店内メニュー、POS連携、キャッシュレス決済</td><td>必須</td></tr>
+        
+          <tr><td>NC-004</td><td>グッズEC</td><td>推し猫グッズのEC、在庫/配送管理、クーポン</td><td>推奨</td></tr>
+        
+          <tr><td>NC-005</td><td>SNS連携</td><td>X/IG連携、投稿テンプレ、来店写真の共有（同意管理）</td><td>推奨</td></tr>
+        
+          <tr><td>NC-006</td><td>店舗運用</td><td>シフト/勤怠、日報、在庫、衛生/安全チェックリスト</td><td>必須</td></tr>
+        
+          <tr><td>NC-007</td><td>レポート/KPI</td><td>来店数/客単価/再来店率/EC売上/予約充足率の可視化</td><td>必須</td></tr>
+        
+        </tbody>
+      </table>
+      
+
+      
+      <h4 style="margin-top:14px;">非機能要件</h4>
+      <div class="grid-2">
+        
+        <div class="card">
+          <h4 style="margin:0 0 6px;">可用性</h4>
+          <ul class="muted" style="margin: 8px 0 0; padding-left: 18px;"><li>店舗営業時間内の可用性 99.9%</li><li>障害時のオフライン運用手順</li></ul>
+        </div>
+        
+        <div class="card">
+          <h4 style="margin:0 0 6px;">セキュリティ</h4>
+          <ul class="muted" style="margin: 8px 0 0; padding-left: 18px;"><li>個人情報/同意の管理、写真公開ポリシー</li><li>権限管理（客/スタッフ/店長）</li></ul>
+        </div>
+        
+        <div class="card">
+          <h4 style="margin:0 0 6px;">パフォーマンス</h4>
+          <ul class="muted" style="margin: 8px 0 0; padding-left: 18px;"><li>予約画面は1秒以内、チェックインは3秒以内</li><li>画像は遅延読み込み/最適化</li></ul>
+        </div>
+        
+      </div>
+      
+
+      
+        
+          
+          
+          <div style="margin-top:14px;">
+            <table class="table">
+              <thead><tr><th>要件ID</th><th>カテゴリ</th><th>説明</th><th>優先度</th></tr></thead>
+              <tbody>
+              
+                <tr><td>NC-001</td><td>機能</td><td>来店予約/チェックイン</td><td>必須</td></tr>
+              
+                <tr><td>NC-002</td><td>機能</td><td>在籍猫プロフィール/カルテ</td><td>必須</td></tr>
+              
+                <tr><td>NC-003</td><td>機能</td><td>メニュー/決済</td><td>必須</td></tr>
+              
+                <tr><td>NC-004</td><td>機能</td><td>グッズEC</td><td>推奨</td></tr>
+              
+                <tr><td>NC-005</td><td>機能</td><td>SNS連携/同意管理</td><td>推奨</td></tr>
+              
+                <tr><td>NC-006</td><td>運用</td><td>シフト/日報/在庫/衛生</td><td>必須</td></tr>
+              
+                <tr><td>NC-007</td><td>分析</td><td>KPI/レポート</td><td>必須</td></tr>
+              
+              </tbody>
+            </table>
+          </div>
+          
+          
+        
+      
+    </section>
+
+    
+    <section class="req-section" id="req-architecture">
+      <h3>アーキテクチャ</h3>
+      
+      
+      <div class="grid-2">
+        <div class="card">
+          <h4>フロントエンド</h4>
+          <ul class="muted" style="margin:8px 0 0; padding-left:18px;">
+            <li>Hugo/VanillaJS  — 予約/紹介サイト/ダッシュボード</li><li>TypeScript  — 型管理/運用スクリプト</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4>バックエンド</h4>
+          <ul class="muted" style="margin:8px 0 0; padding-left:18px;">
+            <li>Node.js  — API/在庫・予約管理（将来）</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4>AI/ML</h4>
+          <ul class="muted" style="margin:8px 0 0; padding-left:18px;">
+            <li>—  — —</li>
+          </ul>
+        </div>
+      </div>
+      
+
+      
+
+      
+      <div style="margin-top: 12px;"><div class="mermaid-wrapper">
+  <div class="mermaid">
+    flowchart LR
+  U[来店客] --&gt; R[予約]
+  R --&gt; C[チェックイン]
+  C --&gt; M[メニュー/決済]
+  C --&gt; P[在籍猫プロフィール]
+  M --&gt; E[グッズEC]
+  P --&gt; S[SNS共有]
+  C --&gt; D[日報/在庫/衛生チェック]
+  D --&gt; K[KPIダッシュボード]
+
+  </div>
+</div>
+</div>
+      
+      
+    </section>
+
+    
+    <section class="req-section" id="req-implementation">
+      <h3>実装</h3>
+      
+      
+      
+      <div style="margin-top: 12px;"><div class="gantt-wrapper">
+  <div class="mermaid" style="width: 1600px !important; min-width: 1600px !important; height: 500px !important;">
+gantt
+  title ネコカフェ 開発計画
+  dateFormat  YYYY-MM-DD
+  section 準備
+  要件定義 :done, req, 2025-09-01, 7d
+  設計       :active, des, 2025-09-08, 7d
+  section 実装
+  予約/チェックイン   :dev1, 2025-09-15, 10d
+  プロフィール       :dev2, 2025-09-25, 7d
+  決済/メニュー      :dev3, 2025-10-02, 7d
+  ダッシュボード    :dev4, 2025-10-09, 10d
+
+  </div>
+  <div class="mermaid-caption">図: ネコカフェ 要件定義書</div>
+</div>
+</div>
       
       
       
@@ -8808,7 +9333,7 @@ npx kamui serve -p 1313
           
         
           
-            { id: "\"prompts-repo\"", title: "\"エージェント\"", category:  5 , category_name: "\"エージェント\"" },
+            { id: "\"prompts-repo\"", title: "\"従業員\"", category:  5 , category_name: "\"従業員\"" },
           
         
           
@@ -8821,6 +9346,10 @@ npx kamui serve -p 1313
         
           
             { id: "\"requirements-kamui-os-npm\"", title: "\"KAMUI OS NPM パッケージ要件定義書\"", category:  2 , category_name: "\"要件定義・開発\"" },
+          
+        
+          
+            { id: "\"requirements-neko-cafe\"", title: "\"ネコカフェ 要件定義書\"", category:  2 , category_name: "\"要件定義・開発\"" },
           
         
           

@@ -121,6 +121,29 @@
             • 連携/API/CSV
           </div>
         </a>
+
+        <a href="#requirements-neko-cafe" class="saas-app-card" onclick="(function(){
+          if (window.showRequirements) {
+            window.showRequirements('neko-cafe');
+            setTimeout(function(){
+              var c = document.getElementById('requirementsDocCard-requirements-neko-cafe');
+              var b = document.getElementById('requirementsDocBody-requirements-neko-cafe');
+              if (c && b) { c.style.display='none'; b.style.display='block'; window.scrollTo(0,0); }
+            }, 0);
+          }
+        })(); return false;">
+          <img src="/images/requirements_doc_card.png" alt="ネコカフェ 要件定義書" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;">
+          <div class="saas-app-title">
+            ネコカフェ 要件定義書
+            <span class="saas-app-arrow">→</span>
+          </div>
+          <div class="saas-app-description">地域密着の猫カフェサービスの要件定義書</div>
+          <div class="saas-app-features">
+            • 予約/在籍猫プロフィール<br>
+            • グッズEC/通知/レポート<br>
+            • SNS連携/店舗運営
+          </div>
+        </a>
         {{ end }}
       </div>
 

@@ -23,7 +23,7 @@ function buildToc(){
     // ダッシュボードの配下セクションはTOCから除外（重複回避）
     .filter(sec => sec.id !== 'saas-applications-overview')
     // 特定の要件定義書は 2-1 の配下にサブ項目として表示するため、トップレベルからは除外
-    .filter(sec => !['requirements-kamui-os','requirements-kamui-os-npm','requirements-sns-marketing'].includes(sec.id));
+    .filter(sec => !['requirements-kamui-os','requirements-kamui-os-npm','requirements-sns-marketing','requirements-neko-cafe'].includes(sec.id));
   const groups = new Map(); // catValue -> { name, items: [{id,title}] }
   // ダッシュボードカテゴリを追加
   groups.set(1, { name: 'ダッシュボード', items: [] });
@@ -45,6 +45,13 @@ function buildToc(){
       grp.items.push({ id, title });
     }
   });
+  // 章1に「メインダッシュボード」を先頭として明示追加
+  if (groups.has(1)) {
+    const g1 = groups.get(1);
+    if (!g1.items.some(it => it.id === '#saas-applications-overview')) {
+      g1.items.unshift({ id: '#saas-applications-overview', title: 'メインダッシュボード' });
+    }
+  }
   const sortedCats = Array.from(groups.keys()).sort((a,b)=>a-b);
   sortedCats.forEach((catValue, catIdx) => {
     const cat = groups.get(catValue);
@@ -85,7 +92,8 @@ function buildToc(){
           { id: '#requirements-document',        title: 'KAMUI CODE 要件定義書',            openBody: true },
           { id: '#requirements-kamui-os',       title: 'KAMUI OS 要件定義書',              openBody: true },
           { id: '#requirements-kamui-os-npm',   title: 'KAMUI OS NPM 要件定義書',          openBody: true },
-          { id: '#requirements-sns-marketing',  title: 'SNSマーケティング ダッシュボード要件', openBody: true }
+          { id: '#requirements-sns-marketing',  title: 'SNSマーケティング ダッシュボード要件', openBody: true },
+          { id: '#requirements-neko-cafe',      title: 'ネコカフェ 要件定義書',              openBody: true }
         ];
         // 折りたたみトグル（2-1 の子を開閉）
         const subToggle = document.createElement('span');
@@ -116,12 +124,7 @@ function buildToc(){
         item.appendChild(sub);
       }
     });
-    // カテゴリラベルクリックでトグル
-    catLabel.addEventListener('click', () => {
-      children.classList.toggle('expanded');
-      toggle.classList.toggle('expanded');
-      toggle.textContent = children.classList.contains('expanded') ? '▼' : '▶';
-    });
+    // カテゴリラベルのトグル処理はビルド後に一括で付与（重複防止）
     catItem.appendChild(catLabel);
     catItem.appendChild(children);
     tocList.appendChild(catItem);
