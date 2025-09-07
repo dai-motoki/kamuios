@@ -507,6 +507,8 @@ function collectElementInfo(el){
 // Alt(Option) + 右クリックで要素情報を取得
 document.addEventListener('contextmenu', (e) => {
   try {
+    // DevTools ON のときだけ発火
+    if (!window.__devToolsActive) return; // 通常のコンテキストメニューを維持
     // 右クリックで発火（特定ターゲットのみ）
     const target = e.target.closest('.saas-app-card, .card, .tree-label, .req-section, .doc-section, [data-path], [class]');
     if (!target) return; // 対象外は通常のコンテキストメニュー
@@ -599,8 +601,8 @@ document.addEventListener('contextmenu', (e) => {
     if (!target) return;
     openInfo(target);
   }
-  function enable(){ ensureNodes(); active = true; document.body.classList.add('inspect-active'); overlay.style.display='block'; tip.style.display='block'; btn.textContent = 'DevTools: ON'; document.addEventListener('mousemove', onMove, true); document.addEventListener('click', onClick, true); }
-  function disable(){ active = false; document.body.classList.remove('inspect-active'); if (overlay) overlay.style.display='none'; if (tip) tip.style.display='none'; btn.textContent = 'DevTools'; document.removeEventListener('mousemove', onMove, true); document.removeEventListener('click', onClick, true); }
+  function enable(){ ensureNodes(); active = true; window.__devToolsActive = true; document.body.classList.add('inspect-active'); overlay.style.display='block'; tip.style.display='block'; btn.textContent = 'DevTools: ON'; document.addEventListener('mousemove', onMove, true); document.addEventListener('click', onClick, true); }
+  function disable(){ active = false; window.__devToolsActive = false; document.body.classList.remove('inspect-active'); if (overlay) overlay.style.display='none'; if (tip) tip.style.display='none'; btn.textContent = 'DevTools'; document.removeEventListener('mousemove', onMove, true); document.removeEventListener('click', onClick, true); }
   btn.addEventListener('click', () => { active ? disable() : enable(); });
   document.addEventListener('keydown', (e) => { if (active && e.key === 'Escape') disable(); });
 })();

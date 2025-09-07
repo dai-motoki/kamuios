@@ -28,8 +28,15 @@
     </style>
     <div class="prompt-cards-wrap">
       <style>
-        .team-dash { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap: 12px; margin-bottom: 14px; }
-        .task-card { background: var(--card); border:1px solid var(--border); border-radius:12px; padding:12px; }
+        /* 横一列のスライダー行（カード） */
+        .row-nav { display:flex; justify-content:flex-end; gap:8px; margin: 4px 0 8px; }
+        .row-btn { background: rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color: var(--text); border-radius: 8px; padding: 6px 10px; cursor: pointer; }
+        .row-btn:hover { background: rgba(255,255,255,0.12); }
+        #promptCardGrid { display:flex; gap: 12px; overflow-x:auto; scroll-snap-type:x mandatory; padding-bottom: 8px; }
+        #promptCardGrid .card { min-width: 320px; scroll-snap-align: start; }
+        /* 横一列のスライダー行（タスク） */
+        #teamDash { display:flex; gap: 12px; overflow-x:auto; scroll-snap-type:x mandatory; margin-bottom: 10px; }
+        .task-card { background: var(--card); border:1px solid var(--border); border-radius:12px; padding:12px; min-width: 280px; scroll-snap-align: start; }
         .task-card h4 { margin: 0 0 8px; font-size: 0.98rem; }
         .task { display:flex; align-items:center; gap:8px; padding:6px 8px; border-radius:8px; margin:4px 0; background: var(--sidebar-bg); border: 1px solid var(--border); }
         .task .status { width:18px; height:18px; display:inline-flex; align-items:center; justify-content:center; border-radius:4px; border:1px solid var(--border); font-size:12px; }
@@ -38,8 +45,12 @@
         .task.todo .status { background:transparent; color:var(--text-weak); }
         .task .name { flex:1; color:var(--text); }
         .task small { color:var(--text-weak); }
+        /* スクロールバー調整（横のみ） */
+        #promptCardGrid::-webkit-scrollbar, #teamDash::-webkit-scrollbar { height: 8px; }
       </style>
-    <div class="card-grid" id="promptCardGrid"></div>
+      <div class="row-nav"><button class="row-btn" id="cardPrev">‹</button><button class="row-btn" id="cardNext">›</button></div>
+      <div class="card-grid" id="promptCardGrid"></div>
+      <div class="row-nav"><button class="row-btn" id="teamPrev">‹</button><button class="row-btn" id="teamNext">›</button></div>
       <div class="team-dash" id="teamDash"></div>
     </div>
     <div class="prompt-viewer" id="promptDocViewer"></div>
@@ -48,8 +59,19 @@
         const sec = document.getElementById('prompts-repo');
         const grid = sec.querySelector('#promptCardGrid');
         const teamDash = sec.querySelector('#teamDash');
+        const cardPrev = sec.querySelector('#cardPrev');
+        const cardNext = sec.querySelector('#cardNext');
+        const teamPrev = sec.querySelector('#teamPrev');
+        const teamNext = sec.querySelector('#teamNext');
         const viewer = sec.querySelector('#promptDocViewer');
         if (!grid || !viewer) return;
+        function attachRowNav(container, prevBtn, nextBtn){
+          const step = () => Math.round(container.clientWidth * 0.9);
+          prevBtn?.addEventListener('click', () => { container.scrollBy({ left: -step(), behavior: 'smooth' }); });
+          nextBtn?.addEventListener('click', () => { container.scrollBy({ left: step(), behavior: 'smooth' }); });
+          // ホイール横スクロール
+          container.addEventListener('wheel', (e) => { if (Math.abs(e.deltaX) < Math.abs(e.deltaY)) { container.scrollLeft += e.deltaY; e.preventDefault(); } }, { passive:false });
+        }
         // 簡易チームダッシュボード（カードの下に表示）
         if (teamDash) {
           const team = [
@@ -64,14 +86,14 @@
               { title: 'OG画像更新', status: 'todo' }
             ]},
             { name: 'サラ', role: '採用担当', tasks: [
-              { title: '求人票テンプレ整備', status: 'doing' },
-              { title: '面談スケジュール運用', status: 'todo' },
-              { title: '候補者DB/同意管理', status: 'todo' }
+              { title: '求人担当の詳細仕様決定完了', status: 'done' },
+              { title: 'KAMUI CODE 実装担当採用', status: 'todo' },
+              { title: 'KAMUI 実装担当採用', status: 'todo' }
             ]},
             { name: 'エミリー', role: '要件定義執筆', tasks: [
-              { title: 'ネコカフェ要件書 章立て', status: 'done' },
-              { title: 'KAMUI OS NPM 要件書 追記', status: 'doing' },
-              { title: 'SNSダッシュボード KPI表', status: 'todo' }
+              { title: 'KAMUI OS 要件定義書 執筆', status: 'doing' },
+              { title: 'KAMUI OS NPM 要件定義書 執筆', status: 'doing' },
+              { title: 'SNSマーケダッシュボード 要件定義書 執筆', status: 'doing' }
             ]}
           ];
           const icon = (s)=> s==='done'?'✅':(s==='doing'?'🟧':'⬜️');
@@ -87,6 +109,7 @@
             });
             teamDash.appendChild(box);
           });
+          attachRowNav(teamDash, teamPrev, teamNext);
         }
         const docs = Array.from(sec.querySelectorAll('.markdown-body'));
         if (!docs.length) return;
@@ -171,6 +194,7 @@
           // いったん隠しておく（選択時にviewerへ移動）
           it.el.style.display = 'none';
         });
+        attachRowNav(grid, cardPrev, cardNext);
         // 先頭を表示
         showDoc(items[0].id);
       })();

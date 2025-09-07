@@ -1,6 +1,8 @@
 # Hugo generated files
 /requirement-docs/public/
 /requirement-docs/resources/
+/public/
+/resources/
 .hugo_build.lock
 
 # Node modules
