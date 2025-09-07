@@ -279,6 +279,13 @@ pre.code code { color: var(--text); }
 .gantt-wrapper { margin: 20px 0; padding: 20px; background: var(--code-bg); border: 1px solid var(--code-border); border-radius: 8px; overflow-x: auto; min-width: 100%; }
 .gantt-wrapper .mermaid { display: block; min-width: 1600px !important; width: 1600px !important; min-height: 500px; }
 
+/* Inspector overlay */
+.inspect-overlay { position: fixed; pointer-events: none; z-index: 3000; border: 2px solid #4a9eff; outline: 2000px solid rgba(74,158,255,0.12); outline-offset: -2000px; background: rgba(74,158,255,0.12); border-radius: 6px; transition: all .05s linear; }
+.inspect-tip { position: fixed; z-index: 3001; min-width: 220px; max-width: 360px; background: rgba(2,6,23,0.6); border: 1px solid rgba(255,255,255,0.08); color: var(--text); border-radius: 12px; padding: 10px 12px; font-size: 12px; line-height: 1.4; box-shadow: 0 10px 30px rgba(0,0,0,0.35); backdrop-filter: blur(10px) saturate(1.1); -webkit-backdrop-filter: blur(10px) saturate(1.1); }
+.inspect-tip .t-path { color: #93c5fd; font-weight: 800; font-size: 13px; display: block; margin-bottom: 6px; }
+.inspect-tip .t-mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.inspect-active { cursor: crosshair !important; }
+
 /* モバイル最適化 */
 /* デザイン要件定義用スタイル */
 .color-palette { margin: 20px 0; }

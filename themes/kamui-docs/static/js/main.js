@@ -540,6 +540,71 @@ document.addEventListener('contextmenu', (e) => {
   } catch(err) { console.error('Inspector failed', err); }
 });
 
+// DevTools hover-inspector (button toggle)
+(function(){
+  const btn = document.getElementById('devToolsBtn');
+  if (!btn) return;
+  let active = false;
+  let overlay, tip;
+  function ensureNodes(){
+    if (!overlay){ overlay = document.createElement('div'); overlay.className = 'inspect-overlay'; overlay.style.display='none'; document.body.appendChild(overlay); }
+    if (!tip){ tip = document.createElement('div'); tip.className = 'inspect-tip'; tip.style.display='none'; document.body.appendChild(tip); }
+  }
+  function fmtSel(el){
+    const tag = el.tagName.toLowerCase();
+    const id = el.id ? `#${el.id}` : '';
+    const cls = el.classList?.length ? '.'+Array.from(el.classList).slice(0,2).join('.') : '';
+    return `${tag}${id}${cls}`;
+  }
+  function moveOverlay(target, x, y){
+    const rect = target.getBoundingClientRect();
+    overlay.style.display = 'block';
+    overlay.style.left = `${rect.left + window.scrollX}px`;
+    overlay.style.top = `${rect.top + window.scrollY}px`;
+    overlay.style.width = `${rect.width}px`;
+    overlay.style.height = `${rect.height}px`;
+    tip.style.display = 'block';
+    const comp = window.getComputedStyle(target);
+    const color = comp.color; const font = comp.font; const margin = comp.margin;
+    tip.innerHTML = `
+      <span class="t-path">${fmtSel(target)} <span class="t-mono">${rect.width.toFixed(0)}×${rect.height.toFixed(0)}</span></span>
+      <div>Color <span class="t-mono">${color}</span></div>
+      <div>Font <span class="t-mono">${font}</span></div>
+      <div>Margin <span class="t-mono">${margin}</span></div>
+    `;
+    const tipW = Math.min(360, Math.max(220, tip.offsetWidth||240));
+    let tx = x + 12, ty = y + 12;
+    if (tx + tipW > window.innerWidth - 20) tx = x - tipW - 12;
+    if (ty + 140 > window.innerHeight - 10) ty = y - 150;
+    tip.style.left = `${Math.max(10, tx)}px`;
+    tip.style.top = `${Math.max(10, ty)}px`;
+  }
+  function openInfo(target){
+    const json = JSON.stringify(collectElementInfo(target), null, 2);
+    openJsonModal(json, 'Inspector');
+    (async()=>{ try{ await navigator.clipboard.writeText(json);}catch(_){}})();
+  }
+  function onMove(e){
+    const node = document.elementFromPoint(e.clientX, e.clientY);
+    if (!node || node === overlay || tip.contains(node)) return;
+    const target = node.closest('body *');
+    if (!target) return;
+    moveOverlay(target, e.clientX, e.clientY);
+  }
+  function onClick(e){
+    e.preventDefault(); e.stopPropagation();
+    const node = document.elementFromPoint(e.clientX, e.clientY);
+    if (!node || node === overlay || tip.contains(node)) return;
+    const target = node.closest('body *');
+    if (!target) return;
+    openInfo(target);
+  }
+  function enable(){ ensureNodes(); active = true; document.body.classList.add('inspect-active'); overlay.style.display='block'; tip.style.display='block'; btn.textContent = 'DevTools: ON'; document.addEventListener('mousemove', onMove, true); document.addEventListener('click', onClick, true); }
+  function disable(){ active = false; document.body.classList.remove('inspect-active'); if (overlay) overlay.style.display='none'; if (tip) tip.style.display='none'; btn.textContent = 'DevTools'; document.removeEventListener('mousemove', onMove, true); document.removeEventListener('click', onClick, true); }
+  btn.addEventListener('click', () => { active ? disable() : enable(); });
+  document.addEventListener('keydown', (e) => { if (active && e.key === 'Escape') disable(); });
+})();
+
 // UI遷移図の初期化
 function initUIFlow() {
   const nodes = [
