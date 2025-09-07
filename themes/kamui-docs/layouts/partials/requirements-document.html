@@ -125,6 +125,9 @@
           {{ end }}
         {{ end }}
       {{ end }}
+      {{ with .custom_html }}
+      <div class="card" style="margin-top:14px;">{{ . | safeHTML }}</div>
+      {{ end }}
     </section>
 
     <!-- Users -->
@@ -217,6 +220,11 @@
             </table>
           </div>
           {{ end }}
+          {{ else if eq .type "custom" }}
+          <div class="card" style="margin-top:14px;">
+            {{ with .title }}<h4 style="margin:0 0 8px;">{{ . }}</h4>{{ end }}
+            {{ with .content }}{{ . | safeHTML }}{{ end }}
+          </div>
           {{ end }}
         {{ end }}
       {{ end }}

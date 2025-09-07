@@ -93,6 +93,45 @@
           - ["チャネル別", "インプレッション/ER/クリック", "施策別の伸びを確認"]
           - ["コンテンツ別", "保存/シェア/視聴完了", "良質コンテンツを特定"]
           - ["カレンダー", "予定/公開/担当/タグ", "運用管理/抜け漏れ防止"]
+    
+    - type: custom
+      title: 参考UI・ダッシュボードデザイン
+      content: |
+        <p style="margin-bottom: 20px; color: var(--text-secondary);">タスク管理・ガントチャート型ダッシュボードの参考デザイン</p>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+          <div style="border: 1px solid var(--border); border-radius: 8px; overflow: hidden;">
+            <img src="/images/task_dashboard_design1.png" alt="タスク管理ダッシュボード - デザイン1" style="width: 100%; height: auto; display: block;">
+            <div style="padding: 12px;">
+              <h3 style="font-size: 1rem; margin-bottom: 4px;">タスク管理ダッシュボード - デザイン1</h3>
+              <p style="font-size: 0.9rem; color: var(--text-secondary);">TODO/IN PROGRESS/COMPLETED のステータス管理UI</p>
+            </div>
+          </div>
+          
+          <div style="border: 1px solid var(--border); border-radius: 8px; overflow: hidden;">
+            <img src="/images/task_dashboard_design2.png" alt="タスク管理ダッシュボード - デザイン2" style="width: 100%; height: auto; display: block;">
+            <div style="padding: 12px;">
+              <h3 style="font-size: 1rem; margin-bottom: 4px;">タスク管理ダッシュボード - デザイン2</h3>
+              <p style="font-size: 0.9rem; color: var(--text-secondary);">ガントチャート型のタイムライン表示</p>
+            </div>
+          </div>
+          
+          <div style="border: 1px solid var(--border); border-radius: 8px; overflow: hidden;">
+            <img src="/images/task_dashboard_design3.png" alt="タスク管理ダッシュボード - デザイン3" style="width: 100%; height: auto; display: block;">
+            <div style="padding: 12px;">
+              <h3 style="font-size: 1rem; margin-bottom: 4px;">タスク管理ダッシュボード - デザイン3</h3>
+              <p style="font-size: 0.9rem; color: var(--text-secondary);">カンバンボード型のタスク管理</p>
+            </div>
+          </div>
+          
+          <div style="border: 1px solid var(--border); border-radius: 8px; overflow: hidden;">
+            <img src="/images/task_dashboard_design4.png" alt="タスク管理ダッシュボード - デザイン4" style="width: 100%; height: auto; display: block;">
+            <div style="padding: 12px;">
+              <h3 style="font-size: 1rem; margin-bottom: 4px;">タスク管理ダッシュボード - デザイン4</h3>
+              <p style="font-size: 0.9rem; color: var(--text-secondary);">進捗トラッキングとメンバー管理</p>
+            </div>
+          </div>
+        </div>
 
   mermaid: |
     flowchart LR
