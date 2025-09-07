@@ -20,6 +20,36 @@ kamuios/
 - Grid が列化しない場合は、項目に `min-width: 0;` を付与。
 - 画像/動画は `/images/...` `/videos/...` の絶対パス参照。
 
+## はまりどころ（2列化が効かないとき）
+
+原因は主に2つの組み合わせでした：
+
+1) 共有スタイルの干渉
+- `data/sections.yaml` の `.dashboard-links` が全体に効いており、セクション内で書いたローカルCSSより強く当たるケース（優先度/出現順）
+
+2) Grid項目の最小幅
+- カード要素（`.saas-app-card`）の既定は `min-width:auto`。画像/テキストの最小幅が大きく、Gridが2列に縮まらず1列のままになる（Gridの「項目のデフォルト最小サイズ」問題）
+
+対応（実際に反映済み）
+- テーマ共通CSSに `#requirements-document .dashboard-links` を追加し、`!important` 付きで2列を強制
+- 併せて子要素に `min-width:0` を付与し、カードが列幅に収まるように調整
+
+参考コード（`themes/kamui-docs/static/css/main.css`）
+
+```css
+/* 2-1 要件定義書のカードは2列 */
+#requirements-document .dashboard-links {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 20px !important;
+}
+#requirements-document .dashboard-links > * { min-width: 0 !important; }
+#requirements-document .dashboard-links a.saas-app-card { min-width: 0 !important; }
+@media (max-width: 900px){
+  #requirements-document .dashboard-links { grid-template-columns: 1fr !important; }
+}
+```
+
 ---
 
 直近タスク（例）

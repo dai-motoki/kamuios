@@ -86,12 +86,12 @@
               { title: 'SNSカード素材', status: 'todo' },
               { title: 'OG画像更新', status: 'todo' }
             ]},
-            { name: 'サラ', role: '採用担当', tasks: [
+            { name: 'トム', role: '採用担当', tasks: [
               { title: '求人担当の詳細仕様決定完了', status: 'done' },
               { title: 'KAMUI CODE 実装担当採用', status: 'todo' },
               { title: 'KAMUI 実装担当採用', status: 'todo' }
             ]},
-            { name: 'トム', role: 'デザイナー', tasks: [
+            { name: 'サラ', role: 'デザイナー', tasks: [
               { title: 'UIコンポーネント整理', status: 'doing' },
               { title: 'ガラス調モーダル調整', status: 'todo' },
               { title: '2列グリッドのレスポンシブ最適化', status: 'todo' }
@@ -182,7 +182,7 @@
           }
           if (/designer-agent\.md$/.test(it.path||'')) {
             img = '<video class="card-video" src="/videos/designer_card_video_square.mp4" poster="/images/agent_card.png" autoplay loop muted playsinline></video>'+
-                  '<span class="card-name">トム</span>';
+                  '<span class="card-name">サラ</span>';
           }
           card.innerHTML = `<div class="card-title">${it.title}</div>${img}`;
           card.addEventListener('click', () => showDoc(it.id));
