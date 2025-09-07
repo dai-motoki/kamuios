@@ -4518,6 +4518,46 @@
 </ul>
           </div>
         
+          <div class="markdown-body" data-path="static/data/prompts/hiring-agent.md">
+            <h1 id="採用担当recruiter">採用担当（Recruiter）</h1>
+<blockquote>
+<p>役割: 採用活動の設計と運用（求人票テンプレ、候補者DB、面談スケジュール、同意管理）。従業員カードとダッシュボードにタスクを可視化します。</p></blockquote>
+<h2 id="追加編集するファイル">追加・編集するファイル</h2>
+<ul>
+<li>カード（従業員セクション）
+<ul>
+<li><code>data/saas/prompts-repo.yaml</code>
+<ul>
+<li><code>markdown_files</code> に本ファイルを追記</li>
+<li><code>custom_html</code> 内の並び順 <code>order</code> に <code>hiring-agent.md</code> を追加（左→右の順番）</li>
+<li>カードのメディア割当（動画/画像）に <code>hiring-agent.md</code> 用の条件を追加</li>
+<li>チームダッシュボード <code>team</code> 配列に採用担当のタスクを追記</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>動画アセット（仮置き）
+<ul>
+<li><code>static/videos/recruiter_card_video_square.mp4</code></li>
+<li>後で本番のキャラクター動画に差し替えてください（正方形推奨、無音、短尺ループ）</li>
+<li>ポスター画像（任意）: <code>static/images/agent_card.png</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="表示確認">表示確認</h2>
+<pre tabindex="0"><code>hugo server -D -p 1313
+→ http://localhost:1313/#prompts-repo
+</code></pre><h2 id="参考タスクダッシュボード">参考タスク（ダッシュボード）</h2>
+<ul>
+<li>求人票テンプレ整備（done/doing/todo を適宜更新）</li>
+<li>面談スケジュール運用（カレンダー/通知）</li>
+<li>候補者DB/同意管理（個人情報保護）</li>
+</ul>
+<hr>
+<p>採用担当は、採用の「見える化」を担当します。タスクの進捗がカード下部のダッシュボードに反映されます。必要に応じて、タスク構成や名称は <code>data/saas/prompts-repo.yaml</code> の <code>team</code> 配列で更新してください。</p>
+
+          </div>
+        
       
       
       
@@ -4579,14 +4619,9 @@
     const teamDash = sec.querySelector('#teamDash');
     const viewer = sec.querySelector('#promptDocViewer');
     if (!grid || !viewer) return;
-    // 簡易チームダッシュボード（カード3つの下に表示）
+    // 簡易チームダッシュボード（カードの下に表示）
     if (teamDash) {
       const team = [
-        { name: 'エミリー', role: '要件定義執筆', tasks: [
-          { title: 'ネコカフェ要件書 章立て', status: 'done' },
-          { title: 'KAMUI OS NPM 要件書 追記', status: 'doing' },
-          { title: 'SNSダッシュボード KPI表', status: 'todo' }
-        ]},
         { name: 'タクミ', role: 'テンプレ/JS', tasks: [
           { title: 'TOC 折りたたみ実装', status: 'done' },
           { title: 'カード4枚化', status: 'done' },
@@ -4596,6 +4631,16 @@
           { title: 'エージェント動画差替', status: 'done' },
           { title: 'SNSカード素材', status: 'todo' },
           { title: 'OG画像更新', status: 'todo' }
+        ]},
+        { name: 'サラ', role: '採用担当', tasks: [
+          { title: '求人票テンプレ整備', status: 'doing' },
+          { title: '面談スケジュール運用', status: 'todo' },
+          { title: '候補者DB/同意管理', status: 'todo' }
+        ]},
+        { name: 'エミリー', role: '要件定義執筆', tasks: [
+          { title: 'ネコカフェ要件書 章立て', status: 'done' },
+          { title: 'KAMUI OS NPM 要件書 追記', status: 'doing' },
+          { title: 'SNSダッシュボード KPI表', status: 'todo' }
         ]}
       ];
       const icon = (s)=> s==='done'?'✅':(s==='doing'?'🟧':'⬜️');
@@ -4621,12 +4666,26 @@
       el.dataset.docId = id;
       return { id, title, path, el };
     });
-    // 並び順: 拓海, ミナ, エミリー（エミリーを右端に）
-    const order = ['create-new-page.v2.md','media-assets-guidelines.md','requirements-docs-agent.md'];
+    // 並び順: 拓海, ミナ, 採用担当, エミリー（エミリーを右端に）
+    const order = ['create-new-page.v2.md','media-assets-guidelines.md','hiring-agent.md','requirements-docs-agent.md'];
     items.sort((a,b)=>{
       const aIdx = order.findIndex(k => (a.path||'').endsWith(k));
       const bIdx = order.findIndex(k => (b.path||'').endsWith(k));
       return (aIdx<0?99:aIdx) - (bIdx<0?99:bIdx);
+    });
+    // タイトル補正（h1/h2 が見つからない場合の保険）
+    const nameMap = new Map([
+      ['create-new-page.v2.md','新規ページ追加（外部YAML基準）'],
+      ['media-assets-guidelines.md','画像/動画アセットの置き場所と参照ルール'],
+      ['hiring-agent.md','採用担当（Recruiter）'],
+      ['requirements-docs-agent.md','要件定義執筆担当（KAMUI OS / KAMUI CODE）']
+    ]);
+    items.forEach(it => {
+      if (!it.title || /^ドキュメント\s*\d+/.test(it.title)) {
+        const key = (it.path||'').split('/').pop();
+        const alt = nameMap.get(key);
+        if (alt) it.title = alt;
+      }
     });
     // ビューア初期化
     function showDoc(id){
@@ -4655,6 +4714,10 @@
       if (/requirements-docs-agent\.md$/.test(it.path||'')) {
         img = '<video class="card-video" src="/videos/agent_card_video_square.mp4" autoplay loop muted playsinline></video>'+
               '<span class="card-name">エミリー</span>';
+      }
+      if (/hiring-agent\.md$/.test(it.path||'')) {
+        img = '<video class="card-video" src="/videos/recruiter_card_video_square.mp4" poster="/images/agent_card.png" autoplay loop muted playsinline></video>'+
+              '<span class="card-name">サラ</span>';
       }
       card.innerHTML = `<div class="card-title">${it.title}</div>${img}`;
       card.addEventListener('click', () => showDoc(it.id));
