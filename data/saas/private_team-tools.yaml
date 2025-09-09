@@ -1,0 +1,136 @@
+# チーム限定ツール - プライベートページ
+
+- id: private-team-tools
+  category: 8
+  category_name: プライベート
+  title: チーム限定ツール
+  private: true
+  required_roles: ["admin", "member", "developer"]
+  content: |
+    社内チーム専用の開発ツールとリソースへのアクセスポイントです。
+  
+  custom_html: |
+    <style>
+      .private-tools {
+        background: var(--card);
+        border: 2px solid #4c6ef5;
+        border-radius: 12px;
+        padding: 24px;
+        margin: 20px 0;
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .private-tools::before {
+        content: 'SAMPLE';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(-30deg);
+        font-size: 10rem;
+        font-weight: bold;
+        color: var(--text);
+        opacity: 0.5;
+        pointer-events: none;
+        z-index: 9999;
+        white-space: nowrap;
+      }
+      
+      .tools-header {
+        margin-bottom: 30px;
+      }
+      
+      .tools-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text);
+      }
+      
+      .tools-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-top: 24px;
+      }
+      
+      .tool-item {
+        background: var(--sidebar-bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 16px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      
+      .tool-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      }
+      
+      .tool-icon {
+        font-size: 2rem;
+        margin-bottom: 8px;
+      }
+      
+      .tool-name {
+        font-weight: 600;
+        color: var(--text);
+      }
+    </style>
+    
+    <div class="private-tools" data-private="true" data-required-roles="admin,member,developer">
+      <div class="tools-header">
+        <h1 class="tools-title">チーム限定ツール</h1>
+      </div>
+      
+      <div id="toolsContent" style="display: none;">
+        <div class="tools-grid">
+          <div class="tool-item">
+            <div class="tool-icon">🔨</div>
+            <div class="tool-name">ビルドツール</div>
+          </div>
+          <div class="tool-item">
+            <div class="tool-icon">📊</div>
+            <div class="tool-name">分析ツール</div>
+          </div>
+          <div class="tool-item">
+            <div class="tool-icon">🔐</div>
+            <div class="tool-name">セキュリティツール</div>
+          </div>
+          <div class="tool-item">
+            <div class="tool-icon">🚀</div>
+            <div class="tool-name">デプロイツール</div>
+          </div>
+        </div>
+      </div>
+      
+      <div id="toolsLoginRequired" class="login-required" style="display: none;">
+        <div class="login-icon">🔐</div>
+        <div class="login-message">
+          このページを表示するにはログインが必要です
+        </div>
+        <button class="login-button" onclick="showLoginModal()">
+          ログイン
+        </button>
+      </div>
+    </div>
+    
+    <script>
+      (function() {
+        const toolsContent = document.getElementById('toolsContent');
+        const loginRequired = document.getElementById('toolsLoginRequired');
+        
+        const authToken = localStorage.getItem('auth_token');
+        const userRole = localStorage.getItem('user_role') || 'guest';
+        const hasAccess = authToken && ['admin', 'member', 'developer'].includes(userRole);
+        
+        if (hasAccess) {
+          toolsContent.style.display = 'block';
+          loginRequired.style.display = 'none';
+        } else {
+          toolsContent.style.display = 'none';
+          loginRequired.style.display = 'block';
+        }
+      })();
+    </script>

@@ -39,3 +39,9 @@ yarn-error.log*
 
 # Reference repositories
 /reference/requirement-docs/
+
+# Private files (except already tracked ones)
+data/saas/private_*.yaml
+static/data/prompts/private_*.md
+static/videos/private_*.mp4
+static/images/private_*.*

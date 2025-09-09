@@ -1,0 +1,241 @@
+# 社内限定ダッシュボード - プライベートページの例
+
+- id: private-internal-dashboard
+  category: 8
+  category_name: プライベート
+  title: 社内限定ダッシュボード
+  private: true
+  required_roles: ["admin", "member"]
+  content: |
+    社内メンバー限定のダッシュボードです。機密情報や内部ツールへのアクセスを提供します。
+  
+  custom_html: |
+    <style>
+      .private-dashboard {
+        background: var(--card);
+        border: 2px solid #ff6b6b;
+        border-radius: 12px;
+        padding: 24px;
+        margin: 20px 0;
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .private-dashboard::before {
+        content: 'SAMPLE';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(-30deg);
+        font-size: 10rem;
+        font-weight: bold;
+        color: var(--text);
+        opacity: 0.5;
+        pointer-events: none;
+        z-index: 9999;
+        white-space: nowrap;
+      }
+      
+      .private-badge {
+        position: absolute;
+        z-index: 10000;
+        top: 20px;
+        right: 20px;
+        background: #ff6b6b;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: bold;
+      }
+      
+      .private-header {
+        margin-bottom: 30px;
+      }
+      
+      .private-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 10px;
+      }
+      
+      .private-description {
+        color: var(--text-weak);
+        font-size: 1rem;
+      }
+      
+      .private-sections {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-top: 30px;
+      }
+      
+      .private-card {
+        background: var(--sidebar-bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 20px;
+        transition: all 0.3s ease;
+      }
+      
+      .private-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      }
+      
+      .private-card-icon {
+        font-size: 2rem;
+        margin-bottom: 10px;
+      }
+      
+      .private-card-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 8px;
+      }
+      
+      .private-card-desc {
+        font-size: 0.9rem;
+        color: var(--text-weak);
+      }
+      
+      .login-required {
+        background: rgba(255, 107, 107, 0.1);
+        border: 1px solid #ff6b6b;
+        border-radius: 8px;
+        padding: 40px;
+        text-align: center;
+        margin: 20px 0;
+      }
+      
+      .login-icon {
+        font-size: 3rem;
+        margin-bottom: 20px;
+      }
+      
+      .login-message {
+        font-size: 1.2rem;
+        color: var(--text);
+        margin-bottom: 20px;
+      }
+      
+      .login-button {
+        background: #ff6b6b;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 6px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      
+      .login-button:hover {
+        background: #ff5252;
+        transform: translateY(-1px);
+      }
+    </style>
+    
+    <div class="private-dashboard" data-private="true" data-required-roles="admin,member">
+      <span class="private-badge">🔒 プライベート</span>
+      
+      <div class="private-header">
+        <h1 class="private-title">社内限定ダッシュボード</h1>
+        <p class="private-description">
+          KAMUI OS の内部開発ツールと機密情報へのアクセスポイントです。
+          このページは認証されたメンバーのみアクセス可能です。
+        </p>
+      </div>
+      
+      <!-- 認証チェック（実装例） -->
+      <div id="privateContent" style="display: none;">
+        <div class="private-sections">
+          <div class="private-card">
+            <div class="private-card-icon">📊</div>
+            <div class="private-card-title">売上分析</div>
+            <div class="private-card-desc">
+              リアルタイムの売上データと顧客分析レポート
+            </div>
+          </div>
+          
+          <div class="private-card">
+            <div class="private-card-icon">🔧</div>
+            <div class="private-card-title">管理ツール</div>
+            <div class="private-card-desc">
+              ユーザー管理、権限設定、システム設定
+            </div>
+          </div>
+          
+          <div class="private-card">
+            <div class="private-card-icon">📈</div>
+            <div class="private-card-title">KPI モニター</div>
+            <div class="private-card-desc">
+              主要業績評価指標のリアルタイム監視
+            </div>
+          </div>
+          
+          <div class="private-card">
+            <div class="private-card-icon">🔑</div>
+            <div class="private-card-title">API キー管理</div>
+            <div class="private-card-desc">
+              各種サービスのAPIキーとトークン管理
+            </div>
+          </div>
+          
+          <div class="private-card">
+            <div class="private-card-icon">📝</div>
+            <div class="private-card-title">内部ドキュメント</div>
+            <div class="private-card-desc">
+              開発ガイドライン、運用手順書、議事録
+            </div>
+          </div>
+          
+          <div class="private-card">
+            <div class="private-card-icon">🚨</div>
+            <div class="private-card-title">インシデント管理</div>
+            <div class="private-card-desc">
+              システム障害の記録と対応状況
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 未認証時の表示 -->
+      <div id="loginRequired" class="login-required">
+        <div class="login-icon">🔐</div>
+        <div class="login-message">
+          このページを表示するにはログインが必要です
+        </div>
+        <button class="login-button" onclick="showLoginModal()">
+          ログイン
+        </button>
+      </div>
+    </div>
+    
+    <script>
+      // 簡易的な認証チェック（実装例）
+      (function() {
+        const privateContent = document.getElementById('privateContent');
+        const loginRequired = document.getElementById('loginRequired');
+        
+        // localStorageから認証トークンを確認
+        const authToken = localStorage.getItem('auth_token');
+        const isAuthenticated = authToken !== null;
+        
+        if (isAuthenticated) {
+          privateContent.style.display = 'block';
+          loginRequired.style.display = 'none';
+        } else {
+          privateContent.style.display = 'none';
+          loginRequired.style.display = 'block';
+        }
+      })();
+      
+      // ログインモーダルの表示（実装例）
+      function showLoginModal() {
+        alert('ログイン機能は実装準備中です。\n\nデモ用：コンソールで以下を実行してください:\nlocalStorage.setItem("auth_token", "demo-token")');
+      }
+    </script>

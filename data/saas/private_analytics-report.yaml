@@ -1,0 +1,294 @@
+# プライベート分析レポート - 機密データを含むレポート
+
+- id: private-analytics-report
+  category: 8
+  category_name: プライベート
+  title: 機密分析レポート
+  private: true
+  required_roles: ["admin", "analyst"]
+  content: |
+    経営層・分析チーム限定の詳細な分析レポート。売上データ、ユーザー行動分析、競合分析などを含みます。
+  
+  custom_html: |
+    <style>
+      .private-report {
+        background: var(--card);
+        border: 2px solid #9775fa;
+        border-radius: 12px;
+        padding: 24px;
+        margin: 20px 0;
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .private-report::before {
+        content: 'SAMPLE';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(-30deg);
+        font-size: 10rem;
+        font-weight: bold;
+        color: var(--text);
+        opacity: 0.5;
+        pointer-events: none;
+        z-index: 9999;
+        white-space: nowrap;
+      }
+      
+      .report-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--border);
+      }
+      
+      .report-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--text);
+      }
+      
+      .confidential-label {
+        background: #9775fa;
+        color: white;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      
+      .report-metrics {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+      }
+      
+      .metric-box {
+        background: var(--sidebar-bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 20px;
+      }
+      
+      .metric-label {
+        font-size: 0.85rem;
+        color: var(--text-weak);
+        margin-bottom: 8px;
+      }
+      
+      .metric-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 4px;
+      }
+      
+      .metric-change {
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+      
+      .metric-change.positive {
+        color: #10b981;
+      }
+      
+      .metric-change.negative {
+        color: #ef4444;
+      }
+      
+      .chart-container {
+        background: var(--sidebar-bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-weak);
+      }
+      
+      .data-table {
+        width: 100%;
+        background: var(--sidebar-bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      
+      .data-table th,
+      .data-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+      }
+      
+      .data-table th {
+        background: var(--card);
+        font-weight: 600;
+        color: var(--text);
+      }
+      
+      .data-table tr:last-child td {
+        border-bottom: none;
+      }
+      
+      .data-table tr:hover {
+        background: var(--card);
+      }
+      
+      .auth-warning {
+        background: rgba(151, 117, 250, 0.1);
+        border: 1px solid #9775fa;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      
+      .auth-warning-icon {
+        font-size: 2rem;
+        margin-bottom: 10px;
+      }
+      
+      .auth-warning-text {
+        color: var(--text);
+        font-size: 1rem;
+      }
+    </style>
+    
+    <div class="private-report" data-private="true" data-required-roles="admin,analyst">
+      <div class="report-header">
+        <h1 class="report-title">機密分析レポート</h1>
+        <div class="confidential-label">
+          <span>🔒</span>
+          <span>CONFIDENTIAL</span>
+        </div>
+      </div>
+      
+      <div class="auth-warning">
+        <div class="auth-warning-icon">⚠️</div>
+        <div class="auth-warning-text">
+          このレポートには機密情報が含まれています。権限のない第三者との共有は禁止されています。
+        </div>
+      </div>
+      
+      <!-- 認証済みコンテンツ -->
+      <div id="reportContent" style="display: none;">
+        <!-- KPIメトリクス -->
+        <div class="report-metrics">
+          <div class="metric-box">
+            <div class="metric-label">月間収益（MRR）</div>
+            <div class="metric-value">¥12.5M</div>
+            <div class="metric-change positive">↑ 23.5% (前月比)</div>
+          </div>
+          
+          <div class="metric-box">
+            <div class="metric-label">アクティブユーザー数</div>
+            <div class="metric-value">45,678</div>
+            <div class="metric-change positive">↑ 15.2% (前月比)</div>
+          </div>
+          
+          <div class="metric-box">
+            <div class="metric-label">解約率（Churn Rate）</div>
+            <div class="metric-value">2.3%</div>
+            <div class="metric-change positive">↓ 0.5% (前月比)</div>
+          </div>
+          
+          <div class="metric-box">
+            <div class="metric-label">顧客獲得コスト（CAC）</div>
+            <div class="metric-value">¥8,500</div>
+            <div class="metric-change negative">↑ 5.2% (前月比)</div>
+          </div>
+        </div>
+        
+        <!-- チャートプレースホルダー -->
+        <div class="chart-container">
+          <div>📊 収益成長チャート（Chart.js実装予定）</div>
+        </div>
+        
+        <!-- データテーブル -->
+        <h3 style="margin: 30px 0 15px; color: var(--text);">顧客セグメント別分析</h3>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>セグメント</th>
+              <th>顧客数</th>
+              <th>平均単価</th>
+              <th>LTV</th>
+              <th>成長率</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>エンタープライズ</td>
+              <td>234</td>
+              <td>¥125,000</td>
+              <td>¥2,500,000</td>
+              <td class="metric-change positive">+35%</td>
+            </tr>
+            <tr>
+              <td>中小企業</td>
+              <td>1,256</td>
+              <td>¥35,000</td>
+              <td>¥420,000</td>
+              <td class="metric-change positive">+22%</td>
+            </tr>
+            <tr>
+              <td>スタートアップ</td>
+              <td>3,478</td>
+              <td>¥12,000</td>
+              <td>¥96,000</td>
+              <td class="metric-change positive">+18%</td>
+            </tr>
+            <tr>
+              <td>個人</td>
+              <td>8,912</td>
+              <td>¥3,500</td>
+              <td>¥21,000</td>
+              <td class="metric-change negative">-5%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- 未認証時の表示 -->
+      <div id="reportLoginRequired" class="login-required" style="display: none;">
+        <div class="login-icon">🔐</div>
+        <div class="login-message">
+          このレポートを表示するには管理者またはアナリスト権限が必要です
+        </div>
+        <button class="login-button" onclick="showLoginModal()">
+          ログイン
+        </button>
+      </div>
+    </div>
+    
+    <script>
+      // 認証チェック（実装例）
+      (function() {
+        const reportContent = document.getElementById('reportContent');
+        const loginRequired = document.getElementById('reportLoginRequired');
+        
+        // 簡易的な権限チェック
+        const authToken = localStorage.getItem('auth_token');
+        const userRole = localStorage.getItem('user_role') || 'guest';
+        const hasAccess = authToken && ['admin', 'analyst'].includes(userRole);
+        
+        if (hasAccess) {
+          reportContent.style.display = 'block';
+          loginRequired.style.display = 'none';
+        } else {
+          reportContent.style.display = 'none';
+          loginRequired.style.display = 'block';
+        }
+      })();
+    </script>

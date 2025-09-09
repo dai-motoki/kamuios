@@ -10,6 +10,7 @@
     - static/data/prompts/requirements-docs-agent.md
     - static/data/prompts/hiring-agent.md
     - static/data/prompts/designer-agent.md
+    - static/data/prompts/private-saas-developer.md
   custom_html: |
     <style>
       .prompt-md { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
@@ -100,6 +101,12 @@
               { title: 'KAMUI OS 要件定義書 執筆', status: 'doing' },
               { title: 'KAMUI OS NPM 要件定義書 執筆', status: 'doing' },
               { title: 'SNSマーケダッシュボード 要件定義書 執筆', status: 'doing' }
+            ]},
+            { name: 'ケンジ', role: 'プライベートSaaS開発', tasks: [
+              { title: '認証システム設計', status: 'done' },
+              { title: 'JWT認証実装', status: 'doing' },
+              { title: 'ロールベースアクセス制御', status: 'todo' },
+              { title: 'API暗号化対応', status: 'todo' }
             ]}
           ];
           const icon = (s)=> s==='done'?'✅':(s==='doing'?'🟧':'⬜️');
@@ -126,8 +133,8 @@
           el.dataset.docId = id;
           return { id, title, path, el };
         });
-        // 並び順: 拓海, ミナ, 採用担当, デザイナー, エミリー（エミリーを右端に）
-        const order = ['create-new-page.v2.md','media-assets-guidelines.md','hiring-agent.md','designer-agent.md','requirements-docs-agent.md'];
+        // 並び順: 拓海, ミナ, 採用担当, デザイナー, プライベートSaaS開発者, エミリー（エミリーを右端に）
+        const order = ['create-new-page.v2.md','media-assets-guidelines.md','hiring-agent.md','designer-agent.md','private-saas-developer.md','requirements-docs-agent.md'];
         items.sort((a,b)=>{
           const aIdx = order.findIndex(k => (a.path||'').endsWith(k));
           const bIdx = order.findIndex(k => (b.path||'').endsWith(k));
@@ -139,6 +146,7 @@
           ['media-assets-guidelines.md','画像/動画アセットの置き場所と参照ルール'],
           ['designer-agent.md','デザイナー（UI/ビジュアル）'],
           ['hiring-agent.md','採用担当（Recruiter）'],
+          ['private-saas-developer.md','プライベートSaaS開発者'],
           ['requirements-docs-agent.md','要件定義執筆担当（KAMUI OS / KAMUI CODE）']
         ]);
         items.forEach(it => {
@@ -183,6 +191,10 @@
           if (/designer-agent\.md$/.test(it.path||'')) {
             img = '<video class="card-video" src="/videos/designer_card_video_square.mp4" poster="/images/agent_card.png" autoplay loop muted playsinline></video>'+
                   '<span class="card-name">サラ</span>';
+          }
+          if (/private-saas-developer\.md$/.test(it.path||'')) {
+            img = '<video class="card-video" src="/videos/private_dev_card_video_square.mp4" poster="/images/private_dev_card.png" autoplay loop muted playsinline></video>'+
+                  '<span class="card-name">ケンジ</span>';
           }
           card.innerHTML = `<div class="card-title">${it.title}</div>${img}`;
           card.addEventListener('click', () => showDoc(it.id));
