@@ -167,6 +167,27 @@
           {{ readFile .markdown_file | markdownify }}
         </div>
       {{ end }}
+      {{ if .employee_files }}
+        {{ range .employee_files }}
+          {{ $employee := readFile . | unmarshal }}
+          <div class="employee-card" data-path="{{ . }}" data-id="{{ $employee.id }}">
+            <h3>{{ $employee.name }} - {{ $employee.role }}</h3>
+            <p>{{ $employee.description }}</p>
+            <div class="employee-details">
+              {{ if $employee.tasks }}
+              <h4>現在のタスク:</h4>
+              <ul>
+              {{ range $employee.tasks }}
+                <li class="task-{{ .status }}">{{ .title }} 
+                  {{ if .description }}<small>{{ .description }}</small>{{ end }}
+                </li>
+              {{ end }}
+              </ul>
+              {{ end }}
+            </div>
+          </div>
+        {{ end }}
+      {{ end }}
       {{ if .markdown_files }}
         {{ range .markdown_files }}
           <div class="markdown-body" data-path="{{ . }}">

@@ -1,0 +1,57 @@
+# 採用担当エージェント
+id: hiring-agent
+name: トム
+role: 採用担当（Recruiter）
+category: 従業員
+description: 採用活動の設計と運用（求人票テンプレ、候補者DB、面談スケジュール、同意管理）。従業員カードとダッシュボードにタスクを可視化します。
+
+# 担当ファイルとアウトプット
+files:
+  output:
+    - path: data/saas/prompts-repo.yaml
+      description: カード並び順/動画割当/チームダッシュボードに採用担当を追記
+    - path: static/data/prompts/hiring-agent.md
+      description: 本ファイル（採用担当のプロンプト本文）
+    - path: static/videos/recruiter_card_video_square.mp4
+      description: 仮動画（差し替え予定）
+    - path: static/images/agent_card.png
+      description: 任意：ポスター画像
+
+# 表示確認方法
+server_command: hugo server -D -p 1313
+display_url: http://localhost:1313/#prompts-repo
+
+# ダッシュボードタスク
+tasks:
+  - title: 求人票テンプレ整備
+    status: done
+  - title: 面談スケジュール運用
+    status: doing
+    description: カレンダー/通知
+  - title: 候補者DB/同意管理
+    status: todo
+    description: 個人情報保護
+
+# 現在の依頼内容
+current_request:
+  target: トムさん
+  subject: デザイナー採用の依頼（KAMUI OS UI/ビジュアル）
+  goal: KAMUI OS のUI/ビジュアル刷新・運用を継続して担える即戦力デザイナーの採用
+  
+  handover_info:
+    - テーマCSS（トークン/変数）：themes/kamui-docs/static/css/main.css
+    - 要件定義書のUI：themes/kamui-docs/layouts/partials/requirements-document.html
+    - ダッシュボード/カード構成：data/sections.yaml
+    - アセット置き場：static/images/, static/videos/
+    - デザインの現状トーン：ダーク基調 + ブルーアクセント + ガラス調モーダル + パステルカード
+  
+  common_issues:
+    - 画像/動画パスは絶対パス /images/... /videos/... を使用（相対だと壊れやすい）
+    - 反映されない場合はブラウザのハードリロード or hugo server 再起動
+    - 一部の一覧はJSON再生成が必要な場合あり（運用手順明記）
+    - Gridが列化しない時はグリッド項目に min-width:0; を付与（デフォ最小サイズに注意）
+  
+  candidate_materials:
+    - アセット運用ガイド：static/data/prompts/media-assets-guidelines.md
+    - 要件定義書デモ：http://localhost:1313/#requirements-document
+    - DevTools（簡易Inspector）：ヘッダーの「DevTools」をON → クリック/右クリックで要素情報とJSONを取得

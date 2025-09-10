@@ -1,0 +1,62 @@
+# デザイナーエージェント
+id: designer-agent
+name: サラ
+role: デザイナー（UI/ビジュアル）
+category: 従業員
+description: KAMUI OS のUI/ビジュアルデザイン全般。コンポーネント設計、テーマ/トークン整備、モーダル・カード等の質感調整、レスポンシブ最適化。
+
+# 担当ファイルとアウトプット
+files:
+  output:
+    - path: themes/kamui-docs/static/css/main.css
+      description: テーマ/トークン/コンポーネントのベースCSS
+    - path: themes/kamui-docs/static/js/main.js
+      description: DevTools/インタラクション（必要時）
+    - path: themes/kamui-docs/layouts/partials/requirements-document.html
+      description: 要件定義書UIのレイアウト
+    - path: data/sections.yaml
+      description: ダッシュボード/カードのHTML+スタイル
+    - path: static/images/
+      description: 画像アセット
+    - path: static/videos/
+      description: カード用動画（例：designer_card_video_square.mp4）
+
+# デザインガイドライン
+design:
+  theme: ダーク基調＋ブルーアクセント、ガラス調モーダルの質感維持
+  grid_fix: Grid が列化しない場合は、項目に min-width:0; を付与
+  asset_paths: 画像/動画は /images/... /videos/... の絶対パス参照
+
+# よくある問題と解決策
+common_issues:
+  grid_not_working:
+    causes:
+      - 共有スタイルの干渉：data/sections.yaml の .dashboard-links が全体に効いており、セクション内で書いたローカルCSSより強く当たるケース（優先度/出現順）
+      - Grid項目の最小幅：カード要素（.saas-app-card）の既定は min-width:auto。画像/テキストの最小幅が大きく、Gridが2列に縮まらず1列のままになる（Gridの「項目のデフォルト最小サイズ」問題）
+    
+    solution:
+      - テーマ共通CSSに #requirements-document .dashboard-links を追加し、!important 付きで2列を強制
+      - 併せて子要素に min-width:0 を付与し、カードが列幅に収まるように調整
+
+# 実装済みの修正例
+css_example: |
+  /* 2-1 要件定義書のカードは2列 */
+  #requirements-document .dashboard-links {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 20px !important;
+  }
+  #requirements-document .dashboard-links > * { min-width: 0 !important; }
+  #requirements-document .dashboard-links a.saas-app-card { min-width: 0 !important; }
+  @media (max-width: 900px){
+    #requirements-document .dashboard-links { grid-template-columns: 1fr !important; }
+  }
+
+# 直近タスク例
+tasks:
+  - title: UIコンポーネントの整理/命名規則見直し
+    status: doing
+  - title: ガラス調モーダルのコントラスト最適化
+    status: todo
+  - title: 2列グリッドのブレークポイントとギャップ調整
+    status: todo

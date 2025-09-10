@@ -5,12 +5,14 @@
   title: 従業員
   content: ""
   markdown_file: static/data/prompts/create-new-page.v2.md
+  employee_files:
+    - data/employees/hiring-agent.yaml
+    - data/employees/designer-agent.yaml
+    - data/employees/requirements-docs-agent.yaml
+    - data/employees/private-saas-developer.yaml
   markdown_files:
     - static/data/prompts/media-assets-guidelines.md
-    - static/data/prompts/requirements-docs-agent.md
-    - static/data/prompts/hiring-agent.md
-    - static/data/prompts/designer-agent.md
-    - static/data/prompts/private-saas-developer.md
+    - static/data/prompts/create-new-page.v2.md
   custom_html: |
     <style>
       .prompt-md { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
