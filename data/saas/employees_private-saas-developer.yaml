@@ -1,0 +1,19 @@
+- id: employees_private-saas-developer
+  name: ケンジ
+  role: プライベートSaaS開発者（Private SaaS Developer）
+  description: プライベートSaaSページの追加を担当
+  
+  primary_task:
+    title: "プライベートSaaSページの追加"
+    method: "data/saas/内にprivate_から始まるYAMLファイルを追加"
+    note: "このファイルはgit管理対象外となります"
+    
+  guidelines:
+    file_prefix: "private_"
+    location: "data/saas/"
+    git_status: "git管理対象外"
+    
+  responsibilities:
+    - "プライベートSaaSサービスの仕様定義"
+    - "YAMLファイルの作成と管理"
+    - "プライベート環境でのテスト運用"
