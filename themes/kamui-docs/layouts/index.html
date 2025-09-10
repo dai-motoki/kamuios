@@ -181,6 +181,30 @@
           </div>
         {{ end }}
       {{ end }}
+      {{ if .yaml_files }}
+        {{ range .yaml_files }}
+          {{ $yamlData := (index (split . "/") -1) }}
+          {{ $yamlPath := replace . "/" "." }}
+          {{ $dataPath := replace $yamlPath "data.saas." "" }}
+          {{ $yamlContent := index $.Site.Data.saas $dataPath }}
+          {{ if $yamlContent }}
+            {{ range $yamlContent }}
+              <div class="yaml-employee-body" data-path="{{ $yamlPath }}" data-employee-id="{{ .id }}">
+                <h3>{{ .name }} - {{ .role }}</h3>
+                <p>{{ .description }}</p>
+                {{ if .current_tasks }}
+                  <h4>現在のタスク</h4>
+                  <ul>
+                    {{ range .current_tasks }}
+                      <li>{{ .title }} ({{ .status }})</li>
+                    {{ end }}
+                  </ul>
+                {{ end }}
+              </div>
+            {{ end }}
+          {{ end }}
+        {{ end }}
+      {{ end }}
       
       {{ if .image }}
       <div class="section-image">

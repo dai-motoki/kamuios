@@ -1,0 +1,53 @@
+- id: employees_designer-agent
+  name: サラ
+  role: デザイナー（UI/ビジュアル）
+  description: KAMUI OS のUI/ビジュアルデザイン全般。コンポーネント設計、テーマ/トークン整備、モーダル・カード等の質感調整、レスポンシブ最適化。
+  
+  responsible_files:
+    - themes/kamui-docs/static/css/main.css
+    - themes/kamui-docs/static/js/main.js
+    - themes/kamui-docs/layouts/partials/requirements-document.html
+    - data/sections.yaml
+    - static/images/
+    - static/videos/
+  
+  current_tasks:
+    - title: UIコンポーネントの整理/命名規則見直し
+      status: todo
+    - title: ガラス調モーダルのコントラスト最適化
+      status: doing
+    - title: 2列グリッドのブレークポイントとギャップ調整
+      status: todo
+      
+  design_guidelines:
+    theme: "ダーク基調＋ブルーアクセント、ガラス調モーダルの質感維持"
+    grid_fix: "Grid が列化しない場合は、項目に min-width: 0; を付与"
+    asset_paths: "画像/動画は /images/... /videos/... の絶対パス参照"
+    
+  common_issues:
+    grid_column_fix:
+      cause1: "共有スタイルの干渉 - data/sections.yaml の .dashboard-links が全体に効いており、セクション内で書いたローカルCSSより強く当たるケース（優先度/出現順）"
+      cause2: "Grid項目の最小幅 - カード要素（.saas-app-card）の既定は min-width:auto。画像/テキストの最小幅が大きく、Gridが2列に縮まらず1列のままになる（Gridの「項目のデフォルト最小サイズ」問題）"
+      
+      solution: "テーマ共通CSSに #requirements-document .dashboard-links を追加し、!important 付きで2列を強制。併せて子要素に min-width:0 を付与し、カードが列幅に収まるように調整"
+      
+      implemented_code: |
+        /* 2-1 要件定義書のカードは2列 */
+        #requirements-document .dashboard-links {
+          display: grid !important;
+          grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+          gap: 20px !important;
+        }
+        #requirements-document .dashboard-links > * { min-width: 0 !important; }
+        #requirements-document .dashboard-links a.saas-app-card { min-width: 0 !important; }
+        @media (max-width: 900px){
+          #requirements-document .dashboard-links { grid-template-columns: 1fr !important; }
+        }
+        
+  files_structure:
+    css: "themes/kamui-docs/static/css/main.css - テーマ/トークン/コンポーネントのベースCSS"
+    js: "themes/kamui-docs/static/js/main.js - DevTools/インタラクション（必要時）"
+    layout: "themes/kamui-docs/layouts/partials/requirements-document.html - 要件定義書UIのレイアウト"
+    config: "data/sections.yaml - ダッシュボード/カードのHTML+スタイル"
+    images: "static/images/ - 画像アセット"
+    videos: "static/videos/ - カード用動画（例: designer_card_video_square.mp4）"
