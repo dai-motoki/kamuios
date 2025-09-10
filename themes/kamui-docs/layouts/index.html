@@ -17,14 +17,21 @@
   {{ with .Site.Data.saas }}
     {{ range $k, $arr := . }}
       {{ range $arr }}
-        {{ $all = $all | append . }}
+        {{/* private_で始まるファイルの場合は、source_fileフィールドを追加 */}}
+        {{ $item := . }}
+        {{ if hasPrefix $k "private_" }}
+          {{ $item = $item | merge (dict "source_file" $k "is_private" true) }}
+        {{ else }}
+          {{ $item = $item | merge (dict "source_file" $k "is_private" false) }}
+        {{ end }}
+        {{ $all = $all | append $item }}
       {{ end }}
     {{ end }}
   {{ end }}
 
   {{ range $all }}
-  <section class="doc-section" id="{{ .id }}" data-cat="{{ .category }}" data-cat-name="{{ .category_name }}">
-    <h2>{{ .title }}</h2>
+  <section class="doc-section" id="{{ .id }}" data-cat="{{ .category }}" data-cat-name="{{ .category_name }}" data-is-private="{{ .is_private }}">
+    <h2>{{ if .is_private }}<span aria-label="プライベートファイル">🔒</span> {{ end }}{{ .title }}</h2>
     {{ if hasPrefix .id "requirements-" }}
       {{ $item := . }}
       {{ $secId := .id }}

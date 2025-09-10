@@ -32,8 +32,13 @@ function buildToc(){
     const catName = sec.dataset.catName || 'その他';
     const id = sec.id ? `#${sec.id}` : '';
     const h2 = sec.querySelector('h2');
+    const isPrivate = sec.dataset.isPrivate === 'true';
     let title = h2 ? (h2.innerText || h2.textContent || id) : id;
     title = title.replace(/^\s*\d+[.\-]\s*/, '');
+    // private_ファイルの場合は鍵アイコンを追加（既にHTMLで追加されている場合は重複を避ける）
+    if (isPrivate && !title.includes('🔒')) {
+      title = `🔒 ${title}`;
+    }
     // ダッシュボード項目は除外
     if (id === '#saas-applications-overview') return;
     // 章1（ダッシュボード）配下の項目もTOCに含める
