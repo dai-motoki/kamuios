@@ -3,6 +3,7 @@ name: Claude Code Review
 permissions:
   contents: read
   pull-requests: write
+  id-token: write
 
 on:
   pull_request:
