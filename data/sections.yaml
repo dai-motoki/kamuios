@@ -6,6 +6,8 @@
   title: ダッシュボード
   content: ""
   custom_html: |
+    {{ partial "dynamic-saas-dashboard" . }}
+    <!-- Original hardcoded content follows as fallback -->
     <style>
       .dashboard-sections {
         margin-bottom: 40px;
