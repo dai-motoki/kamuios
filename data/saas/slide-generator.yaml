@@ -5,12 +5,7 @@
   category: 4
   category_name: ビジネスツール
   title: スライドエディタ
-  content: "プレゼンテーション用スライドを表示・編集するエディタ"
-  video: "/videos/slide_editor_card.mp4"
-  features:
-    - "スライド表示"
-    - "ページナビゲーション"
-    - "フルスクリーン対応"
+  content: ""
   custom_html: |
     <style>
       .slide-generator {

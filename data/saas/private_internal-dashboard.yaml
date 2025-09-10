@@ -6,12 +6,8 @@
   title: 社内限定ダッシュボード
   private: true
   required_roles: ["admin", "member"]
-  content: "社内メンバー限定のダッシュボードです。機密情報や内部ツールへのアクセスを提供します。"
-  video: "/videos/private_dashboard_card.mp4"
-  features:
-    - "機密情報管理"
-    - "内部ツール"
-    - "メンバー限定"
+  content: |
+    社内メンバー限定のダッシュボードです。機密情報や内部ツールへのアクセスを提供します。
   
   custom_html: |
     <style>

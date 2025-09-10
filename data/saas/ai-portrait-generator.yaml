@@ -5,12 +5,7 @@
   category: 3
   category_name: メディアエディタ
   title: AI Portrait Generator
-  content: "手書きスケッチからAIで高品質な画像を生成するメディアエディタ"
-  video: "/videos/ai_portrait_card.mp4"
-  features:
-    - "リアルタイムプレビュー"
-    - "参照画像ギャラリー"
-    - "描画ツール内蔵"
+  content: ""
   custom_html: |
     <div style="margin-bottom: 20px;">
       <button onclick="window.location.hash=''; location.reload();" style="padding: 8px 16px; background: #4a4a4a; border: none; border-radius: 6px; color: white; cursor: pointer; font-size: 14px;">
