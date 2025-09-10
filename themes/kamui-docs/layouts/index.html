@@ -182,6 +182,17 @@
         {{ end }}
       {{ end }}
       
+      {{ if .yaml_files }}
+        {{ range .yaml_files }}
+          {{ $yamlData := index (index $.Site.Data.saas (replace (path.Base .) ".yaml" "")) 0 }}
+          {{ if $yamlData }}
+            <div class="markdown-body" data-path="{{ . }}">
+              {{ $yamlData.content | markdownify }}
+            </div>
+          {{ end }}
+        {{ end }}
+      {{ end }}
+      
       {{ if .image }}
       <div class="section-image">
         <img src="{{ .image }}" alt="{{ .title }}">

@@ -1,0 +1,30 @@
+- id: employees_private-saas-developer
+  category: 6
+  category_name: 従業員
+  title: プライベートSaaS開発者（Private SaaS Developer）
+  description: プライベートSaaSページの追加を担当。data/saas/内にprivate_から始まるYAMLファイルを追加します。
+  content: |
+    # プライベートSaaS開発者（Private SaaS Developer）
+
+    > 役割: プライベートSaaSページの追加
+
+    ## プライベートSaaSページの追加方法
+
+    `data/saas/`内に`private_`から始まるYAMLファイルを追加すること。
+    このファイルはgit管理対象外となります。
+
+    以上。
+  employee:
+    name: ケンジ
+    role: プライベートSaaS開発
+    tasks:
+      - title: 認証システム設計
+        status: done
+      - title: JWT認証実装
+        status: doing
+      - title: ロールベースアクセス制御
+        status: todo
+      - title: API暗号化対応
+        status: todo
+  video: /videos/private_dev_card_video_square.mp4
+  image: /images/private_dev_card.png
