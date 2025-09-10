@@ -1,0 +1,236 @@
+{{/* 従業員詳細表示用パーシャル */}}
+<style>
+  .employee-detail {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  
+  .employee-header {
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  
+  .employee-video {
+    width: 400px;
+    height: 400px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  }
+  
+  .employee-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+  
+  .employee-role {
+    font-size: 1.2rem;
+    color: var(--text-weak);
+    margin-bottom: 8px;
+  }
+  
+  .employee-description {
+    font-size: 1rem;
+    color: var(--text-weak);
+    line-height: 1.7;
+  }
+  
+  .employee-content {
+    color: var(--text);
+    line-height: 1.9;
+  }
+  
+  /* 見出しスタイル */
+  .employee-content h1, 
+  .employee-content h2, 
+  .employee-content h3, 
+  .employee-content h4 {
+    color: var(--text);
+    margin: 24px 0 16px;
+    font-weight: 700;
+  }
+  
+  .employee-content h1 { font-size: 1.8rem; }
+  .employee-content h2 { 
+    font-size: 1.5rem; 
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 8px;
+  }
+  .employee-content h3 { font-size: 1.3rem; }
+  .employee-content h4 { font-size: 1.1rem; }
+  
+  /* 段落・リスト */
+  .employee-content p {
+    color: var(--text-weak);
+    margin: 12px 0 16px;
+    line-height: 1.8;
+  }
+  
+  .employee-content ul, .employee-content ol {
+    padding-left: 1.5em;
+    margin: 12px 0 16px;
+  }
+  
+  .employee-content li {
+    color: var(--text-weak);
+    margin: 8px 0;
+    line-height: 1.7;
+  }
+  
+  /* 引用 */
+  .employee-content blockquote {
+    margin: 16px 0;
+    padding: 12px 16px;
+    border-left: 4px solid var(--link);
+    background: color-mix(in srgb, var(--card) 50%, var(--link) 5%);
+    color: var(--text);
+    border-radius: 8px;
+  }
+  
+  .employee-content blockquote p {
+    margin: 0;
+    color: var(--text);
+  }
+  
+  /* コードブロック */
+  .employee-content pre {
+    background: var(--code-bg);
+    border: 1px solid var(--code-border);
+    border-radius: 8px;
+    padding: 16px;
+    overflow-x: auto;
+    margin: 16px 0;
+  }
+  
+  .employee-content code {
+    font-family: ui-monospace, monospace;
+    font-size: 0.9rem;
+  }
+  
+  .employee-content :not(pre) > code {
+    background: var(--code-bg);
+    border: 1px solid var(--code-border);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--text);
+  }
+  
+  /* テーブル */
+  .employee-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+  }
+  
+  .employee-content th,
+  .employee-content td {
+    border: 1px solid var(--border);
+    padding: 10px 12px;
+    text-align: left;
+  }
+  
+  .employee-content th {
+    background: var(--sidebar-bg);
+    color: var(--text);
+    font-weight: 600;
+  }
+  
+  .employee-content td {
+    color: var(--text-weak);
+  }
+  
+  /* リンク */
+  .employee-content a {
+    color: var(--link);
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+  
+  .employee-content a:hover {
+    text-decoration: underline;
+    opacity: 0.8;
+  }
+  
+  /* ステータスバッジ */
+  .employee-content .status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin: 0 4px;
+  }
+  
+  .employee-content .status-todo {
+    background: color-mix(in srgb, #3b82f6 20%, transparent);
+    color: #3b82f6;
+    border: 1px solid #3b82f6;
+  }
+  
+  .employee-content .status-doing {
+    background: color-mix(in srgb, #10b981 20%, transparent);
+    color: #10b981;
+    border: 1px solid #10b981;
+  }
+  
+  .employee-content .status-done {
+    background: color-mix(in srgb, #6b7280 20%, transparent);
+    color: #6b7280;
+    border: 1px solid #6b7280;
+  }
+  
+  /* レスポンシブ対応 */
+  @media (max-width: 768px) {
+    .employee-detail {
+      padding: 16px;
+    }
+    
+    .employee-video {
+      width: 300px;
+      height: 300px;
+    }
+    
+    .employee-title {
+      font-size: 1.5rem;
+    }
+    
+    .employee-role {
+      font-size: 1rem;
+    }
+  }
+</style>
+
+<div class="employee-detail">
+  {{/* ヘッダー部分 */}}
+  <div class="employee-header">
+    {{ if .video }}
+      <video class="employee-video" src="{{ .video }}" autoplay loop muted playsinline controls>
+        Your browser does not support the video tag.
+      </video>
+    {{ else if .image }}
+      <img class="employee-video" src="{{ .image }}" alt="{{ .title }}" />
+    {{ else }}
+      <video class="employee-video" src="/videos/agent_card.mp4" autoplay loop muted playsinline controls>
+        Your browser does not support the video tag.
+      </video>
+    {{ end }}
+    
+    <h1 class="employee-title">{{ .title }}</h1>
+    
+    {{ if .description }}
+      <p class="employee-description">{{ .description }}</p>
+    {{ end }}
+  </div>
+  
+  {{/* コンテンツ部分 */}}
+  <div class="employee-content">
+    {{ .content | markdownify }}
+  </div>
+</div>

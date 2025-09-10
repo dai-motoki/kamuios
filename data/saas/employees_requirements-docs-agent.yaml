@@ -1,8 +1,9 @@
 - id: employees_requirements-docs-agent
-  category: 6
+  category: 10
   category_name: 従業員
   title: 要件定義執筆担当（KAMUI OS / KAMUI CODE）
   description: 本リポジトリの要件定義書（KAMUI CODE / KAMUI OS）を編集・追加・導線調整する担当。ディレクトリ構成と表示ロジックを理解し、最短手順で改修を行う。
+  video: /videos/requirements_doc_card.mp4
   content: |
     # 要件定義執筆担当（KAMUI OS / KAMUI CODE）
 
@@ -85,4 +86,3 @@
       - title: SNSマーケダッシュボード 要件定義書 執筆
         status: doing
   video: /videos/agent_card_video_square.mp4
-  image: /images/agent_card.png

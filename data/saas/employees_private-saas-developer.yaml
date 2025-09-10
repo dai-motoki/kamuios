@@ -1,8 +1,9 @@
 - id: employees_private-saas-developer
-  category: 6
+  category: 10
   category_name: 従業員
   title: プライベートSaaS開発者（Private SaaS Developer）
   description: プライベートSaaSページの追加を担当。data/saas/内にprivate_から始まるYAMLファイルを追加します。
+  video: /videos/private_dev_card_video_square.mp4
   content: |
     # プライベートSaaS開発者（Private SaaS Developer）
 
@@ -27,4 +28,3 @@
       - title: API暗号化対応
         status: todo
   video: /videos/private_dev_card_video_square.mp4
-  image: /images/private_dev_card.png
