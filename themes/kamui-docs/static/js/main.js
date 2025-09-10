@@ -342,7 +342,7 @@ document.querySelectorAll('.tag').forEach(tag => {
   });
 });
 
-// サイドバー開閉（モバイル）
+// サイドバー開閉（モバイル + デスクトップ）
 const sidebar = document.getElementById('sidebar');
 const backdrop = document.getElementById('sidebarBackdrop');
 const toggleBtn = document.getElementById('toggleSidebar');
@@ -350,7 +350,18 @@ function closeSidebar(){ sidebar?.classList.remove('open'); backdrop?.classList.
 function openSidebar(){ sidebar?.classList.add('open'); backdrop?.classList.add('show'); }
 toggleBtn?.addEventListener('click', () => {
   if (!sidebar) return;
-  sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  if (isMobile) {
+    // 従来どおりオーバーレイ付きのスライド開閉
+    sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+  } else {
+    // デスクトップではサイドバー自体を折りたたみ（非表示）
+    const collapsed = sidebar.classList.toggle('collapsed');
+    if (collapsed) {
+      // 念のためモバイル用の状態も解除
+      closeSidebar();
+    }
+  }
 });
 backdrop?.addEventListener('click', closeSidebar);
 

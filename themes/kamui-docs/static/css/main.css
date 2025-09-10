@@ -89,7 +89,7 @@ body {
 
 /* メイン領域（ヘッダ＋本文） */
 .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-.header-bar { display: flex; align-items: center; gap: 10px; padding: 15px 20px; background: var(--sidebar-bg); border-bottom: 1px solid var(--border); }
+.header-bar { display: flex; align-items: center; gap: 10px; padding: 15px 20px; background: var(--sidebar-bg); border-bottom: 1px solid var(--border); position: relative; z-index: 1100; }
 .menu-btn { display: none; padding: 8px 10px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text-weak); cursor: pointer; }
 .search-bar { flex: 1; max-width: 520px; padding: 8px 15px; background: var(--input-bg); border: 1px solid var(--border); border-radius: 20px; color: var(--text); font-size: 0.9rem; outline: none; transition: all 0.2s; }
 .search-bar:focus { border-color: var(--link); box-shadow: 0 0 0 2px color-mix(in srgb, var(--link) 20%, transparent); }
@@ -476,6 +476,12 @@ pre.code code { color: var(--text); }
   .color-swatches { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; }
   .color-swatch { padding: 12px 8px; }
   .typo-item { padding: 12px; }
+}
+/* デスクトップ時にサイドバーを折りたたむためのスタイル */
+@media (min-width: 769px) {
+  .sidebar.collapsed { display: none; }
+  /* サイドバーが閉じている間はデスクトップでもメニューボタンを表示 */
+  .sidebar.collapsed ~ .main-content .header-bar .menu-btn { display: inline-flex; }
 }
 /* さらに狭い幅では2列へ */
 @media (max-width: 640px) {
