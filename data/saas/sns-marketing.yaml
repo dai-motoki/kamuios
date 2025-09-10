@@ -4,6 +4,12 @@
   category: 7
   category_name: SNS・マーケティング
   title: SNS・マーケティング
+  description: 主要チャネル/運用/KPIの整理ページ
+  video: /videos/sns_marketing_card.mp4
+  features:
+    - X/IG/YT/TikTok
+    - KPI
+    - 運用フロー
   content: ""
   markdown_file: static/data/pages/sns-marketing.md
   custom_html: |

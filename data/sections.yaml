@@ -122,6 +122,9 @@
       </div>
     </div>
     
+    <!-- 動的ダッシュボード: data/saas/ディレクトリから自動生成 -->
+    {{ partial "dynamic-saas-dashboard.html" . }}
+    
     <!-- 要件定義・開発セクション -->
     <div class="dashboard-sections">
       <h2 class="dashboard-section-title">要件定義・開発</h2>

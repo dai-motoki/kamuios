@@ -5,6 +5,12 @@
   category: 4
   category_name: ビジネスツール
   title: スライドエディタ
+  description: AIコンテンツ生成+PDF/HTML出力対応のスライド作成ツール
+  video: /videos/slide_editor_card.mp4
+  features:
+    - リアルタイム編集
+    - AI生成
+    - PDF/HTML出力
   content: ""
   custom_html: |
     <style>

@@ -4,6 +4,12 @@
   category: 6
   category_name: 事業構築
   title: 戦略
+  description: 事業戦略の骨子と進め方
+  video: /videos/strategy_card.mp4
+  features:
+    - ターゲット/価値
+    - チャネル・価格
+    - ロードマップ
   content: ""
   custom_html: |
     <style>

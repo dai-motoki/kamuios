@@ -1,0 +1,95 @@
+{{/* 動的SaaSダッシュボード生成テンプレート */}}
+{{/* data/saas/ディレクトリの全YAMLファイルを読み込んでダッシュボードカードを生成 */}}
+
+{{/* カテゴリ定義 */}}
+{{- $categories := dict 
+  "requirements" (dict "title" "要件定義・開発" "order" 1)
+  "media" (dict "title" "メディアエディタ" "order" 2) 
+  "business" (dict "title" "事業構築" "order" 3)
+  "tools" (dict "title" "ツール・ユーティリティ" "order" 4)
+  "other" (dict "title" "その他" "order" 5)
+-}}
+
+{{/* カテゴリ分類関数 */}}
+{{- define "categorize-app" -}}
+  {{- $filename := .filename -}}
+  {{- if or (hasPrefix $filename "requirements-") (hasPrefix $filename "ui-views") (hasPrefix $filename "storyboard-viewer") -}}
+    requirements
+  {{- else if or (hasPrefix $filename "slide-generator") (hasPrefix $filename "ai-portrait-generator") (hasPrefix $filename "dynamic-media-gallery") (hasPrefix $filename "force-graph-3d") (hasPrefix $filename "threejs-3d-editor") -}}
+    media
+  {{- else if or (hasPrefix $filename "biz-") (hasPrefix $filename "sns-marketing") -}}
+    business
+  {{- else if or (hasPrefix $filename "prompts-repo") (hasPrefix $filename "private_") -}}
+    tools
+  {{- else -}}
+    other
+  {{- end -}}
+{{- end -}}
+
+{{/* data/saas/ディレクトリからYAMLファイルを読み込み */}}
+{{- $saasData := dict -}}
+{{- range $path, $content := .Site.Data.saas -}}
+  {{- $filename := $path -}}
+  {{- $category := partial "categorize-app" (dict "filename" $filename) -}}
+  {{- $isPrivate := hasPrefix $filename "private_" -}}
+  
+  {{/* カテゴリ別にグループ化 */}}
+  {{- $categoryList := index $saasData $category | default slice -}}
+  {{- $appData := dict "filename" $filename "data" $content "isPrivate" $isPrivate -}}
+  {{- $categoryList = $categoryList | append $appData -}}
+  {{- $saasData = merge $saasData (dict $category $categoryList) -}}
+{{- end -}}
+
+{{/* カテゴリ順でソート */}}
+{{- $sortedCategories := slice -}}
+{{- range $categoryKey, $categoryInfo := $categories -}}
+  {{- if index $saasData $categoryKey -}}
+    {{- $sortedCategories = $sortedCategories | append (dict "key" $categoryKey "info" $categoryInfo "apps" (index $saasData $categoryKey)) -}}
+  {{- end -}}
+{{- end -}}
+
+{{/* 動的ダッシュボード出力 */}}
+{{- range $sortedCategories -}}
+  <div class="dashboard-sections">
+    <h2 class="dashboard-section-title">{{ .info.title }}</h2>
+    <div class="dashboard-links">
+      {{/* カテゴリ内アプリをファイル名でソート */}}
+      {{- range sort .apps "filename" -}}
+        {{- $app := .data -}}
+        {{- $filename := .filename -}}
+        {{- $isPrivate := .isPrivate -}}
+        
+        <a href="#{{ $filename }}" class="saas-app-card" onclick="showSectionById('{{ $filename }}'); return false;">
+          {{/* 動画またはプレビュー画像 */}}
+          {{- if $app.video -}}
+            <video src="{{ $app.video }}" alt="{{ $app.title | default $filename }}" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;" autoplay loop muted playsinline></video>
+          {{- else if $app.image -}}
+            <img src="{{ $app.image }}" alt="{{ $app.title | default $filename }}" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;" />
+          {{- else -}}
+            <div style="width: 100%; height: 180px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem;">
+              {{- if $isPrivate -}}🔒{{- else -}}📊{{- end -}}
+            </div>
+          {{- end -}}
+          
+          <div class="saas-app-title">
+            {{ $app.title | default $filename }}
+            {{- if $isPrivate -}} 🔒{{- end -}}
+            <span class="saas-app-arrow">→</span>
+          </div>
+          
+          <div class="saas-app-description">
+            {{ $app.description | default "説明なし" | truncate 100 }}
+          </div>
+          
+          {{- if $app.features -}}
+            <div class="saas-app-features">
+              {{- range first 3 $app.features -}}
+                • {{ . }}<br>
+              {{- end -}}
+            </div>
+          {{- end -}}
+        </a>
+      {{- end -}}
+    </div>
+  </div>
+{{- end -}}
