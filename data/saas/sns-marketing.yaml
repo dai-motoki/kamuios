@@ -4,7 +4,9 @@
   category: 7
   category_name: SNS・マーケティング
   title: SNS・マーケティング
-  content: ""
+  content: "SNSマーケティング戦略とコンテンツプランニングのための要件定義書"
+  video: "/videos/sns_marketing.mp4"
+  features: ["コンテンツ戦略", "KPI設計", "投稿スケジューリング", "エンゲージメント分析"]
   markdown_file: static/data/pages/sns-marketing.md
   custom_html: |
     <div style="margin-bottom: 20px;">

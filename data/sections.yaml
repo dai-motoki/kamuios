@@ -87,6 +87,10 @@
     
     <!-- ダッシュボードセクション -->
     <div class="dashboard-sections">
+      
+      <!-- 動的ダッシュボード：data/saas/の全YAMLファイルを自動読み込み -->
+      {{ partial "dynamic-saas-dashboard.html" . }}
+      
       <div class="dashboard-links">
         <a href="#" class="saas-app-card" onclick="window.location.hash=''; location.reload(); return false;">
           <video src="/videos/dashboard_card.mp4" alt="メインダッシュボード" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;" autoplay loop muted playsinline></video>

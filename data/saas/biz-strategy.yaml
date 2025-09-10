@@ -4,7 +4,9 @@
   category: 6
   category_name: 事業構築
   title: 戦略
-  content: ""
+  content: "ターゲットセグメント、提供価値（JTBD）、チャネル・価格戦略、ロードマップを含む事業戦略の骨子を定義"
+  video: "/videos/biz_strategy.mp4"
+  features: ["ペルソナ定義", "JTBD分析", "収益モデル設計", "ロードマップ策定"]
   custom_html: |
     <style>
       .biz-doc { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
