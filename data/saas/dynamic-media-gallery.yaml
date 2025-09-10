@@ -2,7 +2,9 @@
   category: 1
   category_name: ダッシュボード
   title: Dynamic Media Gallery
-  content: ""
+  content: "インタラクティブなメディアギャラリー - 画像、動画、3Dアセットをダイナミックに表示"
+  video: "/videos/media_gallery.mp4"
+  features: ["3Dビューワー", "動画プレビュー", "フィルタリング", "レスポンシブ表示"]
   custom_html: |
     <div style="background: #0f0f0f; border-radius: 12px; overflow: hidden; margin: 20px 0; min-height: 800px; position: relative;">
       <!-- ギャラリー埋め込み -->

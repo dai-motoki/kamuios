@@ -1,0 +1,133 @@
+{{/* 
+  動的SaaS ダッシュボード生成パーシャルテンプレート
+  data/saas/ ディレクトリの全YAMLファイルを自動読み込みしてダッシュボードに表示
+*/}}
+
+{{ $saas_data := .Site.Data.saas }}
+{{ $sections := dict }}
+
+{{/* カテゴリ別にファイルを分類 */}}
+{{ range $file_name, $content := $saas_data }}
+  {{ range $item := $content }}
+    {{ if and $item.category $item.category_name }}
+      {{ $category := printf "%d" $item.category }}
+      {{ if not (index $sections $category) }}
+        {{ $sections = $sections | merge (dict $category slice) }}
+      {{ end }}
+      {{ $current_section := index $sections $category }}
+      {{ $sections = $sections | merge (dict $category ($current_section | append $item)) }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+
+{{/* カテゴリをソートして表示 */}}
+{{ $sorted_categories := sort (keys $sections) }}
+{{ range $category := $sorted_categories }}
+  {{ $items := index $sections $category }}
+  {{ if $items }}
+    {{ $first_item := index $items 0 }}
+    
+    <!-- カテゴリセクション -->
+    <div class="dashboard-section">
+      <h3 class="dashboard-section-title">{{ $first_item.category_name }}</h3>
+      
+      <div class="dashboard-links">
+        {{ range $item := $items }}
+          {{ $is_private := hasPrefix $item.id "private_" }}
+          {{ $card_link := printf "#%s" $item.id }}
+          
+          <a href="{{ $card_link }}" class="saas-app-card">
+            {{/* ビデオまたは画像の表示 */}}
+            {{ if $item.video }}
+              <video src="{{ $item.video }}" alt="{{ $item.title }}" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;" autoplay loop muted playsinline></video>
+            {{ else if $item.image }}
+              <img src="{{ $item.image }}" alt="{{ $item.title }}" style="width: 100%; height: 180px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;" />
+            {{ else }}
+              {{/* デフォルトのプレースホルダー */}}
+              <div style="width: 100%; height: 180px; background: linear-gradient(135deg, #4a9eff 0%, #63b8ff 100%); border-radius: 8px; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.1rem; font-weight: bold;">
+                {{ $item.title }}
+              </div>
+            {{ end }}
+            
+            <div class="saas-app-title">
+              {{ if $is_private }}🔒 {{ end }}{{ $item.title }}
+              <span class="saas-app-arrow">→</span>
+            </div>
+            
+            {{ if $item.content }}
+              <div class="saas-app-description">{{ $item.content }}</div>
+            {{ else if $item.description }}
+              <div class="saas-app-description">{{ $item.description }}</div>
+            {{ end }}
+            
+            {{ if $item.features }}
+              <div class="saas-app-features">
+                {{ delimit $item.features " • " }}
+              </div>
+            {{ end }}
+            
+            {{/* サブアイテム（章の下階層）の表示 */}}
+            {{ if $item.tabs }}
+              <div class="saas-app-subitems">
+                <div class="subitem-label">章:</div>
+                {{ range $tab := $item.tabs }}
+                  <span class="subitem-tag">{{ $tab.icon }} {{ $tab.label }}</span>
+                {{ end }}
+              </div>
+            {{ else if $item.overview_cards }}
+              <div class="saas-app-subitems">
+                <div class="subitem-label">セクション:</div>
+                {{ range $card := $item.overview_cards }}
+                  <span class="subitem-tag">{{ $card.icon }} {{ $card.title }}</span>
+                {{ end }}
+              </div>
+            {{ else if $item.sections }}
+              <div class="saas-app-subitems">
+                <div class="subitem-label">セクション:</div>
+                {{ range $section := $item.sections }}
+                  <span class="subitem-tag">{{ $section.icon }} {{ $section.title }}</span>
+                {{ end }}
+              </div>
+            {{ end }}
+          </a>
+        {{ end }}
+      </div>
+    </div>
+  {{ end }}
+{{ end }}
+
+<style>
+  .dashboard-section {
+    margin-bottom: 40px;
+  }
+  
+  .saas-app-subitems {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+  
+  .subitem-label {
+    font-size: 0.8rem;
+    color: var(--text-weak);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  
+  .subitem-tag {
+    display: inline-block;
+    font-size: 0.75rem;
+    background: rgba(74, 158, 255, 0.1);
+    color: #4a9eff;
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin-right: 6px;
+    margin-bottom: 4px;
+    border: 1px solid rgba(74, 158, 255, 0.2);
+  }
+  
+  [data-theme="light"] .subitem-tag {
+    background: rgba(74, 158, 255, 0.08);
+    border: 1px solid rgba(74, 158, 255, 0.15);
+  }
+</style>
