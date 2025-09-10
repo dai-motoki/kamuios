@@ -1,0 +1,224 @@
+# Three.js 3Dエディタ
+# ブラウザベースの3Dコンテンツ制作ツール
+
+- id: threejs-3d-editor
+  category: 9
+  category_name: 3Dエディター
+  title: Three.js 3Dエディタ
+  content: ""
+  custom_html: |
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <style>
+      .threejs-container {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 20px;
+      }
+      .threejs-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 16px;
+        text-align: center;
+      }
+      .threejs-canvas-container {
+        width: 100%;
+        height: 500px;
+        background: #000;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin-bottom: 16px;
+        position: relative;
+      }
+      .threejs-info {
+        text-align: center;
+        color: var(--text-weak);
+        font-size: 0.9rem;
+        margin-bottom: 16px;
+      }
+      .threejs-description {
+        color: var(--text);
+        line-height: 1.6;
+        margin-bottom: 16px;
+      }
+    </style>
+    
+    <div class="threejs-container">
+      <h2 class="threejs-title">Three.js 3Dエディタ</h2>
+      
+      <div class="threejs-description">
+        ブラウザベースの3Dコンテンツ制作ツール。Three.jsを使用した本格的な3Dエディタで、
+        モデリング、マテリアル編集、アニメーション、エフェクトなど3Dコンテンツ制作に必要な機能を提供します。
+      </div>
+      
+      <div class="threejs-canvas-container">
+        <canvas id="threejs-canvas"></canvas>
+      </div>
+      
+      <div class="threejs-info">
+        回転する立方体、球体、円錐のサンプル - マウスでドラッグして視点を変更できます
+      </div>
+    </div>
+    
+    <script>
+      (function() {
+        // Three.jsが読み込まれるまで待機
+        function initThreeJS() {
+          if (typeof THREE === 'undefined') {
+            setTimeout(initThreeJS, 100);
+            return;
+          }
+          
+          const container = document.querySelector('.threejs-canvas-container');
+          const canvas = document.getElementById('threejs-canvas');
+          
+          if (!container || !canvas) return;
+          
+          // シーン、カメラ、レンダラーの設定
+          const scene = new THREE.Scene();
+          scene.background = new THREE.Color(0x1a1a1a);
+          
+          const camera = new THREE.PerspectiveCamera(
+            75, 
+            container.offsetWidth / container.offsetHeight, 
+            0.1, 
+            1000
+          );
+          camera.position.z = 8;
+          
+          const renderer = new THREE.WebGLRenderer({ 
+            canvas: canvas, 
+            antialias: true 
+          });
+          renderer.setSize(container.offsetWidth, container.offsetHeight);
+          renderer.shadowMap.enabled = true;
+          renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+          
+          // ライティング
+          const ambientLight = new THREE.AmbientLight(0x404040, 0.4);
+          scene.add(ambientLight);
+          
+          const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+          directionalLight.position.set(5, 5, 5);
+          directionalLight.castShadow = true;
+          directionalLight.shadow.mapSize.width = 1024;
+          directionalLight.shadow.mapSize.height = 1024;
+          scene.add(directionalLight);
+          
+          // 3Dオブジェクトを作成
+          const objects = [];
+          
+          // 立方体
+          const cubeGeometry = new THREE.BoxGeometry(1.5, 1.5, 1.5);
+          const cubeMaterial = new THREE.MeshStandardMaterial({ 
+            color: 0x00ff88,
+            metalness: 0.3,
+            roughness: 0.4
+          });
+          const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+          cube.position.x = -3;
+          cube.castShadow = true;
+          scene.add(cube);
+          objects.push(cube);
+          
+          // 球体
+          const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
+          const sphereMaterial = new THREE.MeshStandardMaterial({ 
+            color: 0xff4444,
+            metalness: 0.5,
+            roughness: 0.2
+          });
+          const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+          sphere.position.x = 0;
+          sphere.castShadow = true;
+          scene.add(sphere);
+          objects.push(sphere);
+          
+          // 円錐
+          const coneGeometry = new THREE.ConeGeometry(1, 2, 8);
+          const coneMaterial = new THREE.MeshStandardMaterial({ 
+            color: 0x4488ff,
+            metalness: 0.7,
+            roughness: 0.3
+          });
+          const cone = new THREE.Mesh(coneGeometry, coneMaterial);
+          cone.position.x = 3;
+          cone.castShadow = true;
+          scene.add(cone);
+          objects.push(cone);
+          
+          // 床を追加
+          const floorGeometry = new THREE.PlaneGeometry(20, 20);
+          const floorMaterial = new THREE.MeshStandardMaterial({ 
+            color: 0x333333,
+            metalness: 0.1,
+            roughness: 0.8
+          });
+          const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+          floor.rotation.x = -Math.PI / 2;
+          floor.position.y = -2;
+          floor.receiveShadow = true;
+          scene.add(floor);
+          
+          // マウス操作用の変数
+          let mouseX = 0;
+          let mouseY = 0;
+          let isMouseDown = false;
+          
+          // マウスイベント
+          canvas.addEventListener('mousedown', (event) => {
+            isMouseDown = true;
+            mouseX = event.clientX;
+            mouseY = event.clientY;
+          });
+          
+          canvas.addEventListener('mouseup', () => {
+            isMouseDown = false;
+          });
+          
+          canvas.addEventListener('mousemove', (event) => {
+            if (isMouseDown) {
+              const deltaX = event.clientX - mouseX;
+              const deltaY = event.clientY - mouseY;
+              
+              camera.position.x += deltaX * 0.01;
+              camera.position.y -= deltaY * 0.01;
+              camera.lookAt(scene.position);
+              
+              mouseX = event.clientX;
+              mouseY = event.clientY;
+            }
+          });
+          
+          // アニメーションループ
+          function animate() {
+            requestAnimationFrame(animate);
+            
+            // オブジェクトを回転
+            objects.forEach((obj, index) => {
+              obj.rotation.x += 0.01 * (index + 1);
+              obj.rotation.y += 0.01 * (index + 1);
+            });
+            
+            renderer.render(scene, camera);
+          }
+          
+          // リサイズ対応
+          window.addEventListener('resize', () => {
+            if (container) {
+              camera.aspect = container.offsetWidth / container.offsetHeight;
+              camera.updateProjectionMatrix();
+              renderer.setSize(container.offsetWidth, container.offsetHeight);
+            }
+          });
+          
+          animate();
+        }
+        
+        // 初期化開始
+        initThreeJS();
+      })();
+    </script>

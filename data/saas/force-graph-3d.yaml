@@ -1,0 +1,280 @@
+# 3D Force Graph
+# インタラクティブな3Dネットワーク可視化ツール
+
+- id: force-graph-3d
+  category: 9
+  category_name: 3Dエディター
+  title: 3D Force Graph
+  content: ""
+  custom_html: |
+    <script src="//cdn.jsdelivr.net/npm/3d-force-graph"></script>
+    
+    <style>
+      body { margin: 0; }
+      .force-graph-container {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 20px;
+      }
+      .force-graph-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 16px;
+        text-align: center;
+      }
+      .force-graph-main {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 320px;
+        gap: 20px;
+        align-items: start;
+      }
+      .force-graph-canvas-container {
+        flex: 1 1 70%;
+        height: 600px;
+        background: #000003;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        position: relative;
+        min-width: 0;
+      }
+      .force-graph-info {
+        flex: 0 0 28%;
+        color: var(--text);
+        font-size: 0.9rem;
+        padding: 16px;
+        background: var(--sidebar-bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+      }
+      .force-graph-info h3 {
+        color: var(--link);
+        margin: 0 0 12px 0;
+        font-size: 1.05rem;
+      }
+      .force-graph-info ul {
+        margin: 0 0 8px 18px;
+      }
+      .force-graph-info li {
+        margin-bottom: 6px;
+        line-height: 1.5;
+      }
+      @media (max-width: 900px) {
+        .force-graph-main {
+          grid-template-columns: 1fr;
+        }
+        .force-graph-canvas-container {
+          height: 420px;
+        }
+        .force-graph-info {
+          width: 100%;
+        }
+      }
+      .force-graph-description {
+        color: var(--text);
+        line-height: 1.6;
+        margin-bottom: 16px;
+      }
+    </style>
+    
+    <div class="force-graph-container">
+      <h2 class="force-graph-title">3D Force Graph</h2>
+      
+      <div class="force-graph-description">
+        インタラクティブな3Dネットワーク可視化ツール。ノードとリンクで構成されたデータを
+        3D空間で美しく表示し、マウスやタッチで操作できます。
+      </div>
+      
+      <div class="force-graph-main">
+        <div class="force-graph-canvas-container">
+          <div id="force-graph-3d"></div>
+        </div>
+        
+        <div class="force-graph-info">
+          <h3>操作方法</h3>
+          <ul>
+            <li><strong>マウス</strong>
+              <ul>
+                <li>ドラッグ: 視点変更（Orbit）</li>
+                <li>ホイール: ズーム</li>
+                <li>ダブルクリック: カメラリセット</li>
+              </ul>
+            </li>
+            <li><strong>ノード</strong>
+              <ul>
+                <li>クリック: フォーカス</li>
+                <li>ドラッグ: 移動</li>
+                <li>ホバー: ハイライト</li>
+              </ul>
+            </li>
+            <li><strong>キーボード</strong>
+              <ul>
+                <li>R: 再配置</li>
+                <li>C: カメラリセット</li>
+                <li>F: 全体フィット</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+    <script type="module">
+      // 3D Force Graphが読み込まれるまで待機
+      function initForceGraph() {
+        if (typeof ForceGraph3D === 'undefined') {
+          setTimeout(initForceGraph, 100);
+          return;
+        }
+        
+        // サンプルデータを作成
+        const sampleData = {
+          nodes: [
+            { id: 'Central', group: 1 },
+            { id: 'Node A', group: 2 },
+            { id: 'Node B', group: 2 },
+            { id: 'Node C', group: 3 },
+            { id: 'Node D', group: 3 },
+            { id: 'Node E', group: 4 },
+            { id: 'Node F', group: 4 },
+            { id: 'Node G', group: 5 },
+            { id: 'Hub 1', group: 1 },
+            { id: 'Hub 2', group: 1 },
+            { id: 'Leaf 1', group: 6 },
+            { id: 'Leaf 2', group: 6 },
+            { id: 'Leaf 3', group: 6 },
+            { id: 'Connector', group: 7 }
+          ],
+          links: [
+            { source: 'Central', target: 'Node A' },
+            { source: 'Central', target: 'Node B' },
+            { source: 'Central', target: 'Node C' },
+            { source: 'Central', target: 'Hub 1' },
+            { source: 'Central', target: 'Hub 2' },
+            { source: 'Node A', target: 'Node D' },
+            { source: 'Node B', target: 'Node E' },
+            { source: 'Node C', target: 'Node F' },
+            { source: 'Hub 1', target: 'Node G' },
+            { source: 'Hub 1', target: 'Leaf 1' },
+            { source: 'Hub 2', target: 'Leaf 2' },
+            { source: 'Hub 2', target: 'Leaf 3' },
+            { source: 'Node D', target: 'Connector' },
+            { source: 'Node E', target: 'Connector' },
+            { source: 'Node F', target: 'Connector' },
+            { source: 'Connector', target: 'Leaf 1' },
+            { source: 'Node G', target: 'Leaf 3' }
+          ]
+        };
+        
+        try {
+          // UnrealBloomPassをインポート（エラーハンドリング付き）
+          import('https://esm.sh/three/examples/jsm/postprocessing/UnrealBloomPass.js')
+            .then(({ UnrealBloomPass }) => {
+              createGraph(sampleData, UnrealBloomPass);
+            })
+            .catch(() => {
+              // BloomPassが読み込めない場合は通常のグラフを作成
+              createGraph(sampleData, null);
+            });
+        } catch (error) {
+          // エラーの場合は通常のグラフを作成
+          createGraph(sampleData, null);
+        }
+      }
+      
+      function createGraph(data, UnrealBloomPass) {
+        const container = document.getElementById('force-graph-3d');
+        if (!container) return;
+        
+        const Graph = ForceGraph3D()(container)
+          .backgroundColor('#000003')
+          .graphData(data)
+          .nodeLabel('id')
+          .nodeAutoColorBy('group')
+          .nodeOpacity(0.8)
+          .nodeResolution(16)
+          .nodeVal(node => Math.random() * 4 + 1) // ランダムなサイズ
+          .linkOpacity(0.6)
+          .linkWidth(2)
+          .linkDirectionalParticles(2)
+          .linkDirectionalParticleWidth(2)
+          .linkDirectionalParticleSpeed(0.01)
+          .enableNodeDrag(true) // ノードドラッグを有効化
+          .enableNavigationControls(true) // ナビゲーションコントロール有効化（OrbitControls）
+          .showNavInfo(true) // 操作ヘルプを表示
+          .d3VelocityDecay(0.3) // 慣性調整（ドラッグ後の減衰）
+          .warmupTicks(60)
+          .cooldownTicks(0)
+          .onNodeClick(node => {
+            console.log('Node clicked:', node);
+            // ノードクリック時にフォーカス
+            const distance = 40;
+            const distRatio = 1 + distance/Math.hypot(node.x, node.y, node.z);
+            Graph.cameraPosition(
+              { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio },
+              node,
+              3000
+            );
+          })
+          .onNodeDrag(node => {
+            // ドラッグ中のノードの位置を固定
+            node.fx = node.x;
+            node.fy = node.y;
+            node.fz = node.z;
+          })
+          .onNodeDragEnd(node => {
+            // ドラッグ終了時に位置固定を解除（またはそのまま固定）
+            node.fx = node.x;
+            node.fy = node.y;
+            node.fz = node.z;
+          })
+          .onLinkClick(link => {
+            console.log('Link clicked:', link);
+            // リンクをハイライト
+            Graph.linkColor(() => 'rgba(255,255,255,0.2)')
+              .linkColor(link, 'rgba(255,100,100,1)');
+          })
+          .onNodeHover(node => {
+            // ホバー時の処理
+            container.style.cursor = node ? 'pointer' : null;
+          });
+        
+        // BloomPassが利用可能な場合は追加
+        if (UnrealBloomPass) {
+          try {
+            const bloomPass = new UnrealBloomPass();
+            bloomPass.strength = 2;
+            bloomPass.radius = 1;
+            bloomPass.threshold = 0;
+            Graph.postProcessingComposer().addPass(bloomPass);
+          } catch (error) {
+            console.warn('Bloom effect could not be applied:', error);
+          }
+        }
+        
+        // 追加のインタラクティブ機能（独自マウスハンドラは削除し、デフォルト操作に委譲）
+        // ダブルクリックでリセット
+        container.addEventListener('dblclick', () => {
+          Graph.cameraPosition({ x: 0, y: 0, z: 200 }, { x: 0, y: 0, z: 0 }, 1000);
+        });
+        
+        // キーボードショートカット
+        document.addEventListener('keydown', (event) => {
+          if (event.key === 'r' || event.key === 'R') {
+            // Rキーでランダムに配置
+            Graph.d3ReheatSimulation();
+          } else if (event.key === 'c' || event.key === 'C') {
+            // Cキーでカメラリセット
+            Graph.cameraPosition({ x: 0, y: 0, z: 200 }, { x: 0, y: 0, z: 0 }, 1000);
+          } else if (event.key === 'f' || event.key === 'F') {
+            // Fキーでフィット
+            Graph.zoomToFit(1000);
+          }
+        });
+      }
+      
+      // 初期化開始
+      initForceGraph();
+    </script>
