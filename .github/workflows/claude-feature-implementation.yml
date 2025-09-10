@@ -1,0 +1,29 @@
+name: Claude Feature Implementation
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  implement-feature:
+    # "claude-implement"ラベルが付けられた時に実行
+    if: github.event.label.name == 'claude-implement'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Claude implements feature
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            このissueの内容を実装してください。
+            新しいブランチを作成し、PRを作成してください。
+            実装が完了したら、PRに実装内容の詳細な説明を記載してください。
+          claude_args: "--max-turns 15 --model claude-sonnet-4-20250514"
