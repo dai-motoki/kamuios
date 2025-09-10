@@ -164,6 +164,86 @@
       <div id="requirementsDocBody-{{ $secId }}" style="display:none;">
         {{ partial "requirements-document" . }}
       </div>
+    {{ else if eq .id "employees-dashboard" }}
+      {{/* 従業員ダッシュボード（カード一覧） */}}
+      <style>
+        #employeesDashboardCards { 
+          display: grid; 
+          grid-template-columns: repeat(3, minmax(0, 1fr)); 
+          gap: 20px; 
+        }
+        #employeesDashboardCards > * { min-width: 0; }
+        #employeesDashboardCards a.saas-app-card { 
+          min-width: 0;
+          display: flex;
+          flex-direction: column;
+        }
+        #employeesDashboardCards .employee-video-container {
+          position: relative;
+          width: 100%;
+          padding-bottom: 100%; /* 1:1 アスペクト比 */
+          overflow: hidden;
+          border-radius: 8px;
+          margin-bottom: 12px;
+        }
+        #employeesDashboardCards .employee-video-container video,
+        #employeesDashboardCards .employee-video-container img {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          display: block;
+        }
+        @media (max-width: 900px){ 
+          #employeesDashboardCards { grid-template-columns: 1fr; } 
+        }
+      </style>
+      <script>
+        // デバッグ用: 従業員ダッシュボードの動画確認
+        document.addEventListener('DOMContentLoaded', function() {
+          setTimeout(function() {
+            const containers = document.querySelectorAll('#employeesDashboardCards .employee-video-container');
+            console.log('従業員動画コンテナ数:', containers.length);
+            containers.forEach(function(container) {
+              const video = container.querySelector('video');
+              const dataVideo = container.getAttribute('data-video');
+              const dataId = container.getAttribute('data-id');
+              console.log('ID:', dataId, 'Video Path:', dataVideo, 'Video Element:', video);
+              if (video) {
+                console.log('Video src:', video.src, 'ReadyState:', video.readyState);
+              }
+            });
+          }, 1000);
+        });
+      </script>
+      <div id="employeesDashboardCards" class="dashboard-links" style="margin-top: 8px; display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px;">
+        {{ range where $all "category" 10 }}
+          {{ if ne .id "employees-dashboard" }}
+            {{ $emp := . }}
+            <a href="#{{ $emp.id }}" class="saas-app-card" onclick="(function(){
+              var target=document.getElementById('{{ $emp.id }}');
+              if(target){ document.querySelectorAll('.doc-section').forEach(function(s){s.style.display='none'}); target.style.display='block'; window.scrollTo(0,0); }
+            })(); return false;">
+              <div class="employee-video-container" data-video="{{ $emp.video }}" data-id="{{ $emp.id }}">
+                {{ if $emp.video }}              
+                  <video src="{{ $emp.video }}" alt="{{ $emp.title }}" autoplay loop muted playsinline controls></video>
+                {{ else if $emp.image }}
+                  <img src="{{ $emp.image }}" alt="{{ $emp.title }}" />
+                {{ else }}
+                  <video src="/videos/agent_card.mp4" alt="{{ $emp.title }}" autoplay loop muted playsinline controls></video>
+                {{ end }}
+              </div>
+              <div class="saas-app-title">{{ $emp.title }}<span class="saas-app-arrow">→</span></div>
+              {{ with $emp.description }}<div class="saas-app-description">{{ . }}</div>{{ end }}
+            </a>
+          {{ end }}
+        {{ end }}
+      </div>
+    {{ else if hasPrefix .id "employees_" }}
+      {{/* 従業員詳細用の専用パーシャル */}}
+      {{ partial "employee-detail" . }}
     {{ else }}
       {{ if .content }}
         {{ .content | markdownify }}
@@ -179,6 +259,17 @@
           <div class="markdown-body" data-path="{{ . }}">
             {{ readFile . | markdownify }}
           </div>
+        {{ end }}
+      {{ end }}
+      
+      {{ if .yaml_files }}
+        {{ range .yaml_files }}
+          {{ $yamlData := index (index $.Site.Data.saas (replace (path.Base .) ".yaml" "")) 0 }}
+          {{ if $yamlData }}
+            <div class="markdown-body" data-path="{{ . }}">
+              {{ $yamlData.content | markdownify }}
+            </div>
+          {{ end }}
         {{ end }}
       {{ end }}
       
@@ -219,6 +310,8 @@
       {{ if .additional_content }}
         {{ .additional_content | markdownify }}
       {{ end }}
+      
+      {{/* ダッシュボード内の従業員カード群は削除 */}}
       
       {{ if .custom_html }}
         {{ .custom_html | safeHTML }}

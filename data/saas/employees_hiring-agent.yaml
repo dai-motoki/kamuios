@@ -1,0 +1,10 @@
+- id: employees_hiring-agent
+  category: 10
+  category_name: 従業員
+  title: 採用担当（Recruiter）
+  description: AI従業員を追加します。
+  video: /videos/recruiter_card_video_square.mp4
+  content: |
+    data/saas/employees_* のファイルを
+    data/saas/employees_hiring-agent.yamlを参考にして作成する。
+  video: /videos/recruiter_1_video.mp4
