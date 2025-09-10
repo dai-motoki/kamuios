@@ -41,48 +41,13 @@
   category: 2                # 章番号（例: 2=要件定義・開発, 3=メディアエディタ, 6=事業構築など）
   category_name: 要件定義・開発
   title: 新規ページのタイトル
-  content: ""                # そのままMarkdownとして描画可（必要に応じて）
-  # どちらかを使う: content か custom_html か markdown_file
-  # markdown_file を使う場合は static 配下の .md を参照
-  # 例) markdown_file: static/data/pages/my-new-page.md
-  # markdown_file: static/data/pages/my-new-page.md
-  # custom_html: |
-  #   <div class="my-new-page">ここにHTMLを書く</div>
+  content: ""               
 ```
 
-### 2) ダッシュボードカードを追加（任意）
+自動的に目次欄に追加されます。
 
-ダッシュボードにカードを出したい場合のみ `data/sections.yaml` のダッシュボードHTMLブロックにリンクを追加します。
 
-```html
-<!-- 例: ダッシュボードのカード群の中に追加 -->
-<a href="#my-new-page" class="saas-app-card" onclick="showSectionById('my-new-page'); return false;">
-  <div class="saas-app-title">
-    新規ページのタイトル
-    <span class="saas-app-arrow">→</span>
-  </div>
-  <div class="saas-app-description">ページの要約</div>
-</a>
-```
-
-### 3) 外部Markdown本文（任意）
-
-本文を別Markdownにしたい場合は、`static/data/pages/<page-id>.md` を作成し、YAMLに `markdown_file` を指定します。
-
-```text
-requirement-docs/static/data/pages/
-└── my-new-page.md
-```
-
-```yaml
-- id: my-new-page
-  category: 2
-  category_name: 要件定義・開発
-  title: 新規ページのタイトル
-  markdown_file: static/data/pages/my-new-page.md
-```
-
-### 4) 静的アセット（任意）
+### 2) 静的アセット（任意）
 
 画像・動画などは `requirement-docs/static/` 配下に置き、本文から `/images/...` のように参照します。
 
@@ -108,7 +73,7 @@ hugo --gc                # 本番ビルド
 ## チェックリスト（必要箇所の更新）
 
 - [ ] `data/saas/<page-id>.yaml` を作成し、`id/category/category_name/title` を設定
-- [ ] 本文は `content` または `markdown_file`（`static/data/pages/<page-id>.md`）で供給
+- [ ] 本文は `content` で供給
 - [ ] ダッシュボードにカードを出すなら `data/sections.yaml` のカード群へ `<a href="#<page-id>">` を追加
 - [ ] 画像等のアセットがあれば `static/images/` 等に配置し、本文から相対パスで参照
 - [ ] `hugo server -D` でローカル確認、`#<page-id>` のハッシュ直リンクで表示を検証

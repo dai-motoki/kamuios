@@ -2,6 +2,7 @@
 /requirement-docs/public/
 /requirement-docs/resources/
 /public/
+public/
 /resources/
 .hugo_build.lock
 
