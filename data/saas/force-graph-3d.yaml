@@ -150,9 +150,9 @@
         // 対象セクションが可視になるのを待ってから初期化
         const section = document.getElementById('force-graph-3d');
         const canvasEl = document.getElementById('force-graph-3d-canvas');
-        const start = () => {
-          // サンプルデータを作成
-          const sampleData = {
+        
+        // サンプルデータを作成
+        const sampleData = {
           nodes: [
             { id: 'Central', group: 1 },
             { id: 'Node A', group: 2 },
@@ -198,7 +198,8 @@
           const visible = window.getComputedStyle(section).display !== 'none';
           const rect = canvasEl.getBoundingClientRect();
           if (visible && rect.width > 0 && rect.height > 0) {
-            start();
+            // 可視になったのでグラフを生成
+            createGraph(sampleData, null);
           } else {
             setTimeout(waitUntilVisible, 200);
           }

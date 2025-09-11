@@ -149,20 +149,83 @@
         border-radius: 8px;
         box-shadow: 0 8px 20px rgba(0,0,0,0.3);
       }
+      .kamui-napkin-slides {
+        background: var(--card);
+        border-radius: 12px;
+        padding: 30px;
+        margin-top: 30px;
+      }
+      .kamui-napkin-header {
+        border-bottom: 2px solid var(--border);
+        padding-bottom: 20px;
+        margin-bottom: 30px;
+      }
+      .kamui-napkin-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        background: linear-gradient(90deg, #60a5fa, #a78bfa);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 10px;
+      }
+      .kamui-napkin-subtitle {
+        color: var(--text-weak);
+        font-size: 1rem;
+      }
+      .kamui-slide-viewer {
+        background: #0f0f0f;
+        border-radius: 12px;
+        padding: 40px;
+        min-height: 500px;
+        position: relative;
+        overflow: hidden;
+      }
+      .kamui-slide-image {
+        width: 100%;
+        height: auto;
+        max-height: 500px;
+        object-fit: contain;
+        display: none;
+        animation: fadeIn 0.5s ease-in-out;
+      }
+      .kamui-slide-image.active {
+        display: block;
+      }
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      .kamui-slide-controls {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .kamui-slide-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--border);
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      .kamui-slide-dot.active {
+        background: var(--link);
+        transform: scale(1.3);
+      }
+      .kamui-slide-info {
+        text-align: center;
+        margin-top: 20px;
+        color: var(--text-weak);
+        font-size: 0.9rem;
+      }
     </style>
     
     <div class="slide-generator">
-      <div class="slide-header">
-        <h2 class="slide-title">📊 スライドエディタ</h2>
-        <div class="slide-meta">
-          <span>バージョン: 1.0</span>
-          <span>対応形式: PowerPoint, Google Slides</span>
-        </div>
-      </div>
       
       <div class="slide-controls">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-          <div style="color: var(--text-weak);">スライド: <span id="currentSlide">1</span> / <span id="totalSlides">6</span></div>
+          <div style="color: var(--text-weak);">スライド: <span id="currentSlide">1</span> / <span id="totalSlides">7</span></div>
           <div style="display: flex; gap: 10px;">
             <button onclick="previousSlide()" style="padding: 8px 16px; background: var(--border); border: none; border-radius: 6px; color: var(--text); cursor: pointer;">← 前へ</button>
             <button onclick="nextSlide()" style="padding: 8px 16px; background: var(--link); border: none; border-radius: 6px; color: white; cursor: pointer;">次へ →</button>
@@ -173,8 +236,20 @@
       
       <div class="slide-viewer" id="slideViewer">
         <div class="slide-display" id="slideDisplay">
-          <!-- スライド1 -->
+          <!-- スライド1: NapkinAI×KAMUICODE -->
           <div class="slide-page active" id="slide-1">
+            <h1 style="font-size: 2rem; color: var(--link); margin-bottom: 30px;">🤝 NapkinAI × KAMUICODE コラボレーション</h1>
+            <div style="text-align: center;">
+              <img src="/images/napkin_kamuicode_japanese_sketch.png" alt="NapkinAI KAMUICODE Collaboration" style="width: 90%; max-width: 900px; margin: 40px auto; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+              <div style="margin-top: 40px;">
+                <p style="font-size: 1.3rem; color: #94a3b8; margin-bottom: 20px;">2つの強力なAIツールの融合</p>
+                <p style="font-size: 1.1rem; color: #64748b;">ビジュアル生成とコード開発の革新的な連携</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- スライド2 -->
+          <div class="slide-page" id="slide-2">
             <div style="text-align: center;">
               <h1>HandwriteRef</h1>
               <h2>手書きスケッチからAI生成への革新的SaaSプラットフォーム</h2>
@@ -188,8 +263,8 @@
             </div>
           </div>
           
-          <!-- スライド2 -->
-          <div class="slide-page" id="slide-2">
+          <!-- スライド3 -->
+          <div class="slide-page" id="slide-3">
             <h1>市場機会</h1>
             <div class="slide-grid">
               <div>
@@ -215,8 +290,8 @@
             </div>
           </div>
           
-          <!-- スライド3 -->
-          <div class="slide-page" id="slide-3">
+          <!-- スライド4 -->
+          <div class="slide-page" id="slide-4">
             <h1>ソリューション</h1>
             <div class="slide-grid">
               <div>
@@ -244,8 +319,8 @@
             </div>
           </div>
           
-          <!-- スライド4 -->
-          <div class="slide-page" id="slide-4">
+          <!-- スライド5 -->
+          <div class="slide-page" id="slide-5">
             <h1 style="font-size: 2rem; color: var(--link); margin-bottom: 30px;">🚀 主要機能とUI</h1>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
               <div style="background: var(--sidebar-bg); padding: 20px; border-radius: 8px;">
@@ -273,8 +348,8 @@
             </div>
           </div>
           
-          <!-- スライド5 -->
-          <div class="slide-page" id="slide-5">
+          <!-- スライド6 -->
+          <div class="slide-page" id="slide-6">
             <h1 style="font-size: 2rem; color: var(--link); margin-bottom: 30px;">💰 収益モデル & ロードマップ</h1>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
               <div>
@@ -311,8 +386,8 @@
             </div>
           </div>
           
-          <!-- スライド6 -->
-          <div class="slide-page" id="slide-6">
+          <!-- スライド7 -->
+          <div class="slide-page" id="slide-7">
             <h1 style="font-size: 2rem; color: var(--link); margin-bottom: 30px;">🎉 まとめ & Next Steps</h1>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
               <div>
@@ -348,9 +423,42 @@
       </div>
     </div>
     
+    <!-- KAMUI CODE × Napkin AI スライドセクション -->
+    <div class="kamui-napkin-slides">
+      <div class="kamui-napkin-header">
+        <h2 class="kamui-napkin-title">🤝 KAMUI CODE × Napkin AI</h2>
+        <p class="kamui-napkin-subtitle">AIコード生成とビジュアル化の革新的融合</p>
+      </div>
+      
+      <div class="kamui-slide-viewer">
+        <img src="/images/napkin_kamuicode_japanese_sketch.png" alt="KAMUI CODE × Napkin AI" class="kamui-slide-image active" data-slide="1">
+        <img src="/images/kamui-napkin-title.png" alt="タイトルスライド" class="kamui-slide-image" data-slide="2">
+        <img src="/images/kamui-napkin-comparison.png" alt="機能比較" class="kamui-slide-image" data-slide="3">
+        <img src="/images/kamui-napkin-workflow.png" alt="統合ワークフロー" class="kamui-slide-image" data-slide="4">
+        <img src="/images/kamui-napkin-usecases.png" alt="活用事例" class="kamui-slide-image" data-slide="5">
+        <img src="/images/kamui-napkin-architecture.png" alt="技術アーキテクチャ" class="kamui-slide-image" data-slide="6">
+        <img src="/images/kamui-napkin-roadmap.png" alt="ロードマップ" class="kamui-slide-image" data-slide="7">
+      </div>
+      
+      <div class="kamui-slide-controls">
+        <div class="kamui-slide-dot active" onclick="showKamuiSlide(1)"></div>
+        <div class="kamui-slide-dot" onclick="showKamuiSlide(2)"></div>
+        <div class="kamui-slide-dot" onclick="showKamuiSlide(3)"></div>
+        <div class="kamui-slide-dot" onclick="showKamuiSlide(4)"></div>
+        <div class="kamui-slide-dot" onclick="showKamuiSlide(5)"></div>
+        <div class="kamui-slide-dot" onclick="showKamuiSlide(6)"></div>
+        <div class="kamui-slide-dot" onclick="showKamuiSlide(7)"></div>
+      </div>
+      
+      <div class="kamui-slide-info">
+        <span id="kamuiSlideTitle">KAMUI CODE × Napkin AI</span> | 
+        スライド <span id="kamuiCurrentSlide">1</span> / 7
+      </div>
+    </div>
+    
     <script>
       let currentSlideIndex = 1;
-      const totalSlides = 6;
+      const totalSlides = 7;
       
       function showSlide(index) {
         // すべてのスライドを非表示
@@ -401,6 +509,77 @@
           } else if (event.key === 'f' || event.key === 'F11') {
             event.preventDefault();
             toggleFullscreen();
+          }
+        }
+      });
+      
+      // KAMUI CODE × Napkin AI スライド制御
+      let currentKamuiSlide = 1;
+      const kamuiSlideTitles = [
+        'KAMUI CODE × Napkin AI',
+        'タイトルスライド',
+        '機能比較',
+        '統合ワークフロー',
+        '活用事例',
+        '技術アーキテクチャ',
+        'ロードマップ'
+      ];
+      
+      function showKamuiSlide(index) {
+        // すべてのスライドを非表示
+        document.querySelectorAll('.kamui-slide-image').forEach(slide => {
+          slide.classList.remove('active');
+        });
+        
+        // すべてのドットを非アクティブに
+        document.querySelectorAll('.kamui-slide-dot').forEach(dot => {
+          dot.classList.remove('active');
+        });
+        
+        // 指定されたスライドを表示
+        const targetSlide = document.querySelector(`.kamui-slide-image[data-slide="${index}"]`);
+        if (targetSlide) {
+          targetSlide.classList.add('active');
+          document.querySelectorAll('.kamui-slide-dot')[index - 1].classList.add('active');
+          document.getElementById('kamuiCurrentSlide').textContent = index;
+          document.getElementById('kamuiSlideTitle').textContent = kamuiSlideTitles[index - 1];
+          currentKamuiSlide = index;
+        }
+      }
+      
+      // 自動スライド切り替え（5秒ごと）
+      let kamuiSlideInterval = setInterval(() => {
+        let nextIndex = currentKamuiSlide + 1;
+        if (nextIndex > 7) nextIndex = 1;
+        showKamuiSlide(nextIndex);
+      }, 5000);
+      
+      // ホバー時は自動切り替えを停止
+      document.querySelector('.kamui-slide-viewer').addEventListener('mouseenter', () => {
+        clearInterval(kamuiSlideInterval);
+      });
+      
+      document.querySelector('.kamui-slide-viewer').addEventListener('mouseleave', () => {
+        kamuiSlideInterval = setInterval(() => {
+          let nextIndex = currentKamuiSlide + 1;
+          if (nextIndex > 7) nextIndex = 1;
+          showKamuiSlide(nextIndex);
+        }, 5000);
+      });
+      
+      // キーボード操作（左右矢印）
+      document.addEventListener('keydown', function(event) {
+        if (event.target.closest('.kamui-napkin-slides')) {
+          if (event.key === 'ArrowRight') {
+            event.preventDefault();
+            let nextIndex = currentKamuiSlide + 1;
+            if (nextIndex > 7) nextIndex = 1;
+            showKamuiSlide(nextIndex);
+          } else if (event.key === 'ArrowLeft') {
+            event.preventDefault();
+            let prevIndex = currentKamuiSlide - 1;
+            if (prevIndex < 1) prevIndex = 7;
+            showKamuiSlide(prevIndex);
           }
         }
       });
