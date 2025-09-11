@@ -304,7 +304,13 @@
           images: 0,
           videos: 0,
           audio: 0,
-          html: 0
+          html: 0,
+          yaml: 0,
+          json: 0,
+          code: 0,
+          text: 0,
+          doc: 0,
+          other: 0
         };
         
         // ルートノードを追加
@@ -348,25 +354,47 @@
           if (dirData.files) {
             dirData.files.forEach(file => {
               const fileId = nodeId++;
-              let group = 6; // デフォルト
+              let group = 10; // デフォルト(その他)
               
               switch(file.type) {
                 case 'image':
-                  group = 3;
+                  group = 3; // 画像
                   stats.images++;
                   break;
                 case 'video':
-                  group = 4;
+                  group = 4; // 動画
                   stats.videos++;
                   break;
                 case 'audio':
-                  group = 5;
+                  group = 5; // 音声
                   stats.audio++;
                   break;
                 case 'html':
-                  group = 6;
+                  group = 6; // HTML
                   stats.html++;
                   break;
+                case 'yaml':
+                  group = 7; // YAML
+                  stats.yaml++;
+                  break;
+                case 'json':
+                  group = 8; // JSON
+                  stats.json++;
+                  break;
+                case 'code':
+                  group = 9; // コード
+                  stats.code++;
+                  break;
+                case 'text':
+                  group = 11; // テキスト
+                  stats.text++;
+                  break;
+                case 'doc':
+                  group = 12; // ドキュメント
+                  stats.doc++;
+                  break;
+                default:
+                  stats.other++;
               }
               
               nodes.push({
@@ -426,21 +454,39 @@
         const videoEl = sectionRoot.querySelector('#video-count');
         const audioEl = sectionRoot.querySelector('#audio-count');
         const htmlEl = sectionRoot.querySelector('#html-count');
+        const yamlEl = sectionRoot.querySelector('#yaml-count');
+        const jsonEl = sectionRoot.querySelector('#json-count');
+        const codeEl = sectionRoot.querySelector('#code-count');
+        const textEl = sectionRoot.querySelector('#text-count');
+        const docEl = sectionRoot.querySelector('#doc-count');
+        const otherEl = sectionRoot.querySelector('#other-count');
         if (folderEl) folderEl.textContent = graphData.stats.folders;
         if (fileEl) fileEl.textContent = graphData.stats.files;
         if (imageEl) imageEl.textContent = graphData.stats.images;
         if (videoEl) videoEl.textContent = graphData.stats.videos;
         if (audioEl) audioEl.textContent = graphData.stats.audio;
         if (htmlEl) htmlEl.textContent = graphData.stats.html;
+        if (yamlEl) yamlEl.textContent = graphData.stats.yaml;
+        if (jsonEl) jsonEl.textContent = graphData.stats.json;
+        if (codeEl) codeEl.textContent = graphData.stats.code;
+        if (textEl) textEl.textContent = graphData.stats.text;
+        if (docEl) docEl.textContent = graphData.stats.doc;
+        if (otherEl) otherEl.textContent = graphData.stats.other;
         
         // カラーパレット
         const colorPalette = {
-          1: '#ff6b6b', // ルート - 赤
-          2: '#4ecdc4', // フォルダ - ティール
-          3: '#45b7d1', // 画像 - 青
-          4: '#96ceb4', // 動画 - 緑
-          5: '#feca57', // 音声 - 黄
-          6: '#dfe6e9'  // HTML - グレー
+          1: '#ff4757', // ルート - 強い赤
+          2: '#2ed573', // フォルダ - 鮮やかなグリーン
+          3: '#1e90ff', // 画像 - 強いブルー
+          4: '#ffa502', // 動画 - 濃いオレンジ
+          5: '#eccc68', // 音声 - 温かいイエロー
+          6: '#a4b0be', // HTML - グレー
+          7: '#6c5ce7', // YAML - パープル
+          8: '#00d2d3', // JSON - ティール
+          9: '#ff6b81', // コード - ピンクレッド
+          10:'#57606f', // その他 - ダークグレー
+          11:'#70a1ff', // テキスト - ライトブルー
+          12:'#2f3542'  // ドキュメント - ダーク
         };
         
         console.log('Creating graph with container:', container);
@@ -459,12 +505,12 @@
             if (node.type === 'image') return 8;
             return 6;
           })
-          .linkOpacity(0.4)
-          .linkWidth(1)
-          .linkColor(() => 'rgba(255,255,255,0.2)')
-          .linkDirectionalParticles(2)
-          .linkDirectionalParticleWidth(1.5)
-          .linkDirectionalParticleSpeed(0.005)
+          .linkOpacity(0.6)
+          .linkWidth(2.5)
+          .linkColor(() => 'rgba(255,255,255,0.35)')
+          .linkDirectionalParticles(4)
+          .linkDirectionalParticleWidth(3)
+          .linkDirectionalParticleSpeed(0.01)
           .enableNodeDrag(true)
           .enableNavigationControls(true)
           .showNavInfo(false)

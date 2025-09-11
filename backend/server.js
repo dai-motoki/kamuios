@@ -26,11 +26,16 @@ function loadEnv() {
 }
 loadEnv();
 
-// メディアファイルの拡張子
+// メディア/ドキュメント/コードなどの拡張子
 const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'];
 const videoExtensions = ['mp4', 'mov', 'avi', 'mkv', 'webm'];
 const audioExtensions = ['mp3', 'wav', 'ogg', 'flac', 'm4a'];
 const htmlExtensions  = ['html', 'htm'];
+const yamlExtensions  = ['yml', 'yaml'];
+const jsonExtensions  = ['json'];
+const textExtensions  = ['txt', 'md', 'markdown', 'log'];
+const codeExtensions  = ['js', 'ts', 'tsx', 'jsx', 'py', 'rb', 'go', 'rs', 'java', 'c', 'cc', 'cpp', 'h', 'hpp', 'cs', 'php', 'sh', 'bash', 'zsh', 'fish'];
+const docExtensions   = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'csv', 'tsv'];
 
 // ディレクトリをスキャンする関数
 function scanDirectory(dirPath, baseDir = null, depth = 0, maxDepth = 5) {
@@ -69,17 +74,22 @@ function scanDirectory(dirPath, baseDir = null, depth = 0, maxDepth = 5) {
                 else if (videoExtensions.includes(ext)) type = 'video';
                 else if (audioExtensions.includes(ext)) type = 'audio';
                 else if (htmlExtensions.includes(ext)) type = 'html';
+                else if (yamlExtensions.includes(ext)) type = 'yaml';
+                else if (jsonExtensions.includes(ext)) type = 'json';
+                else if (codeExtensions.includes(ext)) type = 'code';
+                else if (textExtensions.includes(ext)) type = 'text';
+                else if (docExtensions.includes(ext)) type = 'doc';
                 
-                if (type !== 'other') {
-                    result.files.push({
-                        name: item,
-                        path: relativePath,
-                        fullPath: fullPath,
-                        type: type,
-                        size: stat.size,
-                        modified: stat.mtime
-                    });
-                }
+                // すべてのタイプ（other含む）を返す
+                result.files.push({
+                    name: item,
+                    path: relativePath,
+                    fullPath: fullPath,
+                    type: type,
+                    ext: ext,
+                    size: stat.size,
+                    modified: stat.mtime
+                });
             }
         });
     } catch (err) {
