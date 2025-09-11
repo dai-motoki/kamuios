@@ -3,5 +3,6 @@
   { "category": "creative",   "title": "Flux Kontext (I2I)",   "url": "https://docs.example.com/catalog/creative/flux-kontext",    "path": "/catalog/id/i2i/fal/flux/kontext/max", "description": "画像→画像（Flux Kontext Max）" },
   { "category": "development", "title": "WAN 2.2-5b (T2V)",     "url": "https://docs.example.com/catalog/dev/wan",                 "path": "/catalog/id/t2v/fal/wan/v2.2-5b/text-to-video", "description": "テキスト→動画（WAN 2.2-5b）" },
   { "category": "development", "title": "Uploader (Service)",   "url": "https://docs.example.com/catalog/dev/uploader",           "path": "/catalog/id/uploader/fal",              "description": "アップロードサービス" },
-  { "category": "business",    "title": "Requirements Docs",    "url": "https://docs.example.com/catalog/biz/requirement",        "path": "/catalog/id/requirement",               "description": "要件ドキュメントサービス" }
+  { "category": "business",    "title": "Requirements Docs",    "url": "https://docs.example.com/catalog/biz/requirement",        "path": "/catalog/id/requirement",               "description": "要件ドキュメントサービス" },
+  { "category": "development", "title": "Directory Graph 3D",   "url": "https://docs.example.com/catalog/dev/directory-graph",    "path": "/catalog/id/directory-graph-3d",        "description": "ディレクトリ構造の3D可視化ツール" }
 ]

@@ -33,8 +33,8 @@ const audioExtensions = ['mp3', 'wav', 'ogg', 'flac', 'm4a'];
 const htmlExtensions  = ['html', 'htm'];
 
 // ディレクトリをスキャンする関数
-function scanDirectory(dirPath, baseDir = null, depth = 0, maxDepth = 3) {
-    if (depth > maxDepth) return [];
+function scanDirectory(dirPath, baseDir = null, depth = 0, maxDepth = 5) {
+    if (depth > maxDepth) return { files: [], folders: [] };
     
     if (!baseDir) baseDir = dirPath;
     
