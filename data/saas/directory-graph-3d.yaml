@@ -8,6 +8,12 @@
   content: ""
   custom_html: |
     <script>
+      // THREEを先に読み込む（未ロード時のみ）
+      if (!window.THREE) {
+        const threeScript = document.createElement('script');
+        threeScript.src = '//cdn.jsdelivr.net/npm/three@0.158/build/three.min.js';
+        document.head.appendChild(threeScript);
+      }
       // 3D Force Graphを一度だけ読み込む
       if (!window.ForceGraph3DLoaded) {
         const script = document.createElement('script');
@@ -78,6 +84,23 @@
       .directory-graph-info li {
         margin-bottom: 6px;
         line-height: 1.5;
+      }
+      .view-toggle {
+        margin-top: 12px;
+        display: flex;
+        gap: 8px;
+      }
+      .toggle-btn {
+        padding: 6px 10px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--card);
+        color: var(--text);
+        cursor: pointer;
+      }
+      .toggle-btn.active {
+        background: var(--link);
+        color: #fff;
       }
       .directory-stats {
         margin-top: 16px;
@@ -184,6 +207,11 @@
             </li>
           </ul>
           
+          <div class="view-toggle">
+            <button class="toggle-btn active" id="toggle-color-mode">色で表示</button>
+            <button class="toggle-btn" id="toggle-media-mode">メディアで表示</button>
+          </div>
+
           <div class="directory-stats">
             <h3>統計情報</h3>
             <div id="directory-stats-content">
@@ -224,11 +252,11 @@
               <span class="legend-label">フォルダ</span>
             </div>
             <div class="legend-item">
-              <div class="legend-color" style="background: #45b7d1;"></div>
+              <div class="legend-color" style="background: #ffa502;"></div>
               <span class="legend-label">画像</span>
             </div>
             <div class="legend-item">
-              <div class="legend-color" style="background: #96ceb4;"></div>
+              <div class="legend-color" style="background: #6c5ce7;"></div>
               <span class="legend-label">動画</span>
             </div>
             <div class="legend-item">
@@ -355,8 +383,32 @@
             dirData.files.forEach(file => {
               const fileId = nodeId++;
               let group = 10; // デフォルト(その他)
-              
-              switch(file.type) {
+              // サーバー側タイプが不明な場合は拡張子から解決
+              const ext = (file.ext || (file.name.split('.').pop() || '')).toLowerCase();
+              let resolvedType = file.type;
+              if (!resolvedType || resolvedType === 'other') {
+                const isImage = ['jpg','jpeg','png','gif','webp','svg'].includes(ext);
+                const isVideo = ['mp4','mov','avi','mkv','webm'].includes(ext);
+                const isAudio = ['mp3','wav','ogg','flac','m4a'].includes(ext);
+                const isHtml  = ['html','htm'].includes(ext);
+                const isYaml  = ['yml','yaml'].includes(ext);
+                const isJson  = ['json'].includes(ext);
+                const isText  = ['txt','md','markdown','log'].includes(ext);
+                const isCode  = ['js','ts','tsx','jsx','py','rb','go','rs','java','c','cc','cpp','h','hpp','cs','php','sh','bash','zsh','fish'].includes(ext);
+                const isDoc   = ['pdf','doc','docx','ppt','pptx','xls','xlsx','csv','tsv'].includes(ext);
+                resolvedType = isImage ? 'image'
+                  : isVideo ? 'video'
+                  : isAudio ? 'audio'
+                  : isHtml  ? 'html'
+                  : isYaml  ? 'yaml'
+                  : isJson  ? 'json'
+                  : isCode  ? 'code'
+                  : isText  ? 'text'
+                  : isDoc   ? 'doc'
+                  : 'other';
+              }
+
+              switch(resolvedType) {
                 case 'image':
                   group = 3; // 画像
                   stats.images++;
@@ -400,7 +452,7 @@
               nodes.push({
                 id: fileId,
                 name: file.name,
-                type: file.type,
+                type: resolvedType,
                 path: file.path,
                 size: file.size,
                 group: group,
@@ -477,11 +529,11 @@
         const colorPalette = {
           1: '#ff4757', // ルート - 強い赤
           2: '#2ed573', // フォルダ - 鮮やかなグリーン
-          3: '#1e90ff', // 画像 - 強いブルー
-          4: '#ffa502', // 動画 - 濃いオレンジ
+          3: '#ffb84d', // 画像 - 薄いオレンジ
+          4: '#6c5ce7', // 動画 - パープル
           5: '#eccc68', // 音声 - 温かいイエロー
           6: '#a4b0be', // HTML - グレー
-          7: '#6c5ce7', // YAML - パープル
+          7: '#6c5ce7', // YAML - パープル（動画と同系色だが別用途）
           8: '#00d2d3', // JSON - ティール
           9: '#ff6b81', // コード - ピンクレッド
           10:'#57606f', // その他 - ダークグレー
@@ -505,10 +557,10 @@
             if (node.type === 'image') return 8;
             return 6;
           })
-          .linkOpacity(0.6)
-          .linkWidth(2.5)
-          .linkColor(() => 'rgba(255,255,255,0.35)')
-          .linkDirectionalParticles(4)
+          .linkOpacity(0.75)
+          .linkWidth(4)
+          .linkColor(() => 'rgba(255,255,255,0.5)')
+          .linkDirectionalParticles(2)
           .linkDirectionalParticleWidth(3)
           .linkDirectionalParticleSpeed(0.01)
           .enableNodeDrag(true)
@@ -516,9 +568,15 @@
           .showNavInfo(false)
           .d3VelocityDecay(0.3)
           .d3AlphaDecay(0.02)
-          .dagMode(null) // DAGモードを無効化してフリーレイアウトに
-          .d3Force('charge').strength(-300) // ノード間の反発力を強化
-          .d3Force('link').distance(80) // リンクの距離を設定
+          .dagMode(null);
+        // 個別適用（エラー回避）
+        try {
+          Graph.d3Force('charge').strength(-300);
+          Graph.d3Force('link').distance(80);
+        } catch (e) {
+          console.warn('d3Force setup skipped:', e);
+        }
+        const finalizedGraph = Graph
           .warmupTicks(100)
           .cooldownTicks(0)
           .onNodeClick(node => {
@@ -538,6 +596,40 @@
           })
           .onNodeHover(node => {
             container.style.cursor = node ? 'pointer' : null;
+            // 画像ノードの場合はプレビューを表示
+            const prevId = 'image-preview-tooltip';
+            let tooltip = document.getElementById(prevId);
+            if (node && node.type === 'image') {
+              if (!tooltip) {
+                tooltip = document.createElement('div');
+                tooltip.id = prevId;
+                tooltip.style.position = 'fixed';
+                tooltip.style.padding = '6px';
+                tooltip.style.background = 'rgba(0,0,0,0.8)';
+                tooltip.style.border = '1px solid rgba(255,255,255,0.2)';
+                tooltip.style.borderRadius = '6px';
+                tooltip.style.zIndex = '9999';
+                tooltip.style.pointerEvents = 'none';
+                tooltip.innerHTML = '<img style="max-width:200px; max-height:160px; display:block;" />\n<span style="color:#fff; font-size:12px"></span>';
+                document.body.appendChild(tooltip);
+              }
+              const img = tooltip.querySelector('img');
+              const cap = tooltip.querySelector('span');
+              // 画像はバックエンド(7777)から配信する
+              img.src = `http://localhost:7777/${encodeURI(node.path)}`;
+              cap.textContent = node.name;
+              // マウス位置に追従（複数回バインドを避ける）
+              if (!tooltip.dataset.bound) {
+                document.addEventListener('mousemove', (e) => {
+                  tooltip.style.left = (e.clientX + 12) + 'px';
+                  tooltip.style.top = (e.clientY + 12) + 'px';
+                });
+                tooltip.dataset.bound = '1';
+              }
+              tooltip.style.display = 'block';
+            } else if (tooltip) {
+              tooltip.style.display = 'none';
+            }
           })
           .onNodeDragEnd(node => {
             node.fx = node.x;
@@ -545,7 +637,8 @@
             node.fz = node.z;
           });
         
-        // Bloom効果はThree.jsの重複読み込みを招くため無効化
+        // 軽量なグロー: ノードサイズを上げて代替的に「光らせる」表現
+        // Threeの多重ロード回避のためpostprocessingは使わず視覚的に強調
         
         // ダブルクリックでリセット
         container.addEventListener('dblclick', () => {
@@ -602,6 +695,49 @@
           console.log('Container children:', container.children.length);
           console.log('Canvas found:', container.querySelector('canvas'));
         }, 2000);
+        // 表示モード切り替え
+        const colorBtn = document.getElementById('toggle-color-mode');
+        const mediaBtn = document.getElementById('toggle-media-mode');
+        let showMediaTexture = false;
+        const applyActive = () => {
+          colorBtn.classList.toggle('active', !showMediaTexture);
+          mediaBtn.classList.toggle('active', showMediaTexture);
+        };
+        applyActive();
+        
+        // 画像/動画ノードにテクスチャ適用
+        const loader = new Image();
+        const getVideoThumbUrl = (path) => `http://localhost:7777/${encodeURI(path)}`; // ひとまず同URLを使用（将来サムネAPIに）
+        
+        const textureCache = new Map();
+        function setMediaTextures(enabled) {
+          showMediaTexture = enabled;
+          applyActive();
+          Graph.nodeThreeObject(node => {
+            if (!enabled) return undefined; // デフォルト描画
+            if (node.type !== 'image' && node.type !== 'video') return undefined;
+            const key = `${node.type}:${node.path}`;
+            if (!textureCache.has(key)) {
+              const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ color: 0xffffff }));
+              const img = new Image();
+              img.crossOrigin = 'anonymous';
+              img.onload = () => {
+                const tex = new THREE.Texture(img);
+                tex.needsUpdate = true;
+                sprite.material.map = tex;
+                sprite.material.needsUpdate = true;
+              };
+              img.src = node.type === 'image' ? `http://localhost:7777/${encodeURI(node.path)}` : getVideoThumbUrl(node.path);
+              sprite.scale.set(16, 12, 1);
+              textureCache.set(key, sprite);
+            }
+            return textureCache.get(key);
+          });
+          // 再描画
+          Graph.refresh();
+        }
+        mediaBtn?.addEventListener('click', () => setMediaTextures(true));
+        colorBtn?.addEventListener('click', () => setMediaTextures(false));
       }
       
       // 初期化開始（ページ読み込み完了後）
