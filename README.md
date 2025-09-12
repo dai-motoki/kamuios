@@ -34,6 +34,30 @@ Media Gallery: http://localhost:1313/#dynamic-media-gallery
 
 - **Hugo Server**: ポート1313（メインサイト）
 - **Media Gallery Server**: ポート7777（メディアファイル配信）
+- **API Server**: ポート3001（X投稿API等）
+
+### X投稿機能の設定
+
+1. 環境変数の設定
+```bash
+cp .env.example .env
+# .envファイルを編集して、X APIの認証情報を設定
+```
+
+2. 必要なパッケージのインストール
+```bash
+npm install
+```
+
+3. APIサーバーの起動
+```bash
+npm start
+# または開発モード
+npm run dev
+```
+
+4. X投稿ページにアクセス
+http://localhost:1313/#x-posting
 
 ### トラブルシューティング
 
@@ -44,5 +68,9 @@ pkill hugo
 
 # Node.jsサーバーを停止
 lsof -i :7777
+kill -9 <PID>
+
+# APIサーバーを停止
+lsof -i :3001
 kill -9 <PID>
 ```

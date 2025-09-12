@@ -2,6 +2,10 @@ const express = require('express');
 const fs = require('fs').promises;
 const path = require('path');
 const cors = require('cors');
+require('dotenv').config();
+
+// X投稿APIモジュールをインポート
+const { upload, postToX } = require('./api/x-post');
 
 const app = express();
 const PORT = 3001;
@@ -45,8 +49,12 @@ app.get('/api/images', async (req, res) => {
   }
 });
 
+// X投稿API
+app.post('/api/x-post', upload.single('media'), postToX);
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
   console.log(`API endpoint: http://localhost:${PORT}/api/images`);
+  console.log(`X Post API: http://localhost:${PORT}/api/x-post`);
 });
