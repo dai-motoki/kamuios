@@ -18,13 +18,21 @@ async function postToX(req, res) {
     const { text, account } = req.body;
     const mediaFile = req.file;
     
-    // アカウントに応じた認証情報を取得
-    const apiKey = process.env[`X_API_KEY_${account}`];
-    const apiSecret = process.env[`X_API_SECRET_${account}`];
+    // 共通のAPI認証情報を取得
+    const apiKey = process.env.X_API_KEY;
+    const apiSecret = process.env.X_API_SECRET;
+    
+    // アカウントに応じたアクセストークンを取得
     const accessToken = process.env[`X_ACCESS_TOKEN_${account}`];
     const accessTokenSecret = process.env[`X_ACCESS_TOKEN_SECRET_${account}`];
     
-    if (!apiKey || !apiSecret || !accessToken || !accessTokenSecret) {
+    if (!apiKey || !apiSecret) {
+      return res.status(400).json({ 
+        error: 'X APIの認証情報が設定されていません' 
+      });
+    }
+    
+    if (!accessToken || !accessTokenSecret) {
       return res.status(400).json({ 
         error: `アカウント${account}の認証情報が設定されていません` 
       });
