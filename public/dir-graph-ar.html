@@ -20,10 +20,20 @@
     let Graph;
     let graphContainer;
     let controller1, controller2;
+    let controllerGrip1, controllerGrip2;
     let selectLine1, selectLine2;
     let selectedObject = null;
     let grabDistance = 0;
     let originalScale = null;
+
+    // 2本持ち操作用（スケール/回転）
+    let grip1Pressed = false;
+    let grip2Pressed = false;
+    let twoHandActive = false;
+    let initialPinchDistance = 0;
+    let initialGraphScale = 1;
+    let initialGripVector = new THREE.Vector3();
+    let initialGraphRotationY = 0;
 
     // バックエンド設定
     function getBackendBase(){
@@ -450,6 +460,8 @@
       controller1 = renderer.xr.getController(0);
       controller1.addEventListener('selectstart', onSelectStart);
       controller1.addEventListener('selectend', onSelectEnd);
+      controller1.addEventListener('squeezestart', onSqueezeStart);
+      controller1.addEventListener('squeezeend', onSqueezeEnd);
       controller1.addEventListener('connected', (event) => {
         controller1.gamepad = event.data.gamepad;
       });
@@ -459,10 +471,18 @@
       controller2 = renderer.xr.getController(1);
       controller2.addEventListener('selectstart', onSelectStart);
       controller2.addEventListener('selectend', onSelectEnd);
+      controller2.addEventListener('squeezestart', onSqueezeStart);
+      controller2.addEventListener('squeezeend', onSqueezeEnd);
       controller2.addEventListener('connected', (event) => {
         controller2.gamepad = event.data.gamepad;
       });
       scene.add(controller2);
+
+      // 物理グリップ空間（スケール/回転の基準）
+      controllerGrip1 = renderer.xr.getControllerGrip(0);
+      controllerGrip2 = renderer.xr.getControllerGrip(1);
+      scene.add(controllerGrip1);
+      scene.add(controllerGrip2);
 
       // 選択ライン（レイキャスト表示）
       const geometry = new THREE.BufferGeometry().setFromPoints([
@@ -483,7 +503,7 @@
       controller2.add(selectLine2);
     }
 
-    // オブジェクト選択開始
+    // オブジェクト選択開始（トリガー）
     function onSelectStart(event) {
       const controller = event.target;
       const selectLine = controller === controller1 ? selectLine1 : selectLine2;
@@ -504,27 +524,63 @@
         grabDistance = intersects[0].distance;
         controller.userData.selected = selectedObject;
         selectLine.visible = true;
-        
-        // 選択したオブジェクトの色を変更
-        if (selectedObject.material) {
-          selectedObject.userData.originalColor = selectedObject.material.color.getHex();
-          selectedObject.material.color.setHex(0xffff00);
+
+        // 視線方向に一定距離で保持するためコントローラーにアタッチ
+        if (selectedObject) {
+          selectedObject.userData.prevParent = selectedObject.parent;
+          // ハイライト（色がある場合のみ）
+          if (selectedObject.material && selectedObject.material.color) {
+            selectedObject.userData.originalColor = selectedObject.material.color.getHex();
+            selectedObject.material.color.setHex(0xffff00);
+          }
+          controller.attach(selectedObject);
+          // コントローラー前方に配置
+          selectedObject.position.set(0, 0, -grabDistance);
         }
       }
     }
 
-    // オブジェクト選択終了
+    // オブジェクト選択終了（トリガー）
     function onSelectEnd(event) {
       const controller = event.target;
       const selectLine = controller === controller1 ? selectLine1 : selectLine2;
       
       if (controller.userData.selected) {
+        const obj = controller.userData.selected;
+        // 元の親に戻す
+        if (obj.userData && obj.userData.prevParent) {
+          obj.userData.prevParent.attach(obj);
+        } else {
+          graphContainer.attach(obj);
+        }
         // 元の色に戻す
-        if (controller.userData.selected.material && controller.userData.selected.userData.originalColor !== undefined) {
-          controller.userData.selected.material.color.setHex(controller.userData.selected.userData.originalColor);
+        if (obj.material && obj.userData && obj.userData.originalColor !== undefined) {
+          obj.material.color.setHex(obj.userData.originalColor);
         }
         controller.userData.selected = undefined;
         selectLine.visible = false;
+      }
+    }
+
+    // グリップ開始（2本持ち操作）
+    function onSqueezeStart(event) {
+      if (event.target === controller1) grip1Pressed = true;
+      if (event.target === controller2) grip2Pressed = true;
+      if (grip1Pressed && grip2Pressed) {
+        twoHandActive = true;
+        initialPinchDistance = controllerGrip1.position.distanceTo(controllerGrip2.position);
+        initialGraphScale = graphContainer.scale.x;
+        initialGripVector.copy(new THREE.Vector3().subVectors(controllerGrip2.position, controllerGrip1.position));
+        initialGraphRotationY = graphContainer.rotation.y;
+      }
+    }
+
+    // グリップ終了
+    function onSqueezeEnd(event) {
+      if (event.target === controller1) grip1Pressed = false;
+      if (event.target === controller2) grip2Pressed = false;
+      if (!(grip1Pressed && grip2Pressed)) {
+        twoHandActive = false;
       }
     }
 
@@ -571,63 +627,21 @@
     function updateControllers() {
       if (!renderer.xr.isPresenting) return;
 
-      // 両方のコントローラーを処理
-      [controller1, controller2].forEach((controller, index) => {
-        if (!controller.gamepad) return;
-
-        const gamepad = controller.gamepad;
-        const selectLine = index === 0 ? selectLine1 : selectLine2;
-
-        // トリガーでオブジェクトを移動
-        if (controller.userData.selected && gamepad.buttons[1].pressed) {
-          const tempMatrix = new THREE.Matrix4();
-          tempMatrix.identity().extractRotation(controller.matrixWorld);
-          
-          const direction = new THREE.Vector3(0, 0, -grabDistance);
-          direction.applyMatrix4(tempMatrix);
-          
-          controller.userData.selected.position.copy(controller.position).add(direction);
+      // 2本持ちのスケール/回転
+      if (twoHandActive) {
+        const currentDistance = controllerGrip1.position.distanceTo(controllerGrip2.position);
+        if (initialPinchDistance > 0) {
+          const ratio = currentDistance / initialPinchDistance;
+          const newScale = THREE.MathUtils.clamp(initialGraphScale * ratio, 0.005, 0.2);
+          graphContainer.scale.setScalar(newScale);
         }
 
-        // グリップボタンでグラフ全体を操作
-        if (gamepad.buttons[2] && gamepad.buttons[2].pressed) {
-          // 左スティックで回転
-          if (Math.abs(gamepad.axes[2]) > 0.1) {
-            graphContainer.rotation.y += gamepad.axes[2] * 0.02;
-          }
-          if (Math.abs(gamepad.axes[3]) > 0.1) {
-            graphContainer.rotation.x += gamepad.axes[3] * 0.02;
-          }
-
-          // 右スティックで拡大縮小
-          if (Math.abs(gamepad.axes[0]) > 0.1 || Math.abs(gamepad.axes[1]) > 0.1) {
-            const scaleChange = 1 + (gamepad.axes[1] * 0.01);
-            graphContainer.scale.multiplyScalar(scaleChange);
-            
-            // スケールの範囲を制限
-            const minScale = 0.001;
-            const maxScale = 0.1;
-            graphContainer.scale.clampScalar(minScale, maxScale);
-          }
-        }
-
-        // タッチパッドで位置移動
-        if (gamepad.buttons[0] && gamepad.buttons[0].touched) {
-          if (Math.abs(gamepad.axes[0]) > 0.1) {
-            graphContainer.position.x += gamepad.axes[0] * 0.01;
-          }
-          if (Math.abs(gamepad.axes[1]) > 0.1) {
-            graphContainer.position.z -= gamepad.axes[1] * 0.01;
-          }
-        }
-
-        // レイキャスト表示の更新
-        if (gamepad.buttons[1].pressed && !controller.userData.selected) {
-          selectLine.visible = true;
-        } else if (!controller.userData.selected) {
-          selectLine.visible = false;
-        }
-      });
+        const currentVector = new THREE.Vector3().subVectors(controllerGrip2.position, controllerGrip1.position);
+        const initAz = Math.atan2(initialGripVector.x, initialGripVector.z);
+        const curAz = Math.atan2(currentVector.x, currentVector.z);
+        const deltaYaw = curAz - initAz;
+        graphContainer.rotation.y = initialGraphRotationY + deltaYaw;
+      }
     }
 
     // 開始
