@@ -1,13 +1,13 @@
 # X投稿管理システム
 
 - id: x-posting
-  category: 8
-  category_name: プライベート
+  category: 7
+  category_name: SNS・マーケティング
   title: X投稿管理
   private: true
   required_roles: ["admin", "member"]
   content: |
-    X（旧Twitter）への投稿を管理するシステムです。複数アカウントの切り替えに対応しています。
+    X（旧Twitter）への投稿を管理するシステムです。スレッド投稿では概要が100文字ごとに自動分割されます。
   
   custom_html: |
     <style>
@@ -46,35 +46,6 @@
         font-size: 0.95rem;
       }
       
-      .account-selector {
-        margin-bottom: 30px;
-      }
-      
-      .account-label {
-        display: block;
-        font-size: 0.9rem;
-        font-weight: 600;
-        color: var(--text);
-        margin-bottom: 8px;
-      }
-      
-      .account-select {
-        width: 100%;
-        padding: 10px 12px;
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        background: var(--sidebar-bg);
-        color: var(--text);
-        font-size: 1rem;
-        cursor: pointer;
-        transition: border-color 0.3s ease;
-      }
-      
-      .account-select:hover,
-      .account-select:focus {
-        border-color: #1da1f2;
-        outline: none;
-      }
       
       .post-form {
         display: flex;
@@ -261,8 +232,12 @@
       }
       
       .post-button:disabled {
-        opacity: 0.5;
+        opacity: 0.7;
         cursor: not-allowed;
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
       
       .status-message {
@@ -271,13 +246,18 @@
         margin-top: 20px;
         font-size: 0.95rem;
         display: none;
+        position: relative;
+        z-index: 1000;
+        font-weight: 600;
       }
       
       .status-message.success {
-        background: rgba(76, 175, 80, 0.1);
-        border: 1px solid #4caf50;
-        color: #4caf50;
+        background: rgba(76, 175, 80, 0.2);
+        border: 2px solid #4caf50;
+        color: #2e7d32;
         display: block;
+        box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        animation: slideIn 0.3s ease-out;
       }
       
       .status-message.error {
@@ -294,19 +274,24 @@
         display: block;
       }
       
-      .loading-spinner {
-        display: inline-block;
-        width: 16px;
-        height: 16px;
-        border: 2px solid rgba(29, 161, 242, 0.3);
-        border-top-color: #1da1f2;
-        border-radius: 50%;
-        animation: spin 0.8s linear infinite;
-        margin-right: 8px;
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
       
-      @keyframes spin {
-        to { transform: rotate(360deg); }
+      .loading-text {
+        animation: blink 1s infinite;
+      }
+      
+      @keyframes blink {
+        0%, 50% { opacity: 1; }
+        51%, 100% { opacity: 0.3; }
       }
     </style>
     
@@ -316,7 +301,7 @@
           <svg class="x-logo" viewBox="0 0 24 24" fill="currentColor">
             <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
           </svg>
-          X投稿管理
+          投稿管理
         </h1>
         <p class="x-description">
           複数のXアカウントから投稿を管理できます。テキストと動画の投稿に対応しています。
@@ -324,14 +309,6 @@
       </div>
       
       <div class="post-form">
-        <div class="account-selector">
-          <label class="account-label">投稿アカウント</label>
-          <select id="accountSelect" class="account-select">
-            <option value="1">アカウント 1</option>
-            <option value="2">アカウント 2</option>
-            <option value="3">アカウント 3</option>
-          </select>
-        </div>
         
         <div class="form-group">
           <label class="form-label">投稿内容</label>
@@ -339,9 +316,9 @@
             id="postText" 
             class="text-input" 
             placeholder="投稿する内容を入力してください..."
-            maxlength="280"
+            maxlength="140"
           ></textarea>
-          <div id="charCounter" class="char-counter">0 / 280</div>
+          <div id="charCounter" class="char-counter">0 / 140</div>
         </div>
         
         <div class="form-group">
@@ -355,7 +332,7 @@
           <textarea 
             id="postDescription" 
             class="description-input" 
-            placeholder="動画の概要を入力（100文字以内推奨）..."
+            placeholder="動画の概要を入力（100文字ごとに分割してスレッド投稿されます）..."
             maxlength="500"
           ></textarea>
           <div id="descCharCounter" class="char-counter">0 / 500</div>
@@ -398,7 +375,6 @@
     <script>
       (function() {
         // 要素の取得
-        const accountSelect = document.getElementById('accountSelect');
         const postText = document.getElementById('postText');
         const charCounter = document.getElementById('charCounter');
         const enableThread = document.getElementById('enableThread');
@@ -415,23 +391,58 @@
         const statusMessage = document.getElementById('statusMessage');
         
         let selectedFile = null;
+        let apiBaseUrl = '';
+        
+        // 環境設定の読み込み（オプショナル）
+        async function loadConfig() {
+          // 開発環境の可能性があるAPIサーバーのURLリスト
+          const possibleApiUrls = [
+            'http://localhost:3001',
+            'http://localhost:3000', 
+            'http://localhost:8080',
+            ''  // 相対パス（本番環境）
+          ];
+          
+          for (const baseUrl of possibleApiUrls) {
+            try {
+              const configUrl = baseUrl ? `${baseUrl}/api/config` : '/api/config';
+              const response = await fetch(configUrl);
+              
+              if (response.ok) {
+                const config = await response.json();
+                apiBaseUrl = config.apiBaseUrl || baseUrl;
+                console.log('設定読み込み成功:', { configUrl, config, apiBaseUrl });
+                return; // 成功したら終了
+              }
+            } catch (error) {
+              console.log(`${baseUrl || '相対パス'} での設定取得失敗:`, error.message);
+            }
+          }
+          
+          // 全て失敗した場合は相対パスで動作
+          console.log('全ての設定API取得に失敗、相対パスで動作');
+          apiBaseUrl = '';
+        }
+        
+        // 初期化時に設定を読み込み
+        loadConfig();
         
         // スレッド投稿の切り替え
         enableThread.addEventListener('change', function() {
           descriptionGroup.style.display = this.checked ? 'block' : 'none';
         });
         
-        // 文字数カウンター
+        // 文字数カウンター（日本語対応）
         postText.addEventListener('input', function() {
           const length = this.value.length;
-          charCounter.textContent = `${length} / 280`;
+          charCounter.textContent = `${length} / 140`;
           
           // 文字数に応じて色を変更
           charCounter.classList.remove('warning', 'error');
-          if (length > 280) {
+          if (length > 140) {
             charCounter.classList.add('error');
             postButton.disabled = true;
-          } else if (length > 250) {
+          } else if (length > 120) {
             charCounter.classList.add('warning');
             postButton.disabled = false;
           } else {
@@ -510,7 +521,7 @@
         // クリアボタン
         clearButton.addEventListener('click', function() {
           postText.value = '';
-          charCounter.textContent = '0 / 280';
+          charCounter.textContent = '0 / 140';
           charCounter.classList.remove('warning', 'error');
           postDescription.value = '';
           descCharCounter.textContent = '0 / 500';
@@ -535,14 +546,18 @@
             return;
           }
           
-          // ボタンを無効化
+          // ボタンを無効化してローディング表示
           postButton.disabled = true;
-          postButton.innerHTML = '<span class="loading-spinner"></span>投稿中...';
+          postButton.innerHTML = '<span class="loading-text">投稿中...</span>';
           
           try {
+            // 設定が読み込まれていない場合は再読み込み
+            if (apiBaseUrl === '') {
+              await loadConfig();
+            }
+            
             const formData = new FormData();
             formData.append('text', text);
-            formData.append('account', accountSelect.value);
             formData.append('description', description);
             formData.append('enableThread', enableThread.checked);
             
@@ -550,23 +565,33 @@
               formData.append('media', selectedFile);
             }
             
-            const response = await fetch('/api/x-post', {
+            // 環境設定からAPIサーバーURLを構築
+            const apiUrl = apiBaseUrl ? `${apiBaseUrl}/api/x-post` : '/api/x-post';
+            const response = await fetch(apiUrl, {
               method: 'POST',
               body: formData
             });
             
-            const result = await response.json();
-            
-            if (result.success) {
-              let message = '投稿が完了しました！';
-              if (result.url) {
-                message += ` <a href="${result.url}" target="_blank">投稿を見る</a>`;
+            if (response.ok) {
+              const result = await response.json();
+              
+              if (result.success) {
+                let message = '🎉 投稿が完了しました！';
+                if (result.url) {
+                  message += ` <a href="${result.url}" target="_blank" style="color: #1da1f2; text-decoration: underline;">投稿を見る →</a>`;
+                }
+                if (result.mainTweetId) {
+                  message += ` (ID: ${result.mainTweetId})`;
+                }
+                // フォームを先にクリア
+                clearButton.click();
+                // その後でステータスメッセージ表示
+                showStatus(message, 'success');
+              } else {
+                showStatus(result.error || '投稿に失敗しました', 'error');
               }
-              showStatus(message, 'success');
-              // フォームをクリア
-              clearButton.click();
             } else {
-              showStatus(result.error || '投稿に失敗しました', 'error');
+              showStatus(`投稿エラー: ${response.status} ${response.statusText}`, 'error');
             }
           } catch (error) {
             console.error('投稿エラー:', error);
@@ -580,15 +605,9 @@
         
         // ステータスメッセージ表示
         function showStatus(message, type) {
-          statusMessage.innerHTML = message; // HTMLを許可してリンクを表示
+          statusMessage.innerHTML = message;
           statusMessage.className = `status-message ${type}`;
           statusMessage.style.display = 'block';
-          
-          if (type === 'success') {
-            setTimeout(() => {
-              statusMessage.style.display = 'none';
-            }, 10000); // 成功メッセージは10秒表示
-          }
         }
       })();
     </script>

@@ -2,7 +2,7 @@ const express = require('express');
 const fs = require('fs').promises;
 const path = require('path');
 const cors = require('cors');
-require('dotenv').config();
+require('dotenv').config({ path: '.env.local' });
 
 // X投稿APIモジュールをインポート（純JavaScript版）
 const { upload, postToX } = require('./api/x-post');
@@ -49,8 +49,16 @@ app.get('/api/images', async (req, res) => {
   }
 });
 
+// 環境設定API（フロントエンド用）
+app.get('/api/config', (req, res) => {
+  res.json({
+    apiBaseUrl: process.env.API_BASE_URL || ''
+  });
+});
+
 // X投稿API
 app.post('/api/x-post', upload.single('media'), postToX);
+
 
 // Start server
 app.listen(PORT, () => {

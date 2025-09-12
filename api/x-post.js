@@ -22,7 +22,7 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// 環境変数の検証（Pythonと同じロジック）
+// 環境変数の検証（動的アカウント対応）
 function validateEnvironment(account) {
   const requiredVars = [
     'X_API_KEY',
@@ -270,12 +270,12 @@ function splitDescriptionBy100Chars(text, maxLength = 100) {
 }
 
 // スレッド投稿（Pythonのpost_thread_with_videoと完全に同じロジック）
-async function postThreadWithVideo(postTitle, disclaimer, videoDescription, mediaId, oauth, token, userData, enableThread) {
+async function postThreadWithVideo(postTitle, videoDescription, mediaId, oauth, token, userData, enableThread) {
   try {
     const tweetIds = [];
     
-    // 投稿1: メイン投稿（タイトル + 動画 + kamui.aiリンク）
-    const mainText = `${postTitle}\n\nhttps://www.kamui.ai/`;
+    // 投稿1: メイン投稿（タイトル + 動画）
+    const mainText = postTitle;
     console.log(`📝 投稿1: メイン投稿`);
     
     const tweetUrl = 'https://api.twitter.com/2/tweets';
@@ -320,58 +320,16 @@ async function postThreadWithVideo(postTitle, disclaimer, videoDescription, medi
     console.log('⏱️ 投稿間隔待機中...');
     await sleep(3000);
     
-    // 投稿2: 免責事項（メイン投稿への返信）
-    console.log(`📝 投稿2: 免責事項リプライ`);
-    const disclaimerData = {
-      text: disclaimer,
-      reply: {
-        in_reply_to_tweet_id: mainTweetId
-      }
-    };
-    
-    const disclaimerRequest = {
-      url: tweetUrl,
-      method: 'POST'
-    };
-    
-    const disclaimerAuth = oauth.authorize(disclaimerRequest, token);
-    const disclaimerResponse = await axios.post(tweetUrl, disclaimerData, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...oauth.toHeader(disclaimerAuth)
-      }
-    });
-    
-    const disclaimerTweetId = disclaimerResponse.data.data.id;
-    tweetIds.push(disclaimerTweetId);
-    console.log(`✅ 免責事項投稿成功! ID: ${disclaimerTweetId}`);
-    
-    // 投稿間隔（スパム判定回避）
-    console.log('⏱️ 投稿間隔待機中...');
-    await sleep(3000);
-    
-    // 投稿3以降: 概要（分割投稿対応）
+    // 投稿2以降: 概要（分割投稿対応）
     if (videoDescription && videoDescription.trim()) {
       console.log(`📝 概要投稿開始 - 全文: ${videoDescription.length}文字`);
       
       // 説明文を100文字ずつに分割
       const descriptionChunks = splitDescriptionBy100Chars(videoDescription);
       
-      // スパム防止のための最大投稿数制限
-      const maxDescriptionPosts = 5;
-      if (descriptionChunks.length > maxDescriptionPosts) {
-        console.log(`⚠️ 投稿数制限: ${descriptionChunks.length}個 → ${maxDescriptionPosts}個に制限`);
-        descriptionChunks.splice(maxDescriptionPosts);
-        // 最後の投稿に省略を示す
-        if (descriptionChunks.length > 0) {
-          descriptionChunks[descriptionChunks.length - 1] = 
-            descriptionChunks[descriptionChunks.length - 1].substring(0, 94) + '...';
-        }
-      }
-      
       console.log(`📝 分割結果: ${descriptionChunks.length}個の投稿に分割`);
       
-      let lastTweetId = disclaimerTweetId;
+      let lastTweetId = mainTweetId;
       
       for (let i = 0; i < descriptionChunks.length; i++) {
         const chunk = descriptionChunks[i];
@@ -473,7 +431,9 @@ async function postThreadWithVideo(postTitle, disclaimer, videoDescription, medi
 // X投稿処理（メイン関数 - Pythonのmain()と同じロジック）
 async function postToX(req, res) {
   try {
-    const { text, account, description, enableThread } = req.body;
+    const { text, description, enableThread } = req.body;
+    // デフォルトアカウントIDを使用（環境変数で設定可能）
+    const account = process.env.X_DEFAULT_ACCOUNT || '1';
     const mediaFile = req.file;
     
     console.log('=== X API 動画投稿 SaaS版 ===');
@@ -516,16 +476,9 @@ async function postToX(req, res) {
     const videoDescription = description || '';
     const enableThreadBool = enableThread === 'true' || enableThread === true;
     
-    // 免責事項を設定（Pythonと同じ）
-    const disclaimer = `
-
-お知らせ
-これはAIにより全自動で生成された動画コンテンツです。 ウェビナーの復習用やご自身のコンテンツへの展開などにご活用ください。
-
-人手による修正で信頼性の担保されたコンテンツ等は別のウェブサイトにて公開予定です。`;
+    // 免責事項は削除
     
     console.log(`📄 メイン投稿テキスト: ${postTitle}`);
-    console.log(`📄 免責事項: ${disclaimer}`);
     console.log(`📄 概要（全文）: ${videoDescription}`);
     console.log(`📊 概要文字数: ${videoDescription.length}`);
     console.log(`🔄 スレッド投稿: ${enableThreadBool ? '有効' : '無効'}`);
@@ -569,7 +522,6 @@ async function postToX(req, res) {
     try {
       const result = await postThreadWithVideo(
         postTitle,
-        disclaimer,
         videoDescription,
         mediaId,
         oauth,
