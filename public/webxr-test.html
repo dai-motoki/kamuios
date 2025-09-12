@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebXR Test - Simple AR/VR</title>
+  <style>
+    body { margin: 0; font-family: sans-serif; }
+    #info { position: absolute; top: 10px; left: 10px; color: white; background: rgba(0,0,0,0.5); padding: 10px; }
+    button { margin: 5px; padding: 10px; }
+  </style>
+</head>
+<body>
+  <div id="info">WebXR Simple Test</div>
+
+  <script src="https://cdn.jsdelivr.net/npm/three@0.158/build/three.min.js"></script>
+  <script>
+    // グローバル変数
+    let renderer, scene, camera;
+    let cube;
+
+    // 初期化
+    function init() {
+      // シーン
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x000000);
+
+      // カメラ
+      camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 20);
+
+      // レンダラー
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.xr.enabled = true;
+      document.body.appendChild(renderer.domElement);
+
+      // テストキューブ
+      const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
+      const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+      cube = new THREE.Mesh(geometry, material);
+      cube.position.set(0, 0, -1);
+      scene.add(cube);
+
+      // ライト
+      const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
+      scene.add(light);
+
+      // ARボタン作成（手動）
+      const arButton = document.createElement('button');
+      arButton.textContent = 'START AR';
+      arButton.style.position = 'absolute';
+      arButton.style.bottom = '20px';
+      arButton.style.left = '50%';
+      arButton.style.transform = 'translateX(-50%)';
+      arButton.style.padding = '12px 20px';
+      arButton.style.border = '1px solid white';
+      arButton.style.borderRadius = '4px';
+      arButton.style.background = 'rgba(0,0,0,0.5)';
+      arButton.style.color = 'white';
+      arButton.style.fontFamily = 'sans-serif';
+      arButton.style.fontSize = '16px';
+      arButton.style.cursor = 'pointer';
+      
+      arButton.onclick = async () => {
+        if (!navigator.xr) {
+          alert('WebXR not supported');
+          return;
+        }
+
+        try {
+          // AR セッションを開始
+          const session = await navigator.xr.requestSession('immersive-ar', {
+            requiredFeatures: ['local'],
+            optionalFeatures: ['local-floor', 'bounded-floor', 'hand-tracking']
+          });
+
+          // セッション設定
+          renderer.xr.setReferenceSpaceType('local');
+          await renderer.xr.setSession(session);
+
+          arButton.textContent = 'AR ACTIVE';
+          arButton.style.display = 'none';
+
+          session.addEventListener('end', () => {
+            arButton.style.display = 'block';
+            arButton.textContent = 'START AR';
+          });
+
+        } catch (e) {
+          console.error('AR Error:', e);
+          alert('AR Error: ' + e.message);
+        }
+      };
+
+      document.body.appendChild(arButton);
+
+      // VRボタン作成（手動）
+      const vrButton = document.createElement('button');
+      vrButton.textContent = 'START VR';
+      vrButton.style.position = 'absolute';
+      vrButton.style.bottom = '20px';
+      vrButton.style.right = '20px';
+      vrButton.style.padding = '12px 20px';
+      vrButton.style.border = '1px solid white';
+      vrButton.style.borderRadius = '4px';
+      vrButton.style.background = 'rgba(0,0,0,0.5)';
+      vrButton.style.color = 'white';
+      vrButton.style.fontFamily = 'sans-serif';
+      vrButton.style.fontSize = '16px';
+      vrButton.style.cursor = 'pointer';
+
+      vrButton.onclick = async () => {
+        if (!navigator.xr) {
+          alert('WebXR not supported');
+          return;
+        }
+
+        try {
+          // VR セッションを開始
+          const session = await navigator.xr.requestSession('immersive-vr', {
+            requiredFeatures: ['local'],
+            optionalFeatures: ['local-floor', 'bounded-floor', 'hand-tracking']
+          });
+
+          // セッション設定
+          renderer.xr.setReferenceSpaceType('local');
+          await renderer.xr.setSession(session);
+
+          vrButton.textContent = 'VR ACTIVE';
+          vrButton.style.display = 'none';
+
+          session.addEventListener('end', () => {
+            vrButton.style.display = 'block';
+            vrButton.textContent = 'START VR';
+          });
+
+        } catch (e) {
+          console.error('VR Error:', e);
+          alert('VR Error: ' + e.message);
+        }
+      };
+
+      document.body.appendChild(vrButton);
+
+      // WebXRサポートチェック
+      checkXRSupport();
+
+      // リサイズ
+      window.addEventListener('resize', onWindowResize);
+    }
+
+    // WebXRサポートチェック
+    async function checkXRSupport() {
+      const info = document.getElementById('info');
+      const messages = ['WebXR Simple Test'];
+
+      if ('xr' in navigator) {
+        messages.push('✓ WebXR API available');
+
+        try {
+          const arSupported = await navigator.xr.isSessionSupported('immersive-ar');
+          messages.push(arSupported ? '✓ AR supported' : '✗ AR not supported');
+        } catch (e) {
+          messages.push('✗ AR check failed: ' + e.message);
+        }
+
+        try {
+          const vrSupported = await navigator.xr.isSessionSupported('immersive-vr');
+          messages.push(vrSupported ? '✓ VR supported' : '✗ VR not supported');
+        } catch (e) {
+          messages.push('✗ VR check failed: ' + e.message);
+        }
+      } else {
+        messages.push('✗ WebXR not available');
+      }
+
+      info.innerHTML = messages.join('<br>');
+    }
+
+    // リサイズハンドラ
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    // アニメーションループ
+    function animate() {
+      renderer.setAnimationLoop(render);
+    }
+
+    function render() {
+      // キューブを回転
+      if (cube) {
+        cube.rotation.x += 0.01;
+        cube.rotation.y += 0.01;
+      }
+
+      renderer.render(scene, camera);
+    }
+
+    // 開始
+    init();
+    animate();
+  </script>
+</body>
+</html>

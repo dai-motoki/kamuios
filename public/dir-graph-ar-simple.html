@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Directory Graph AR - Simple</title>
+  <style>
+    body { margin: 0; font-family: sans-serif; overflow: hidden; }
+    #info { position: absolute; top: 10px; left: 10px; color: white; background: rgba(0,0,0,0.5); padding: 10px; z-index: 100; }
+    button { margin: 5px; padding: 10px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div id="info">Directory Graph AR - Loading...</div>
+
+  <script src="https://cdn.jsdelivr.net/npm/three@0.158/build/three.min.js"></script>
+  <script src="https://unpkg.com/3d-force-graph"></script>
+  <script>
+    // グローバル変数
+    let renderer, scene, camera;
+    let Graph;
+    let graphContainer;
+
+    // 初期化
+    async function init() {
+      const info = document.getElementById('info');
+      info.textContent = 'Initializing...';
+
+      // シーン
+      scene = new THREE.Scene();
+      scene.background = null; // 透明背景
+
+      // カメラ
+      camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 20);
+
+      // レンダラー
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.xr.enabled = true;
+      renderer.setClearAlpha(0);
+      document.body.appendChild(renderer.domElement);
+
+      // サンプルグラフデータを作成
+      const graphData = {
+        nodes: [
+          { id: '1', name: 'root', type: 'directory' },
+          { id: '2', name: 'src', type: 'directory' },
+          { id: '3', name: 'public', type: 'directory' },
+          { id: '4', name: 'data', type: 'directory' },
+          { id: '5', name: 'index.js', type: 'file' },
+          { id: '6', name: 'style.css', type: 'file' },
+          { id: '7', name: 'app.js', type: 'file' },
+          { id: '8', name: 'config.json', type: 'file' }
+        ],
+        links: [
+          { source: '1', target: '2' },
+          { source: '1', target: '3' },
+          { source: '1', target: '4' },
+          { source: '2', target: '5' },
+          { source: '2', target: '7' },
+          { source: '3', target: '6' },
+          { source: '4', target: '8' }
+        ]
+      };
+      
+      // グラフコンテナを作成
+      graphContainer = new THREE.Group();
+      graphContainer.name = 'graph-container';
+      
+      // ノードを作成
+      const nodePositions = {};
+      graphData.nodes.forEach((node, index) => {
+        const geometry = new THREE.SphereGeometry(2);
+        const material = new THREE.MeshBasicMaterial({ 
+          color: node.type === 'directory' ? 0x4444ff : 0xff4444 
+        });
+        const sphere = new THREE.Mesh(geometry, material);
+        
+        // 円形に配置
+        const angle = (index / graphData.nodes.length) * Math.PI * 2;
+        const radius = 30;
+        const x = Math.cos(angle) * radius;
+        const y = (Math.random() - 0.5) * 20;
+        const z = Math.sin(angle) * radius;
+        
+        sphere.position.set(x, y, z);
+        nodePositions[node.id] = sphere.position;
+        graphContainer.add(sphere);
+      });
+      
+      // リンクを作成
+      graphData.links.forEach(link => {
+        const sourcePos = nodePositions[link.source];
+        const targetPos = nodePositions[link.target];
+        if (sourcePos && targetPos) {
+          const geometry = new THREE.BufferGeometry().setFromPoints([
+            sourcePos,
+            targetPos
+          ]);
+          const material = new THREE.LineBasicMaterial({ color: 0x666666 });
+          const line = new THREE.Line(geometry, material);
+          graphContainer.add(line);
+        }
+      });
+      
+      // スケールと位置を調整
+      graphContainer.scale.setScalar(0.02);
+      graphContainer.position.set(0, 0, -2);
+      
+      // コンテナをメインシーンに追加
+      scene.add(graphContainer);
+      
+      info.textContent = 'Graph loaded - ' + graphData.nodes.length + ' nodes - Ready for AR';
+
+      // ライト
+      const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
+      scene.add(light);
+
+      // ARボタン作成（webxr-test.htmlと完全に同じ）
+      const arButton = document.createElement('button');
+      arButton.textContent = 'START AR';
+      arButton.style.position = 'absolute';
+      arButton.style.bottom = '20px';
+      arButton.style.left = '50%';
+      arButton.style.transform = 'translateX(-50%)';
+      arButton.style.padding = '12px 20px';
+      arButton.style.border = '1px solid white';
+      arButton.style.borderRadius = '4px';
+      arButton.style.background = 'rgba(0,0,0,0.5)';
+      arButton.style.color = 'white';
+      arButton.style.fontFamily = 'sans-serif';
+      arButton.style.fontSize = '16px';
+      
+      arButton.onclick = async () => {
+        if (!navigator.xr) {
+          alert('WebXR not supported');
+          return;
+        }
+
+        try {
+          // AR セッションを開始
+          const session = await navigator.xr.requestSession('immersive-ar', {
+            requiredFeatures: ['local'],
+            optionalFeatures: ['local-floor', 'bounded-floor', 'hand-tracking']
+          });
+
+          // セッション設定
+          renderer.xr.setReferenceSpaceType('local');
+          await renderer.xr.setSession(session);
+
+          arButton.textContent = 'AR ACTIVE';
+          arButton.style.display = 'none';
+
+          info.textContent = 'AR Session Started!';
+
+          session.addEventListener('end', () => {
+            arButton.style.display = 'block';
+            arButton.textContent = 'START AR';
+            info.textContent = 'AR Session Ended';
+          });
+
+        } catch (e) {
+          console.error('AR Error:', e);
+          alert('AR Error: ' + e.message);
+        }
+      };
+
+      document.body.appendChild(arButton);
+
+      // WebXRサポートチェック
+      await checkXRSupport();
+
+      // リサイズ
+      window.addEventListener('resize', onWindowResize);
+    }
+
+    // WebXRサポートチェック
+    async function checkXRSupport() {
+      const info = document.getElementById('info');
+      if ('xr' in navigator) {
+        try {
+          const arSupported = await navigator.xr.isSessionSupported('immersive-ar');
+          console.log('AR supported:', arSupported);
+        } catch (e) {
+          console.error('AR check failed:', e);
+        }
+      }
+    }
+
+    // リサイズハンドラ
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    // アニメーションループ
+    function animate() {
+      renderer.setAnimationLoop(render);
+    }
+
+    function render() {
+      renderer.render(scene, camera);
+    }
+
+    // 開始
+    init();
+    animate();
+  </script>
+</body>
+</html>

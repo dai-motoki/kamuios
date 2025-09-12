@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Directory Graph AR</title>
+  <style>
+    body { margin: 0; font-family: sans-serif; overflow: hidden; }
+    #info { position: absolute; top: 10px; left: 10px; color: white; background: rgba(0,0,0,0.5); padding: 10px; z-index: 100; }
+    button { margin: 5px; padding: 10px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div id="info">Directory Graph AR - Loading...</div>
+
+  <script src="https://cdn.jsdelivr.net/npm/three@0.158/build/three.min.js"></script>
+  <script>
+    // グローバル変数
+    let renderer, scene, camera;
+    let Graph;
+    let graphContainer;
+    let controller1, controller2;
+    let selectLine1, selectLine2;
+    let selectedObject = null;
+    let grabDistance = 0;
+    let originalScale = null;
+
+    // バックエンド設定
+    function getBackendBase(){
+      try {
+        const params = new URLSearchParams(location.search);
+        const q = params.get('backend');
+        if (q){ const c=q.replace(/\/$/,''); localStorage.setItem('kamuiBackend', c); return c; }
+        const saved = (localStorage.getItem('kamuiBackend')||'').trim(); 
+        if (saved) return saved.replace(/\/$/,'');
+        return location.origin + '/backend';
+      } catch(_) { return 'http://localhost:7777'; }
+    }
+    const backendBase = getBackendBase();
+
+    // ファイルタイプを判定
+    function extType(name){
+      const ext = (name.split('.').pop()||'').toLowerCase();
+      if (['jpg','jpeg','png','gif','webp','svg'].includes(ext)) return 'image';
+      if (['mp4','mov','avi','mkv','webm'].includes(ext)) return 'video';
+      if (['mp3','wav','ogg','flac','m4a'].includes(ext)) return 'audio';
+      if (['html','htm'].includes(ext)) return 'html';
+      if (['yml','yaml'].includes(ext)) return 'yaml';
+      if (['json'].includes(ext)) return 'json';
+      if (['txt','md','markdown','log'].includes(ext)) return 'text';
+      if (['js','ts','tsx','jsx','py','rb','go','rs','java','c','cc','cpp','h','hpp','cs','php','sh','bash','zsh','fish'].includes(ext)) return 'code';
+      if (['pdf','doc','docx','ppt','pptx','xls','xlsx','csv','tsv'].includes(ext)) return 'doc';
+      return 'other';
+    }
+
+    // ディレクトリデータをグラフデータに変換
+    function convertToGraphData(directoryData){
+      const nodes=[]; const links=[]; let nodeId=0;
+      const root = { id: nodeId++, name:'ROOT', type:'root', path: directoryData.baseDir, group:1 };
+      nodes.push(root);
+      function walk(dir, parentId, depth=0){
+        (dir.folders||[]).forEach(f=>{
+          const id=nodeId++; nodes.push({ id, name:f.name, type:'folder', path:f.path, group:2, depth });
+          links.push({ source: parentId, target:id });
+          if (f.items) walk(f.items, id, depth+1);
+        });
+        (dir.files||[]).forEach(file=>{
+          const id=nodeId++; const t=file.type && file.type!=='other'? file.type : extType(file.name);
+          const group = t==='image'?3 : t==='video'?4 : t==='audio'?5 : t==='html'?6 : t==='yaml'?7 : t==='json'?8 : t==='code'?9 : t==='text'?11 : t==='doc'?12 : 10;
+          nodes.push({ id, name:file.name, type:t, path:file.path, size:file.size, group, depth });
+          links.push({ source: parentId, target:id });
+        });
+      }
+      walk(directoryData.data, root.id);
+      return { nodes, links };
+    }
+
+    // 初期化
+    async function init() {
+      const info = document.getElementById('info');
+      info.textContent = 'Initializing...';
+
+      // シーン
+      scene = new THREE.Scene();
+      scene.background = null; // 透明背景
+
+      // カメラ
+      camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 20);
+
+      // レンダラー
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.xr.enabled = true;
+      renderer.setClearAlpha(0);
+      document.body.appendChild(renderer.domElement);
+
+      // バックエンドからディレクトリデータを取得
+      let graphData;
+      try{
+        info.textContent = 'Fetching directory data...';
+        const res = await fetch(`${backendBase}/api/scan`); 
+        const data = await res.json();
+        graphData = convertToGraphData(data);
+        info.textContent = `Directory loaded - ${graphData.nodes.length} nodes`;
+      } catch(e){
+        console.error('Failed to fetch directory data:', e);
+        info.textContent = 'Using sample data (backend not available)';
+        // フォールバック：サンプルデータ
+        graphData = {
+          nodes: [
+            { id: '1', name: 'root', type: 'directory', group: 1 },
+            { id: '2', name: 'src', type: 'directory', group: 2 },
+            { id: '3', name: 'public', type: 'directory', group: 2 },
+            { id: '4', name: 'data', type: 'directory', group: 2 },
+            { id: '5', name: 'index.js', type: 'file', group: 9 },
+            { id: '6', name: 'style.css', type: 'file', group: 9 },
+            { id: '7', name: 'app.js', type: 'file', group: 9 },
+            { id: '8', name: 'config.json', type: 'file', group: 8 }
+          ],
+          links: [
+            { source: '1', target: '2' },
+            { source: '1', target: '3' },
+            { source: '1', target: '4' },
+            { source: '2', target: '5' },
+            { source: '2', target: '7' },
+            { source: '3', target: '6' },
+            { source: '4', target: '8' }
+          ]
+        };
+      }
+      
+      // グラフコンテナを作成
+      graphContainer = new THREE.Group();
+      graphContainer.name = 'graph-container';
+      
+      // 色パレット（グループごと）
+      const palette = {
+        1:'#ff4757', // root
+        2:'#2ed573', // folder
+        3:'#ffb84d', // image
+        4:'#6c5ce7', // video
+        5:'#eccc68', // audio
+        6:'#a4b0be', // html
+        7:'#6c5ce7', // yaml
+        8:'#00d2d3', // json
+        9:'#ff6b81', // code
+        10:'#57606f', // other
+        11:'#70a1ff', // text
+        12:'#2f3542'  // doc
+      };
+
+      // 3次元放射状レイアウト
+      const levelMap = new Map();
+      const levelNodes = [];
+      
+      // 深さ（レベル）を計算
+      function calculateLevels() {
+        // BFSで各ノードのレベルを計算
+        const visited = new Set();
+        const queue = [];
+        
+        // ルートノードを探す
+        const rootNode = graphData.nodes.find(n => n.type === 'root') || graphData.nodes[0];
+        rootNode.level = 0;
+        queue.push(rootNode);
+        visited.add(rootNode.id);
+        
+        while (queue.length > 0) {
+          const current = queue.shift();
+          
+          // このノードに接続されている子ノードを探す
+          graphData.links.forEach(link => {
+            if (link.source === current.id || link.source.id === current.id) {
+              const targetId = typeof link.target === 'object' ? link.target.id : link.target;
+              const targetNode = graphData.nodes.find(n => n.id === targetId);
+              
+              if (targetNode && !visited.has(targetNode.id)) {
+                targetNode.level = current.level + 1;
+                queue.push(targetNode);
+                visited.add(targetNode.id);
+              }
+            }
+          });
+        }
+        
+        // レベルごとにノードをグループ化
+        graphData.nodes.forEach(node => {
+          const level = node.level || 0;
+          if (!levelNodes[level]) levelNodes[level] = [];
+          levelNodes[level].push(node);
+        });
+      }
+      
+      calculateLevels();
+      
+      // 3次元放射状に配置（球面上に配置）
+      const radiusStep = 50; // レベル間の半径差
+      
+      levelNodes.forEach((nodes, level) => {
+        if (level === 0) {
+          // ルートノードは中心に配置
+          nodes[0].x = 0;
+          nodes[0].y = 0;
+          nodes[0].z = 0;
+        } else {
+          // 各レベルのノードを球面上に配置
+          const radius = level * radiusStep;
+          const phiStep = Math.PI / (Math.ceil(Math.sqrt(nodes.length)) + 1); // 縦方向の角度
+          const thetaStep = (2 * Math.PI) / Math.ceil(Math.sqrt(nodes.length)); // 横方向の角度
+          
+          nodes.forEach((node, index) => {
+            // 球面座標系で均等に配置
+            const row = Math.floor(index / Math.ceil(Math.sqrt(nodes.length)));
+            const col = index % Math.ceil(Math.sqrt(nodes.length));
+            
+            const phi = (row + 1) * phiStep; // 0 < phi < π
+            const theta = col * thetaStep; // 0 <= theta < 2π
+            
+            // 球面座標から直交座標へ変換
+            node.x = radius * Math.sin(phi) * Math.cos(theta);
+            node.y = radius * Math.sin(phi) * Math.sin(theta);
+            node.z = radius * Math.cos(phi);
+          });
+        }
+      });
+
+      // ノードを作成（画像はスプライト、その他はスフィア）
+      const nodePositions = {};
+      const textureCache = new Map();
+      
+      graphData.nodes.forEach((node) => {
+        if (node.type === 'image' || node.type === 'video') {
+          // 画像・動画ノードはスプライトで表示
+          const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ color: 0xffffff }));
+          
+          // 画像をロード
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => {
+            const tex = new THREE.Texture(img);
+            tex.needsUpdate = true;
+            sprite.material.map = tex;
+            sprite.material.needsUpdate = true;
+          };
+          img.src = `${backendBase}/${encodeURI(node.path)}`;
+          
+          // スプライトのサイズ設定
+          const scale = node.type === 'video' ? 8 : 6;
+          sprite.scale.set(scale, scale * 0.75, 1);
+          sprite.position.set(node.x || 0, node.y || 0, node.z || 0);
+          
+          nodePositions[node.id] = sprite.position;
+          graphContainer.add(sprite);
+        } else {
+          // その他のノードはスフィア
+          const size = node.type === 'root' ? 3 : 
+                      node.type === 'folder' ? 2 : 1;
+          
+          const geometry = new THREE.SphereGeometry(size);
+          const material = new THREE.MeshBasicMaterial({ 
+            color: palette[node.group] || '#ffffff'
+          });
+          const sphere = new THREE.Mesh(geometry, material);
+          
+          sphere.position.set(node.x || 0, node.y || 0, node.z || 0);
+          nodePositions[node.id] = sphere.position;
+          graphContainer.add(sphere);
+        }
+      });
+      
+      // リンクを作成（別のグループに保存）
+      const linksGroup = new THREE.Group();
+      linksGroup.name = 'links';
+      linksGroup.visible = false; // デフォルトで非表示
+      
+      graphData.links.forEach(link => {
+        const sourceNode = graphData.nodes.find(n => n.id === link.source);
+        const targetNode = graphData.nodes.find(n => n.id === link.target);
+        if (sourceNode && targetNode) {
+          const geometry = new THREE.BufferGeometry().setFromPoints([
+            new THREE.Vector3(sourceNode.x || 0, sourceNode.y || 0, sourceNode.z || 0),
+            new THREE.Vector3(targetNode.x || 0, targetNode.y || 0, targetNode.z || 0)
+          ]);
+          const material = new THREE.LineBasicMaterial({ 
+            color: 0xffffff,
+            opacity: 0.2,
+            transparent: true
+          });
+          const line = new THREE.Line(geometry, material);
+          linksGroup.add(line);
+        }
+      });
+      
+      graphContainer.add(linksGroup);
+      
+      // スケールと位置を調整
+      graphContainer.scale.setScalar(0.02);
+      graphContainer.position.set(0, 0, -2);
+      
+      // コンテナをメインシーンに追加
+      scene.add(graphContainer);
+      
+      info.textContent = 'Graph loaded - ' + graphData.nodes.length + ' nodes - Ready for AR';
+
+      // ライト
+      const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
+      scene.add(light);
+
+      // リンク表示切り替えボタン
+      const linkButton = document.createElement('button');
+      linkButton.textContent = 'リンク表示: OFF';
+      linkButton.style.position = 'absolute';
+      linkButton.style.top = '20px';
+      linkButton.style.right = '20px';
+      linkButton.style.padding = '10px 15px';
+      linkButton.style.border = '1px solid white';
+      linkButton.style.borderRadius = '4px';
+      linkButton.style.background = 'rgba(0,0,0,0.5)';
+      linkButton.style.color = 'white';
+      linkButton.style.fontFamily = 'sans-serif';
+      linkButton.style.fontSize = '14px';
+      linkButton.style.cursor = 'pointer';
+      
+      linkButton.onclick = () => {
+        const linksGroup = graphContainer.getObjectByName('links');
+        if (linksGroup) {
+          linksGroup.visible = !linksGroup.visible;
+          linkButton.textContent = linksGroup.visible ? 'リンク表示: ON' : 'リンク表示: OFF';
+        }
+      };
+      
+      document.body.appendChild(linkButton);
+
+      // ARボタン作成
+      const arButton = document.createElement('button');
+      arButton.textContent = 'START AR';
+      arButton.style.position = 'absolute';
+      arButton.style.bottom = '20px';
+      arButton.style.left = '50%';
+      arButton.style.transform = 'translateX(-50%)';
+      arButton.style.padding = '12px 20px';
+      arButton.style.border = '1px solid white';
+      arButton.style.borderRadius = '4px';
+      arButton.style.background = 'rgba(0,0,0,0.5)';
+      arButton.style.color = 'white';
+      arButton.style.fontFamily = 'sans-serif';
+      arButton.style.fontSize = '16px';
+      
+      arButton.onclick = async () => {
+        if (!navigator.xr) {
+          alert('WebXR not supported');
+          return;
+        }
+
+        try {
+          // AR セッションを開始
+            const session = await navigator.xr.requestSession('immersive-ar', {
+              requiredFeatures: ['local'],
+              optionalFeatures: ['local-floor', 'bounded-floor', 'hand-tracking']
+            });
+            
+          // セッション設定
+            renderer.xr.setReferenceSpaceType('local');
+            await renderer.xr.setSession(session);
+
+          arButton.textContent = 'AR ACTIVE';
+          arButton.style.display = 'none';
+
+          info.textContent = 'AR Session Started!';
+            
+            session.addEventListener('end', () => {
+            arButton.style.display = 'block';
+            arButton.textContent = 'START AR';
+            info.textContent = 'AR Session Ended';
+          });
+
+        } catch (e) {
+          console.error('AR Error:', e);
+          alert('AR Error: ' + e.message);
+        }
+      };
+
+      document.body.appendChild(arButton);
+
+      // VRボタン作成
+      const vrButton = document.createElement('button');
+      vrButton.textContent = 'START VR';
+      vrButton.style.position = 'absolute';
+      vrButton.style.bottom = '70px'; // ARボタンの上に配置
+      vrButton.style.left = '50%';
+      vrButton.style.transform = 'translateX(-50%)';
+      vrButton.style.padding = '12px 20px';
+      vrButton.style.border = '1px solid white';
+      vrButton.style.borderRadius = '4px';
+      vrButton.style.background = 'rgba(0,0,0,0.5)';
+      vrButton.style.color = 'white';
+      vrButton.style.fontFamily = 'sans-serif';
+      vrButton.style.fontSize = '16px';
+      
+      vrButton.onclick = async () => {
+        if (!navigator.xr) {
+          alert('WebXR not supported');
+          return;
+        }
+
+        try {
+          // VR セッションを開始
+            const session = await navigator.xr.requestSession('immersive-vr', {
+              requiredFeatures: ['local'],
+              optionalFeatures: ['local-floor', 'bounded-floor', 'hand-tracking']
+            });
+            
+          // セッション設定
+          renderer.xr.setReferenceSpaceType('local');
+          await renderer.xr.setSession(session);
+
+          vrButton.textContent = 'VR ACTIVE';
+          vrButton.style.display = 'none';
+
+          info.textContent = 'VR Session Started!';
+
+          session.addEventListener('end', () => {
+            vrButton.style.display = 'block';
+            vrButton.textContent = 'START VR';
+            info.textContent = 'VR Session Ended';
+          });
+
+        } catch (e) {
+          console.error('VR Error:', e);
+          alert('VR Error: ' + e.message);
+        }
+      };
+
+      document.body.appendChild(vrButton);
+
+      // WebXRサポートチェック
+      await checkXRSupport();
+
+      // リサイズ
+      window.addEventListener('resize', onWindowResize);
+
+      // VRコントローラーの設定
+      setupControllers();
+    }
+
+    // VRコントローラーの設定
+    function setupControllers() {
+      // コントローラー1（右手）
+      controller1 = renderer.xr.getController(0);
+      controller1.addEventListener('selectstart', onSelectStart);
+      controller1.addEventListener('selectend', onSelectEnd);
+      controller1.addEventListener('connected', (event) => {
+        controller1.gamepad = event.data.gamepad;
+      });
+      scene.add(controller1);
+
+      // コントローラー2（左手）
+      controller2 = renderer.xr.getController(1);
+      controller2.addEventListener('selectstart', onSelectStart);
+      controller2.addEventListener('selectend', onSelectEnd);
+      controller2.addEventListener('connected', (event) => {
+        controller2.gamepad = event.data.gamepad;
+      });
+      scene.add(controller2);
+
+      // 選択ライン（レイキャスト表示）
+      const geometry = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(0, 0, 0),
+        new THREE.Vector3(0, 0, -5)
+      ]);
+      const material = new THREE.LineBasicMaterial({
+        color: 0x00ff00,
+        linewidth: 2
+      });
+
+      selectLine1 = new THREE.Line(geometry, material);
+      selectLine1.visible = false;
+      controller1.add(selectLine1);
+
+      selectLine2 = new THREE.Line(geometry.clone(), material.clone());
+      selectLine2.visible = false;
+      controller2.add(selectLine2);
+    }
+
+    // オブジェクト選択開始
+    function onSelectStart(event) {
+      const controller = event.target;
+      const selectLine = controller === controller1 ? selectLine1 : selectLine2;
+      
+      // レイキャスト
+      const tempMatrix = new THREE.Matrix4();
+      tempMatrix.identity().extractRotation(controller.matrixWorld);
+      
+      const raycaster = new THREE.Raycaster();
+      raycaster.ray.origin.setFromMatrixPosition(controller.matrixWorld);
+      raycaster.ray.direction.set(0, 0, -1).applyMatrix4(tempMatrix);
+      
+      // グラフコンテナ内のオブジェクトと交差判定
+      const intersects = raycaster.intersectObjects(graphContainer.children, true);
+      
+      if (intersects.length > 0) {
+        selectedObject = intersects[0].object;
+        grabDistance = intersects[0].distance;
+        controller.userData.selected = selectedObject;
+        selectLine.visible = true;
+        
+        // 選択したオブジェクトの色を変更
+        if (selectedObject.material) {
+          selectedObject.userData.originalColor = selectedObject.material.color.getHex();
+          selectedObject.material.color.setHex(0xffff00);
+        }
+      }
+    }
+
+    // オブジェクト選択終了
+    function onSelectEnd(event) {
+      const controller = event.target;
+      const selectLine = controller === controller1 ? selectLine1 : selectLine2;
+      
+      if (controller.userData.selected) {
+        // 元の色に戻す
+        if (controller.userData.selected.material && controller.userData.selected.userData.originalColor !== undefined) {
+          controller.userData.selected.material.color.setHex(controller.userData.selected.userData.originalColor);
+        }
+        controller.userData.selected = undefined;
+        selectLine.visible = false;
+      }
+    }
+
+    // WebXRサポートチェック
+    async function checkXRSupport() {
+      const info = document.getElementById('info');
+      if ('xr' in navigator) {
+        try {
+          const arSupported = await navigator.xr.isSessionSupported('immersive-ar');
+          const vrSupported = await navigator.xr.isSessionSupported('immersive-vr');
+          console.log('AR supported:', arSupported);
+          console.log('VR supported:', vrSupported);
+        } catch (e) {
+          console.error('XR check failed:', e);
+        }
+      }
+    }
+
+    // リサイズハンドラ
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+            
+            // アニメーションループ
+    function animate() {
+      renderer.setAnimationLoop(render);
+    }
+
+    function render() {
+      // グラフをゆっくり回転（VR/ARモードでない場合のみ）
+      if (graphContainer && !renderer.xr.isPresenting) {
+        graphContainer.rotation.y += 0.001;
+      }
+
+      // コントローラーの状態を更新
+      updateControllers();
+
+      renderer.render(scene, camera);
+    }
+
+    // コントローラーの状態更新
+    function updateControllers() {
+      if (!renderer.xr.isPresenting) return;
+
+      // 両方のコントローラーを処理
+      [controller1, controller2].forEach((controller, index) => {
+        if (!controller.gamepad) return;
+
+        const gamepad = controller.gamepad;
+        const selectLine = index === 0 ? selectLine1 : selectLine2;
+
+        // トリガーでオブジェクトを移動
+        if (controller.userData.selected && gamepad.buttons[1].pressed) {
+          const tempMatrix = new THREE.Matrix4();
+          tempMatrix.identity().extractRotation(controller.matrixWorld);
+          
+          const direction = new THREE.Vector3(0, 0, -grabDistance);
+          direction.applyMatrix4(tempMatrix);
+          
+          controller.userData.selected.position.copy(controller.position).add(direction);
+        }
+
+        // グリップボタンでグラフ全体を操作
+        if (gamepad.buttons[2] && gamepad.buttons[2].pressed) {
+          // 左スティックで回転
+          if (Math.abs(gamepad.axes[2]) > 0.1) {
+            graphContainer.rotation.y += gamepad.axes[2] * 0.02;
+          }
+          if (Math.abs(gamepad.axes[3]) > 0.1) {
+            graphContainer.rotation.x += gamepad.axes[3] * 0.02;
+          }
+
+          // 右スティックで拡大縮小
+          if (Math.abs(gamepad.axes[0]) > 0.1 || Math.abs(gamepad.axes[1]) > 0.1) {
+            const scaleChange = 1 + (gamepad.axes[1] * 0.01);
+            graphContainer.scale.multiplyScalar(scaleChange);
+            
+            // スケールの範囲を制限
+            const minScale = 0.001;
+            const maxScale = 0.1;
+            graphContainer.scale.clampScalar(minScale, maxScale);
+          }
+        }
+
+        // タッチパッドで位置移動
+        if (gamepad.buttons[0] && gamepad.buttons[0].touched) {
+          if (Math.abs(gamepad.axes[0]) > 0.1) {
+            graphContainer.position.x += gamepad.axes[0] * 0.01;
+          }
+          if (Math.abs(gamepad.axes[1]) > 0.1) {
+            graphContainer.position.z -= gamepad.axes[1] * 0.01;
+          }
+        }
+
+        // レイキャスト表示の更新
+        if (gamepad.buttons[1].pressed && !controller.userData.selected) {
+          selectLine.visible = true;
+        } else if (!controller.userData.selected) {
+          selectLine.visible = false;
+        }
+      });
+    }
+
+    // 開始
+    init();
+    animate();
+  </script>
+</body>
+</html>
