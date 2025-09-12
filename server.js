@@ -2,6 +2,8 @@ const express = require('express');
 const fs = require('fs').promises;
 const path = require('path');
 const cors = require('cors');
+const http = require('http');
+const https = require('https');
 
 const app = express();
 const PORT = 3001;
@@ -10,8 +12,51 @@ const PORT = 3001;
 app.use(cors());
 app.use(express.json());
 
+// WebXR/AR を許可（Meta Quest など）
+app.use((req, res, next) => {
+  // xr-spatial-tracking を自身のオリジンで許可
+  res.setHeader('Permissions-Policy', 'xr-spatial-tracking=(self)');
+  next();
+});
+
 // Serve static files from public directory
 app.use(express.static('public'));
+
+// Backend proxy (to local media-scanner on 7777) => single ngrok tunnelでOK
+const BACKEND_TARGET = process.env.BACKEND_TARGET || 'http://localhost:7777';
+const backendURL = new URL(BACKEND_TARGET);
+app.use('/backend', (req, res) => {
+  const targetPath = req.originalUrl.replace(/^\/backend/, '') || '/';
+  const requestOptions = {
+    protocol: backendURL.protocol,
+    hostname: backendURL.hostname,
+    port: backendURL.port || (backendURL.protocol === 'https:' ? 443 : 80),
+    path: targetPath,
+    method: req.method,
+    headers: {
+      ...req.headers,
+      host: backendURL.host
+    }
+  };
+  const proxy = (backendURL.protocol === 'https:' ? https : http).request(requestOptions, (proxyRes) => {
+    res.status(proxyRes.statusCode || 502);
+    // 転送ヘッダ（content-length は除外）
+    Object.entries(proxyRes.headers || {}).forEach(([k, v]) => {
+      if (k.toLowerCase() === 'content-length') return;
+      res.setHeader(k, v);
+    });
+    proxyRes.pipe(res);
+  });
+  proxy.on('error', (err) => {
+    console.error('Proxy error:', err.message);
+    res.status(502).send('Bad Gateway');
+  });
+  if (req.method !== 'GET' && req.method !== 'HEAD') {
+    req.pipe(proxy);
+  } else {
+    proxy.end();
+  }
+});
 
 // API endpoint to get images list
 app.get('/api/images', async (req, res) => {

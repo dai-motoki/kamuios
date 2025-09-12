@@ -24,6 +24,13 @@
         };
         document.head.appendChild(script);
       }
+      // ARButton (WebXR) を読み込む
+      if (!(window.ARButton || (window.THREE && window.THREE.ARButton))) {
+        const arScript = document.createElement('script');
+        arScript.src = '//cdn.jsdelivr.net/npm/three@0.158/examples/js/webxr/ARButton.js';
+        arScript.onload = () => { window.__ARButtonLoaded = true; };
+        document.head.appendChild(arScript);
+      }
     </script>
     
     <style>
@@ -302,11 +309,31 @@
         waitUntilVisible();
       }
       
+      // バックエンドベースURL（ngrok/localhost/プロキシ）
+      function getBackendBase() {
+        try {
+          const params = new URLSearchParams(location.search);
+          const q = params.get('backend');
+          if (q) {
+            const cleaned = q.replace(/\/$/, '');
+            localStorage.setItem('kamuiBackend', cleaned);
+            return cleaned;
+          }
+          const saved = (localStorage.getItem('kamuiBackend') || '').trim();
+          if (saved) return saved.replace(/\/$/, '');
+          if (location.protocol.startsWith('http')) {
+            return location.origin + '/backend';
+          }
+        } catch(_) {}
+        return 'http://localhost:7777';
+      }
+      const backendBase = getBackendBase();
+
       // ディレクトリ構造を取得
       async function fetchDirectoryStructure() {
         try {
           // localhost:7777のサーバーから取得
-          const response = await fetch('http://localhost:7777/api/scan');
+          const response = await fetch(`${backendBase}/api/scan`);
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
           }
@@ -616,7 +643,7 @@
               const img = tooltip.querySelector('img');
               const cap = tooltip.querySelector('span');
               // 画像はバックエンド(7777)から配信する
-              img.src = `http://localhost:7777/${encodeURI(node.path)}`;
+              img.src = `${backendBase}/${encodeURI(node.path)}`;
               cap.textContent = node.name;
               // マウス位置に追従（複数回バインドを避ける）
               if (!tooltip.dataset.bound) {
@@ -636,6 +663,101 @@
             node.fy = node.y;
             node.fz = node.z;
           });
+
+        // WebXR AR 対応（ARButton読み込み待ちにも対応）
+        try {
+          const renderer = Graph.renderer && Graph.renderer();
+          const scene = Graph.scene && Graph.scene();
+          const mountEl = (sectionRoot && sectionRoot.querySelector && sectionRoot.querySelector('.view-toggle')) || container;
+          function trySetupAR(times = 20) {
+            try {
+              if (!renderer || !scene) return; // Graph未初期化
+              const ARLib = window.ARButton || (window.THREE && window.THREE.ARButton);
+              if (!navigator.xr || !ARLib) {
+                if (times > 0) setTimeout(() => trySetupAR(times - 1), 300);
+                return;
+              }
+              renderer.xr.enabled = true;
+              try { renderer.xr.setReferenceSpaceType && renderer.xr.setReferenceSpaceType('local'); } catch(_){ }
+              // 透明背景で実写合成
+              try { renderer.setClearAlpha(0); renderer.domElement.style.background = 'transparent'; } catch(_) {}
+              const arBtn = ARLib.createButton(renderer, { requiredFeatures: ['local'], optionalFeatures: ['hit-test'] });
+              arBtn.style.marginLeft = 'auto';
+              if (mountEl && !mountEl.querySelector('.ar-button')) {
+                // threeのARButtonはclassName='ar-button'を持つ
+                mountEl.appendChild(arBtn);
+              }
+              let arGroup = null;
+              renderer.xr.addEventListener('sessionstart', () => {
+                try {
+                  if (!arGroup) {
+                    arGroup = new THREE.Group();
+                    arGroup.name = 'graphArGroup';
+                    const toMove = scene.children.filter(obj => !obj.isLight);
+                    toMove.forEach(obj => { scene.remove(obj); arGroup.add(obj); });
+                    scene.add(arGroup);
+                  }
+                  // 自動スケール・配置
+                  arGroup.updateMatrixWorld(true);
+                  const box = new THREE.Box3().setFromObject(arGroup);
+                  const size = new THREE.Vector3(); box.getSize(size);
+                  const center = new THREE.Vector3(); box.getCenter(center);
+                  const maxDim = Math.max(size.x, size.y, size.z) || 1;
+                  const target = 1.2; // 約1.2mに収める
+                  const s = target / maxDim;
+                  arGroup.scale.setScalar(s);
+                  arGroup.position.sub(center);
+                  arGroup.position.z -= 1.5;
+                  arGroup.position.y -= 0.2;
+                  // XR描画ループ
+                  const cam = (Graph.camera && Graph.camera()) || null;
+                  if (renderer.setAnimationLoop && cam) {
+                    renderer.setAnimationLoop(() => {
+                      try { renderer.render(scene, cam); } catch(_) {}
+                    });
+                  }
+                } catch(e) { console.warn('AR group setup failed:', e); }
+              });
+              renderer.xr.addEventListener('sessionend', () => {
+                try {
+                  if (arGroup) {
+                    const toMoveBack = [...arGroup.children];
+                    toMoveBack.forEach(obj => { arGroup.remove(obj); scene.add(obj); });
+                    scene.remove(arGroup);
+                    arGroup = null;
+                  }
+                  if (renderer.setAnimationLoop) renderer.setAnimationLoop(null);
+                } catch(e) { console.warn('AR teardown failed:', e); }
+              });
+            } catch(e) { console.warn('AR setup error:', e); }
+          }
+          trySetupAR();
+
+          // フォールバック: ARButton未読込でも独自ARボタンを表示
+          async function ensureCustomARButton() {
+            try {
+              if (!renderer || !scene || !navigator.xr) return;
+              if (mountEl.querySelector('.ar-button')) return; // 既にARボタンあり
+              const supported = await navigator.xr.isSessionSupported('immersive-ar');
+              if (!supported) return;
+              const btn = document.createElement('button');
+              btn.textContent = 'Enter AR';
+              btn.className = 'toggle-btn ar-button';
+              btn.style.marginLeft = 'auto';
+              btn.addEventListener('click', async () => {
+                try {
+                  renderer.xr.enabled = true;
+                  const session = await navigator.xr.requestSession('immersive-ar', {
+                    requiredFeatures: ['local-floor']
+                  });
+                  await renderer.xr.setSession(session);
+                } catch(err) { console.warn('XR session failed:', err); }
+              });
+              mountEl.appendChild(btn);
+            } catch(err) { console.warn('ensureCustomARButton failed:', err); }
+          }
+          setTimeout(ensureCustomARButton, 1200);
+        } catch(e) { console.warn('AR setup skipped:', e); }
         
         // 軽量なグロー: ノードサイズを上げて代替的に「光らせる」表現
         // Threeの多重ロード回避のためpostprocessingは使わず視覚的に強調
@@ -707,7 +829,7 @@
         
         // 画像/動画ノードにテクスチャ適用
         const loader = new Image();
-        const getVideoThumbUrl = (path) => `http://localhost:7777/${encodeURI(path)}`; // ひとまず同URLを使用（将来サムネAPIに）
+        const getVideoThumbUrl = (path) => `${backendBase}/${encodeURI(path)}`; // ひとまず同URLを使用（将来サムネAPIに）
         
         const textureCache = new Map();
         function setMediaTextures(enabled) {
@@ -727,7 +849,7 @@
                 sprite.material.map = tex;
                 sprite.material.needsUpdate = true;
               };
-              img.src = node.type === 'image' ? `http://localhost:7777/${encodeURI(node.path)}` : getVideoThumbUrl(node.path);
+              img.src = node.type === 'image' ? `${backendBase}/${encodeURI(node.path)}` : getVideoThumbUrl(node.path);
               sprite.scale.set(16, 12, 1);
               textureCache.set(key, sprite);
             }
