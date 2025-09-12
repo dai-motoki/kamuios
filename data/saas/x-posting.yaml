@@ -321,7 +321,6 @@
           <label class="form-label">アカウント選択</label>
           <select id="accountSelect" class="text-input">
             <option value="">アカウントを選択してください</option>
-            <option value="TEST">TEST</option>
             <option value="CODEJA">CODEJA</option>
             <option value="CODEEN">CODEEN</option>
             <option value="OSJA">OSJA</option>
