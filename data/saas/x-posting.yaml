@@ -108,6 +108,20 @@
         transition: border-color 0.3s ease;
       }
       
+      .description-input {
+        width: 100%;
+        min-height: 80px;
+        padding: 12px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--sidebar-bg);
+        color: var(--text);
+        font-size: 0.95rem;
+        font-family: inherit;
+        resize: vertical;
+        transition: border-color 0.3s ease;
+      }
+      
       .text-input:focus {
         border-color: #1da1f2;
         outline: none;
@@ -331,6 +345,23 @@
         </div>
         
         <div class="form-group">
+          <label class="form-label">
+            <input type="checkbox" id="enableThread" /> スレッド投稿を有効にする
+          </label>
+        </div>
+        
+        <div class="form-group" id="descriptionGroup" style="display: none;">
+          <label class="form-label">概要（スレッド投稿時）</label>
+          <textarea 
+            id="postDescription" 
+            class="description-input" 
+            placeholder="動画の概要を入力（100文字以内推奨）..."
+            maxlength="500"
+          ></textarea>
+          <div id="descCharCounter" class="char-counter">0 / 500</div>
+        </div>
+        
+        <div class="form-group">
           <label class="form-label">動画を追加（オプション）</label>
           <div id="mediaUpload" class="media-upload">
             <input 
@@ -370,6 +401,10 @@
         const accountSelect = document.getElementById('accountSelect');
         const postText = document.getElementById('postText');
         const charCounter = document.getElementById('charCounter');
+        const enableThread = document.getElementById('enableThread');
+        const descriptionGroup = document.getElementById('descriptionGroup');
+        const postDescription = document.getElementById('postDescription');
+        const descCharCounter = document.getElementById('descCharCounter');
         const mediaUpload = document.getElementById('mediaUpload');
         const mediaInput = document.getElementById('mediaInput');
         const mediaPreview = document.getElementById('mediaPreview');
@@ -380,6 +415,11 @@
         const statusMessage = document.getElementById('statusMessage');
         
         let selectedFile = null;
+        
+        // スレッド投稿の切り替え
+        enableThread.addEventListener('change', function() {
+          descriptionGroup.style.display = this.checked ? 'block' : 'none';
+        });
         
         // 文字数カウンター
         postText.addEventListener('input', function() {
@@ -396,6 +436,20 @@
             postButton.disabled = false;
           } else {
             postButton.disabled = false;
+          }
+        });
+        
+        // 概要文字数カウンター
+        postDescription.addEventListener('input', function() {
+          const length = this.value.length;
+          descCharCounter.textContent = `${length} / 500`;
+          
+          // 文字数に応じて色を変更
+          descCharCounter.classList.remove('warning', 'error');
+          if (length > 500) {
+            descCharCounter.classList.add('error');
+          } else if (length > 400) {
+            descCharCounter.classList.add('warning');
           }
         });
         
@@ -458,6 +512,11 @@
           postText.value = '';
           charCounter.textContent = '0 / 280';
           charCounter.classList.remove('warning', 'error');
+          postDescription.value = '';
+          descCharCounter.textContent = '0 / 500';
+          descCharCounter.classList.remove('warning', 'error');
+          enableThread.checked = false;
+          descriptionGroup.style.display = 'none';
           selectedFile = null;
           previewVideo.src = '';
           mediaPreview.style.display = 'none';
@@ -469,6 +528,7 @@
         // 投稿ボタン
         postButton.addEventListener('click', async function() {
           const text = postText.value.trim();
+          const description = postDescription.value.trim();
           
           if (!text && !selectedFile) {
             showStatus('投稿内容を入力してください', 'error');
@@ -483,6 +543,8 @@
             const formData = new FormData();
             formData.append('text', text);
             formData.append('account', accountSelect.value);
+            formData.append('description', description);
+            formData.append('enableThread', enableThread.checked);
             
             if (selectedFile) {
               formData.append('media', selectedFile);
@@ -495,8 +557,12 @@
             
             const result = await response.json();
             
-            if (response.ok) {
-              showStatus('投稿が完了しました！', 'success');
+            if (result.success) {
+              let message = '投稿が完了しました！';
+              if (result.url) {
+                message += ` <a href="${result.url}" target="_blank">投稿を見る</a>`;
+              }
+              showStatus(message, 'success');
               // フォームをクリア
               clearButton.click();
             } else {
@@ -514,14 +580,14 @@
         
         // ステータスメッセージ表示
         function showStatus(message, type) {
-          statusMessage.textContent = message;
+          statusMessage.innerHTML = message; // HTMLを許可してリンクを表示
           statusMessage.className = `status-message ${type}`;
           statusMessage.style.display = 'block';
           
           if (type === 'success') {
             setTimeout(() => {
               statusMessage.style.display = 'none';
-            }, 5000);
+            }, 10000); // 成功メッセージは10秒表示
           }
         }
       })();

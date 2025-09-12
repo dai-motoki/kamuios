@@ -4,7 +4,7 @@ const path = require('path');
 const cors = require('cors');
 require('dotenv').config();
 
-// X投稿APIモジュールをインポート
+// X投稿APIモジュールをインポート（純JavaScript版）
 const { upload, postToX } = require('./api/x-post');
 
 const app = express();
