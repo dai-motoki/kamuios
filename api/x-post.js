@@ -22,16 +22,21 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// 環境変数の検証（動的アカウント対応）
-function validateEnvironment(account) {
-  const requiredVars = [
-    'X_API_KEY',
-    'X_API_SECRET',
-    `X_ACCESS_TOKEN_${account}`,
-    `X_ACCESS_TOKEN_SECRET_${account}`
+// 環境変数の検証（共通API Key + プレフィックス方式）
+function validateEnvironment(accountAlias) {
+  const prefix = `X_${accountAlias}_`;
+  
+  // 共通のAPI認証
+  const commonVars = ['X_API_KEY', 'X_API_SECRET'];
+  // アカウント固有の認証
+  const accountVars = [
+    `${prefix}ACCESS_TOKEN`,
+    `${prefix}ACCESS_TOKEN_SECRET`
   ];
   
+  const requiredVars = [...commonVars, ...accountVars];
   const missingVars = [];
+  
   for (const varName of requiredVars) {
     if (!process.env[varName]) {
       missingVars.push(varName);
@@ -40,12 +45,13 @@ function validateEnvironment(account) {
   
   return {
     valid: missingVars.length === 0,
-    missing: missingVars
+    missing: missingVars,
+    prefix: prefix
   };
 }
 
-// OAuth 1.0a認証設定（Pythonのtweepyと同じ設定）
-function createOAuthConfig(account) {
+// OAuth 1.0a認証設定（共通API Key使用）
+function createOAuthConfig() {
   return OAuth({
     consumer: {
       key: process.env.X_API_KEY,
@@ -61,11 +67,11 @@ function createOAuthConfig(account) {
   });
 }
 
-// アクセストークン取得
-function getAccessToken(account) {
+// アクセストークン取得（プレフィックス方式）
+function getAccessToken(prefix) {
   return {
-    key: process.env[`X_ACCESS_TOKEN_${account}`],
-    secret: process.env[`X_ACCESS_TOKEN_SECRET_${account}`]
+    key: process.env[`${prefix}ACCESS_TOKEN`],
+    secret: process.env[`${prefix}ACCESS_TOKEN_SECRET`]
   };
 }
 
@@ -431,16 +437,25 @@ async function postThreadWithVideo(postTitle, videoDescription, mediaId, oauth, 
 // X投稿処理（メイン関数 - Pythonのmain()と同じロジック）
 async function postToX(req, res) {
   try {
-    const { text, description, enableThread } = req.body;
-    // デフォルトアカウントIDを使用（環境変数で設定可能）
-    const account = process.env.X_DEFAULT_ACCOUNT || '1';
+    const { text, description, enableThread, account } = req.body;
+    const accountAlias = account;
     const mediaFile = req.file;
     
     console.log('=== X API 動画投稿 SaaS版 ===');
     console.log(`実行時刻: ${new Date().toLocaleString('ja-JP')}`);
     
-    // 環境変数の検証（Pythonと同じ）
-    const validation = validateEnvironment(account || '1');
+    // アカウント選択チェック
+    if (!accountAlias) {
+      return res.status(400).json({ 
+        success: false,
+        error: 'アカウントを選択してください'
+      });
+    }
+    
+    console.log(`使用アカウント: ${accountAlias}`);
+    
+    // 環境変数の検証（プレフィックス方式）
+    const validation = validateEnvironment(accountAlias);
     if (!validation.valid) {
       return res.status(400).json({ 
         success: false,
@@ -448,9 +463,9 @@ async function postToX(req, res) {
       });
     }
     
-    // OAuth設定（Pythonと同じ）
-    const oauth = createOAuthConfig(account || '1');
-    const token = getAccessToken(account || '1');
+    // OAuth設定（共通API Key + アカウント別トークン）
+    const oauth = createOAuthConfig();
+    const token = getAccessToken(validation.prefix);
     
     // 認証テスト（Pythonのapi_v2.get_me()と同等）
     console.log('🔐 認証テスト中...');
