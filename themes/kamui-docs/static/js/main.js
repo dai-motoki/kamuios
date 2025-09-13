@@ -1123,6 +1123,143 @@ async function initDocMenuTable() {
   }
 }
 
+// 右下フローティング AIエージェント タスクボード（フロントのみ・ローカルストレージ永続化）
+function initTaskBoard(){
+  try {
+    // 二重初期化ガード（同一ページで複数回読み込まれても1回だけ）
+    if (window.__aiTaskBoardInit) return;
+    window.__aiTaskBoardInit = true;
+    if (document.getElementById('aiTaskBoard') || document.querySelector('.taskboard-toggle')) return;
+
+    const STORAGE_KEY = 'kamui_task_board_v1';
+    const state = { open: false, tasks: [] };
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const saved = JSON.parse(raw);
+        if (saved && typeof saved === 'object') {
+          if (Array.isArray(saved.tasks)) state.tasks = saved.tasks;
+          if (typeof saved.open === 'boolean') state.open = saved.open;
+        }
+      }
+    } catch(_) {}
+
+    function save(){
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(_) {}
+    }
+
+    // 要素生成
+    const toggleBtn = document.createElement('button');
+    toggleBtn.className = 'taskboard-toggle';
+    toggleBtn.setAttribute('aria-label', 'AIエージェント タスクを開く');
+    toggleBtn.setAttribute('title', 'AIエージェント タスク');
+    toggleBtn.innerHTML = '🤖';
+
+    const panel = document.createElement('div');
+    panel.id = 'aiTaskBoard';
+    panel.className = 'taskboard-panel';
+    panel.setAttribute('role', 'dialog');
+    panel.setAttribute('aria-modal', 'false');
+    panel.setAttribute('aria-hidden', state.open ? 'false' : 'true');
+
+    panel.innerHTML = `
+      <div class="taskboard-header">
+        <div class="tb-title">AIエージェント タスク</div>
+        <div class="tb-actions">
+          <button class="tb-btn tb-hide" aria-label="閉じる" title="閉じる">×</button>
+        </div>
+      </div>
+      <div class="taskboard-list" id="taskboardList" aria-live="polite"></div>
+      <div class="taskboard-compose">
+        <input type="text" id="taskboardInput" class="tb-input" placeholder="新規タスクを入力... (Enterで追加)" autocomplete="off" />
+        <button id="taskboardSend" class="tb-send" aria-label="送信">送信</button>
+      </div>
+    `;
+
+    document.body.appendChild(toggleBtn);
+    document.body.appendChild(panel);
+
+    const listEl = panel.querySelector('#taskboardList');
+    const inputEl = panel.querySelector('#taskboardInput');
+    const sendEl  = panel.querySelector('#taskboardSend');
+    const hideEl  = panel.querySelector('.tb-hide');
+
+    function render(){
+      if (!listEl) return;
+      if (!Array.isArray(state.tasks)) state.tasks = [];
+      if (state.tasks.length === 0){
+        listEl.innerHTML = `<div class="tb-empty">タスクはありません。チャット欄から追加してください。</div>`;
+        return;
+      }
+      const html = state.tasks.map(t => {
+        const status = t.status || 'todo';
+        const isDone = status === 'done';
+        const isDoing = status === 'doing';
+        const icon = isDone ? '✔' : (isDoing ? '●' : '');
+        return `
+          <div class="task-item ${status}" data-id="${String(t.id)}">
+            <button class="task-status ${status}" data-action="cycle" title="状態を切替">
+              <span class="i">${icon}</span>
+            </button>
+            <div class="task-text">${escapeHtml(t.text||'')}</div>
+          </div>
+        `;
+      }).join('');
+      listEl.innerHTML = html;
+    }
+
+    function setOpen(open){
+      state.open = !!open;
+      panel.classList.toggle('open', state.open);
+      panel.setAttribute('aria-hidden', state.open ? 'false' : 'true');
+      toggleBtn.setAttribute('aria-pressed', state.open ? 'true' : 'false');
+      save();
+    }
+
+    function nextStatus(s){
+      return s === 'todo' ? 'doing' : (s === 'doing' ? 'done' : 'todo');
+    }
+
+    function addTask(text){
+      const trimmed = String(text||'').trim();
+      if (!trimmed) return;
+      const task = { id: Date.now().toString(36) + Math.random().toString(36).slice(2,6), text: trimmed, status: 'todo' };
+      state.tasks.unshift(task);
+      save();
+      render();
+    }
+
+    toggleBtn.addEventListener('click', () => setOpen(!state.open));
+    hideEl?.addEventListener('click', () => setOpen(false));
+    sendEl?.addEventListener('click', () => { addTask(inputEl?.value); if (inputEl) inputEl.value=''; });
+    inputEl?.addEventListener('keydown', (e) => {
+      // 日本語IME確定 Enter の重複発火回避
+      if (e.isComposing || e.keyCode === 229) return;
+      if (e.key === 'Enter') { addTask(inputEl.value); inputEl.value=''; }
+    });
+    listEl?.addEventListener('click', (e) => {
+      const btn = e.target.closest('.task-status');
+      if (!btn) return;
+      const item = btn.closest('.task-item');
+      const id = item?.getAttribute('data-id');
+      if (!id) return;
+      const idx = state.tasks.findIndex(x => String(x.id) === id);
+      if (idx === -1) return;
+      const cur = state.tasks[idx].status || 'todo';
+      state.tasks[idx].status = nextStatus(cur);
+      save();
+      render();
+    });
+
+    // 初期描画
+    render();
+    // パネル表示状態
+    setOpen(!!state.open);
+  } catch(err) {
+    console.error('TaskBoard init failed', err);
+  }
+}
+
 // 初期化
 document.addEventListener('DOMContentLoaded', () => {
   initUIFlow();
@@ -1132,4 +1269,5 @@ document.addEventListener('DOMContentLoaded', () => {
   initImageModals();
   initContextMenu();
   initDocMenuTable();
+  initTaskBoard();
 });
