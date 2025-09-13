@@ -1,0 +1,123 @@
+# Three.js シューティングギャラリー
+
+- id: game-threejs-shooter
+  category: 11
+  category_name: ゲーム
+  title: Three.js シューティング
+  content: ""
+  custom_html: |
+    <div style="margin-bottom: 20px;">
+      <button onclick="window.location.hash=''; location.reload();" style="padding: 8px 16px; background: #4a4a4a; border: none; border-radius: 6px; color: white; cursor: pointer; font-size: 14px;">
+        ← SaaS一覧に戻る
+      </button>
+    </div>
+    <style>
+      .sh-wrap { background: var(--card); border:1px solid var(--border); border-radius:12px; padding: 12px; max-width: 560px; margin: 0 auto; }
+      .sh-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+      .sh-title { font-weight:700; font-size:1.1rem; }
+      .sh-stats { color: var(--text-weak); font-size:.95rem; }
+      .sh-canvas { width: 100%; height: auto; display:block; background:#000; border-radius:8px; cursor: crosshair; }
+      .sh-controls { display:flex; gap:8px; margin-top:8px; }
+      .sh-btn { padding: 8px 12px; border-radius: 6px; border:1px solid var(--border); background:#2d2d2d; color:#fff; cursor:pointer; }
+      .sh-btn:hover { background:#3a3a3a; }
+      .sh-help { color: var(--text-weak); font-size:.9rem; margin-top:6px; }
+    </style>
+    <div class="sh-wrap">
+      <div class="sh-header">
+        <div class="sh-title">Shooting Gallery</div>
+        <div class="sh-stats">Score: <span id="shScore">0</span> | Time: <span id="shTime">30</span>s</div>
+      </div>
+      <div id="shMount"></div>
+      <div class="sh-controls">
+        <button class="sh-btn" id="shStart">▶ Start</button>
+        <button class="sh-btn" id="shReset">🔄 Reset</button>
+        <label class="sh-btn" style="display:flex;align-items:center;gap:6px;">Speed
+          <select id="shSpeed" style="background:#2d2d2d;color:#fff;border:1px solid var(--border);border-radius:6px;padding:4px 8px;">
+            <option value="0.06">Easy</option>
+            <option value="0.09" selected>Normal</option>
+            <option value="0.12">Hard</option>
+          </select>
+        </label>
+      </div>
+      <div class="sh-help">ターゲットをクリックして撃破。制限時間内にできるだけ多く倒そう。</div>
+    </div>
+    <script src="https://unpkg.com/three@0.158.0/build/three.min.js"></script>
+    <script>
+      (function(){
+        const mount = document.getElementById('shMount');
+        const scoreEl = document.getElementById('shScore');
+        const timeEl = document.getElementById('shTime');
+        let scene, camera, renderer, targets=[], running=false, animId=0, score=0, time=30, timer=null, speed=0.09, gun=null;
+        const raycaster = new THREE.Raycaster(); const mouse = new THREE.Vector2();
+        function clearOverlays(){ mount.querySelectorAll('.game-overlay').forEach(n=>n.remove()); }
+        function ensureInit(){ if(!renderer) init(); }
+        function init(){
+          scene = new THREE.Scene();
+          camera = new THREE.PerspectiveCamera(60, 4/3, 0.1, 100);
+          camera.position.set(0, 2.5, 10); camera.lookAt(0,2,0);
+          renderer = new THREE.WebGLRenderer({ antialias:true });
+          const w=520, h=390; renderer.setSize(w,h); renderer.setPixelRatio(window.devicePixelRatio||1); camera.aspect=w/h; camera.updateProjectionMatrix();
+          renderer.domElement.className='sh-canvas'; mount.innerHTML=''; mount.appendChild(renderer.domElement); clearOverlays();
+          const hemi = new THREE.HemisphereLight(0xffffff, 0x222222, 0.9); scene.add(hemi);
+          scene.add(new THREE.AmbientLight(0xbbbbbb)); const dl=new THREE.DirectionalLight(0xffffff,1.2); dl.position.set(3,6,5); scene.add(dl);
+          const floor = new THREE.Mesh(new THREE.PlaneGeometry(20,20), new THREE.MeshPhongMaterial({ color:0x0f0f0f, side:THREE.DoubleSide })); floor.rotation.x=-Math.PI/2; floor.position.y=0; floor.position.z=-5; scene.add(floor);
+          // gun (simple FPS view)
+          gun = new THREE.Group();
+          const body = new THREE.Mesh(new THREE.BoxGeometry(0.25,0.15,0.8), new THREE.MeshPhongMaterial({ color:0x444b5a }));
+          body.position.set(0, -0.1, -1.7);
+          const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,0.4, 16), new THREE.MeshPhongMaterial({ color:0x222222 }));
+          barrel.rotation.x = Math.PI/2; barrel.position.set(0, -0.08, -2.1);
+          const grip = new THREE.Mesh(new THREE.BoxGeometry(0.1,0.18,0.2), new THREE.MeshPhongMaterial({ color:0x3a3f4a }));
+          grip.position.set(-0.05, -0.23, -1.55);
+          gun.add(body); gun.add(barrel); gun.add(grip);
+          camera.add(gun); scene.add(camera);
+          // spawn initial targets
+          targets=[]; for(let i=0;i<6;i++) spawnTarget();
+          score=0; scoreEl.textContent=score; time=30; timeEl.textContent=time; speed=Number(document.getElementById('shSpeed').value);
+          
+        }
+        function spawnTarget(){
+          const geo = new THREE.BoxGeometry(0.8, 0.8, 0.8);
+          const mat = new THREE.MeshPhongMaterial({ color: new THREE.Color(`hsl(${Math.floor(Math.random()*360)},70%,55%)`) });
+          const m = new THREE.Mesh(geo, mat);
+          m.position.set(-5 + Math.random()*10, 1 + Math.random()*3, -18 - Math.random()*6);
+          m.userData.vx = speed * (Math.random()<0.5 ? 1 : -1);
+          scene.add(m); targets.push(m);
+        }
+        function loop(){ if(!running) return; update(); renderer.render(scene,camera); animId=requestAnimationFrame(loop); }
+        function update(){
+          targets.forEach(t=>{ t.position.x += t.userData.vx; if(t.position.x<-5.5 || t.position.x>5.5) t.userData.vx *= -1; t.rotation.y += 0.02; t.position.z += 0.02; });
+          for(let i=targets.length-1;i>=0;i--){ if(targets[i].position.z > 5){ scene.remove(targets[i]); targets.splice(i,1); spawnTarget(); } }
+        }
+        function onClick(e){
+          if(!renderer||!running) return;
+          const rect=renderer.domElement.getBoundingClientRect();
+          mouse.x=((e.clientX-rect.left)/rect.width)*2-1; mouse.y=-((e.clientY-rect.top)/rect.height)*2+1;
+          raycaster.setFromCamera(mouse, camera);
+          // tracer line
+          const start = new THREE.Vector3(); camera.getWorldPosition(start);
+          const dir = raycaster.ray.direction.clone();
+          const endDefault = start.clone().add(dir.clone().multiplyScalar(20));
+          const hit = raycaster.intersectObjects(targets, false)[0];
+          const end = hit ? hit.point.clone() : endDefault;
+          const geom = new THREE.BufferGeometry().setFromPoints([start, end]);
+          const line = new THREE.Line(geom, new THREE.LineBasicMaterial({ color: 0xffffaa }));
+          scene.add(line); setTimeout(()=>{ scene.remove(line); geom.dispose(); }, 100);
+          // muzzle flash
+          const flash = new THREE.Mesh(new THREE.SphereGeometry(0.2, 12, 12), new THREE.MeshBasicMaterial({ color: 0xffee88 }));
+          const flashPos = start.clone().add(dir.clone().multiplyScalar(0.8));
+          flash.position.copy(flashPos); scene.add(flash); setTimeout(()=>{ scene.remove(flash); flash.geometry.dispose(); }, 80);
+          if(hit){ const obj=hit.object; scene.remove(obj); targets.splice(targets.indexOf(obj),1); score++; scoreEl.textContent=score; spawnTarget(); }
+        }
+        function start(){ if(running) return; ensureInit(); clearOverlays(); running=true; animId=requestAnimationFrame(loop); timer=setInterval(()=>{ time--; timeEl.textContent=time; if(time<=0) gameOver(); }, 1000); }
+        function reset(){ running=false; cancelAnimationFrame(animId); clearInterval(timer); init(); }
+        function showOverlay(text){ const over=document.createElement('div'); over.className='game-overlay'; over.style.cssText='position:absolute;inset:0;background:rgba(0,0,0,.6);color:#fff;display:flex;align-items:center;justify-content:center;border-radius:8px;font:700 22px system-ui'; over.textContent=text; mount.style.position='relative'; mount.appendChild(over); setTimeout(()=>{ over.remove(); }, 1200); }
+        function gameOver(){ running=false; cancelAnimationFrame(animId); clearInterval(timer); showOverlay('Time Up! Score: '+score); }
+        document.getElementById('shStart').onclick=start;
+        document.getElementById('shReset').onclick=reset;
+        document.getElementById('shSpeed').onchange=()=>{ speed = Number(document.getElementById('shSpeed').value); targets.forEach(t=> t.userData.vx = speed * Math.sign(t.userData.vx||1)); };
+        // only clicks on canvas count as shots
+        document.addEventListener('click', (e)=>{ if(e.target===renderer?.domElement) onClick(e); });
+        init();
+      })();
+    </script>

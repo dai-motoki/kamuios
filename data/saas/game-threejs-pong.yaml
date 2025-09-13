@@ -1,0 +1,84 @@
+# Three.js 3Dポン
+
+- id: game-threejs-pong
+  category: 11
+  category_name: ゲーム
+  title: Three.js 3Dポン
+  content: ""
+  custom_html: |
+    <div style="margin-bottom: 20px;">
+      <button onclick="window.location.hash=''; location.reload();" style="padding: 8px 16px; background: #4a4a4a; border: none; border-radius: 6px; color: white; cursor: pointer; font-size: 14px;">
+        ← SaaS一覧に戻る
+      </button>
+    </div>
+    <style>
+      .pong-wrap { background: var(--card); border:1px solid var(--border); border-radius:12px; padding: 12px; max-width: 560px; margin: 0 auto; }
+      .pong-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+      .pong-title { font-weight:700; font-size:1.1rem; }
+      .pong-stats { color: var(--text-weak); font-size:.95rem; }
+      .pong-canvas { width: 100%; height: auto; display:block; background:#000; border-radius:8px; }
+      .pong-controls { display:flex; gap:8px; margin-top:8px; }
+      .pong-btn { padding: 8px 12px; border-radius: 6px; border:1px solid var(--border); background:#2d2d2d; color:#fff; cursor:pointer; }
+      .pong-btn:hover { background:#3a3a3a; }
+      .pong-help { color: var(--text-weak); font-size:.9rem; margin-top:6px; }
+    </style>
+    <div class="pong-wrap">
+      <div class="pong-header">
+        <div class="pong-title">3D Pong</div>
+        <div class="pong-stats">Score: <span id="pgScore">0</span></div>
+      </div>
+      <div id="pgMount"></div>
+      <div class="pong-controls">
+        <button class="pong-btn" id="pgStart">▶ Start</button>
+        <button class="pong-btn" id="pgReset">🔄 Reset</button>
+      </div>
+      <div class="pong-help">マウスでパドル移動。ボールを打ち返すとスコア。</div>
+    </div>
+    <script src="https://unpkg.com/three@0.158.0/build/three.min.js"></script>
+    <script>
+      (function(){
+        const mount = document.getElementById('pgMount');
+        const scoreEl = document.getElementById('pgScore');
+        let scene, camera, renderer, paddle, ball, running=false, animId=0, score=0, vel=new THREE.Vector3(0.05,0.04,-0.08);
+        function clearOverlays(){ document.getElementById('pgMount').querySelectorAll('.game-overlay').forEach(n=>n.remove()); }
+        function init(){
+          scene = new THREE.Scene();
+          camera = new THREE.PerspectiveCamera(60, 4/3, 0.1, 100);
+          camera.position.set(0, 5, 12); camera.lookAt(0,0,0);
+          renderer = new THREE.WebGLRenderer({ antialias:true });
+          const w=520, h=390; renderer.setSize(w,h); renderer.setPixelRatio(window.devicePixelRatio||1); camera.aspect = w/h; camera.updateProjectionMatrix();
+          renderer.domElement.className='pong-canvas'; mount.innerHTML=''; mount.appendChild(renderer.domElement); clearOverlays();
+          const hemi = new THREE.HemisphereLight(0xffffff, 0x222222, 0.9); scene.add(hemi);
+          scene.add(new THREE.AmbientLight(0xbbbbbb)); const dl=new THREE.DirectionalLight(0xffffff,1.2); dl.position.set(3,6,5); scene.add(dl);
+          const table = new THREE.Mesh(new THREE.BoxGeometry(10,0.5,20), new THREE.MeshPhongMaterial({ color:0x111111 })); table.position.y=-0.25; scene.add(table);
+          const walls = new THREE.Mesh(new THREE.BoxGeometry(10.5,4,0.5), new THREE.MeshPhongMaterial({ color:0x222 }));
+          const wallBack = walls.clone(); wallBack.position.set(0,2,-10.25); scene.add(wallBack);
+          const wallLeft = new THREE.Mesh(new THREE.BoxGeometry(0.5,4,20), new THREE.MeshPhongMaterial({ color:0x222 })); wallLeft.position.set(-5.25,2,0); scene.add(wallLeft);
+          const wallRight = wallLeft.clone(); wallRight.position.x = 5.25; scene.add(wallRight);
+          paddle = new THREE.Mesh(new THREE.BoxGeometry(2,0.4,0.6), new THREE.MeshPhongMaterial({ color:0x4a9eff })); paddle.position.set(0,0,9); scene.add(paddle);
+          ball = new THREE.Mesh(new THREE.SphereGeometry(0.35, 16, 16), new THREE.MeshPhongMaterial({ color:0xffffff })); ball.position.set(0,0,0); scene.add(ball);
+          score=0; scoreEl.textContent=score; vel.set(0.06,0.05,-0.09);
+          
+        }
+        function loop(){ if(!running) return; update(); renderer.render(scene,camera); animId=requestAnimationFrame(loop); }
+        function update(){
+          ball.position.add(vel);
+          if (ball.position.x < -4.7 || ball.position.x > 4.7) vel.x *= -1;
+          if (ball.position.y < -0.1 || ball.position.y > 3) vel.y *= -1;
+          if (ball.position.z < -9.7) vel.z *= -1;
+          if (ball.position.z > 8.3){
+            if (Math.abs(ball.position.x - paddle.position.x) < 1.3){ vel.z *= -1; score++; scoreEl.textContent=score; }
+            else { gameOver(); }
+          }
+        }
+        function onMouseMove(e){ if(!renderer) return; const rect=renderer.domElement.getBoundingClientRect(); const nx=(e.clientX-rect.left)/rect.width; paddle.position.x = (nx-0.5)*9; }
+        function start(){ if(running) return; if(!renderer) init(); clearOverlays(); running=true; animId=requestAnimationFrame(loop); }
+        function reset(){ running=false; cancelAnimationFrame(animId); init(); }
+        function showOverlay(text){ const over=document.createElement('div'); over.className='game-overlay'; over.style.cssText='position:absolute;inset:0;background:rgba(0,0,0,.6);color:#fff;display:flex;align-items:center;justify-content:center;border-radius:8px;font:700 22px system-ui'; over.textContent=text; mount.style.position='relative'; mount.appendChild(over); setTimeout(()=>{ over.remove(); }, 1200); }
+        function gameOver(){ running=false; cancelAnimationFrame(animId); showOverlay('Game Over'); }
+        document.addEventListener('mousemove', onMouseMove);
+        document.getElementById('pgStart').onclick=start;
+        document.getElementById('pgReset').onclick=reset;
+        init();
+      })();
+    </script>

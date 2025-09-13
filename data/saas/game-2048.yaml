@@ -1,0 +1,126 @@
+# 2048パズル
+
+- id: game-2048
+  category: 11
+  category_name: ゲーム
+  title: 2048
+  content: ""
+  custom_html: |
+    <div style="margin-bottom: 20px;">
+      <button onclick="window.location.hash=''; location.reload();" style="padding: 8px 16px; background: #4a4a4a; border: none; border-radius: 6px; color: white; cursor: pointer; font-size: 14px;">
+        ← SaaS一覧に戻る
+      </button>
+    </div>
+    <style>
+      .g2048-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; max-width: 520px; }
+      .g2048-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+      .g2048-title { font-weight:700; font-size:1.2rem; }
+      .g2048-stats { color: var(--text-weak); }
+      .g2048-grid { background:#1e1e1e; border-radius:8px; padding:10px; display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; }
+      .g2048-cell { height: 100px; background:#2a2a2a; border-radius:6px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:1.4rem; color:#fff; }
+      .g2048-controls { margin-top:10px; display:flex; gap:8px; }
+      .g2048-btn { padding:8px 12px; border-radius:6px; border: 1px solid var(--border); background:#2d2d2d; color:#fff; cursor:pointer; }
+      .g2048-btn:hover { background:#3a3a3a; }
+    </style>
+    <div class="g2048-wrap">
+      <div class="g2048-header">
+        <div class="g2048-title">2048</div>
+        <div class="g2048-stats">Score: <span id="gScore">0</span></div>
+      </div>
+      <div class="g2048-grid" id="gGrid"></div>
+      <div class="g2048-controls">
+        <button class="g2048-btn" id="gNew">🔄 New Game</button>
+        <span style="color:var(--text-weak);">矢印キー/WASDで移動。2048を目指せ！</span>
+      </div>
+    </div>
+    <script>
+      (function(){
+        const gridEl = document.getElementById('gGrid');
+        const size = 4; let grid = []; let score = 0;
+        function emptyGrid(){ grid = Array.from({length:size}, ()=> Array(size).fill(0)); }
+        function randEmpty(){
+          const empty=[]; for(let r=0;r<size;r++)for(let c=0;c<size;c++) if(!grid[r][c]) empty.push([r,c]);
+          if(!empty.length) return null; return empty[Math.floor(Math.random()*empty.length)];
+        }
+        function addRandom(){ const p=randEmpty(); if(!p) return; grid[p[0]][p[1]] = Math.random()<0.9?2:4; }
+        function draw(){
+          gridEl.innerHTML=''; document.getElementById('gScore').textContent = score;
+          for(let r=0;r<size;r++){
+            for(let c=0;c<size;c++){
+              const v = grid[r][c];
+              const cell = document.createElement('div'); cell.className='g2048-cell';
+              if(v){ cell.textContent = v; const hue = 40 + Math.log2(v)*20; cell.style.background = `hsl(${hue},60%,40%)`; }
+              gridEl.appendChild(cell);
+            }
+          }
+        }
+        function slide(arr){
+          const filtered = arr.filter(v=>v!==0);
+          for(let i=0;i<filtered.length-1;i++){
+            if(filtered[i]===filtered[i+1]){ filtered[i]*=2; score+=filtered[i]; filtered[i+1]=0; i++; }
+          }
+          return filtered.filter(v=>v!==0);
+        }
+        function move(dir){
+          let moved=false;
+          if(dir==='left'){
+            for(let r=0;r<size;r++){
+              const row = slide(grid[r]); const newRow=[...row]; while(newRow.length<size) newRow.push(0);
+              if(grid[r].join(',')!==newRow.join(',')) moved=true; grid[r]=newRow;
+            }
+          } else if(dir==='right'){
+            for(let r=0;r<size;r++){
+              const rev = [...grid[r]].reverse(); const row = slide(rev); const newRow=[...row]; while(newRow.length<size) newRow.push(0); newRow.reverse();
+              if(grid[r].join(',')!==newRow.join(',')) moved=true; grid[r]=newRow;
+            }
+          } else if(dir==='up'){
+            for(let c=0;c<size;c++){
+              const col = slide(Array.from({length:size}, (_,r)=> grid[r][c])); const newCol=[...col]; while(newCol.length<size) newCol.push(0);
+              for(let r=0;r<size;r++){ if(grid[r][c]!==newCol[r]) moved=true; grid[r][c]=newCol[r]; }
+            }
+          } else if(dir==='down'){
+            for(let c=0;c<size;c++){
+              const rev = Array.from({length:size},(_,r)=> grid[r][c]).reverse(); const col = slide(rev); const newCol=[...col]; while(newCol.length<size) newCol.push(0); newCol.reverse();
+              for(let r=0;r<size;r++){ if(grid[r][c]!==newCol[r]) moved=true; grid[r][c]=newCol[r]; }
+            }
+          }
+          if(moved){ addRandom(); draw(); checkState(); }
+        }
+        function canMove(){
+          for(let r=0;r<size;r++) for(let c=0;c<size;c++) if(grid[r][c]===0) return true;
+          for(let r=0;r<size;r++) for(let c=0;c<size;c++){
+            const v=grid[r][c]; if((r+1<size && grid[r+1][c]===v) || (c+1<size && grid[r][c+1]===v)) return true;
+          }
+          return false;
+        }
+        function checkState(){
+          for(let r=0;r<size;r++) for(let c=0;c<size;c++) if(grid[r][c]===2048){ banner('You Win!'); return; }
+          if(!canMove()) banner('Game Over');
+        }
+        function banner(text){
+          const overlay = document.createElement('div');
+          overlay.style.cssText = 'position:relative';
+          const layer = document.createElement('div');
+          layer.style.cssText = 'position:absolute;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;border-radius:8px';
+          const msg = document.createElement('div');
+          msg.style.cssText='color:#fff;font:700 28px system-ui'; msg.textContent=text;
+          layer.appendChild(msg);
+          // place overlay over grid
+          gridEl.parentNode.insertBefore(overlay, gridEl);
+          overlay.appendChild(gridEl);
+          overlay.appendChild(layer);
+          setTimeout(()=>{ layer.remove(); overlay.parentNode.insertBefore(gridEl, overlay); overlay.remove(); }, 1500);
+        }
+        document.addEventListener('keydown', e=>{
+          const k=e.key.toLowerCase();
+          if(k==='arrowleft'||k==='a') move('left');
+          else if(k==='arrowright'||k==='d') move('right');
+          else if(k==='arrowup'||k==='w') move('up');
+          else if(k==='arrowdown'||k==='s') move('down');
+        });
+        document.getElementById('gNew').onclick = ()=> start();
+        function start(){ score=0; emptyGrid(); addRandom(); addRandom(); draw(); }
+        start();
+      })();
+    </script>
+

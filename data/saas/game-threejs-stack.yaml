@@ -1,0 +1,103 @@
+# Three.js スタックタワー
+
+- id: game-threejs-stack
+  category: 11
+  category_name: ゲーム
+  title: Three.js スタックタワー
+  content: ""
+  custom_html: |
+    <div style="margin-bottom: 20px;">
+      <button onclick="window.location.hash=''; location.reload();" style="padding: 8px 16px; background: #4a4a4a; border: none; border-radius: 6px; color: white; cursor: pointer; font-size: 14px;">
+        ← SaaS一覧に戻る
+      </button>
+    </div>
+    <style>
+      .stk-wrap { background: var(--card); border:1px solid var(--border); border-radius:12px; padding: 12px; max-width: 560px; margin: 0 auto; }
+      .stk-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+      .stk-title { font-weight:700; font-size:1.1rem; }
+      .stk-stats { color: var(--text-weak); font-size:.95rem; }
+      .stk-canvas { width: 100%; height: auto; display:block; background:#000; border-radius:8px; }
+      .stk-controls { display:flex; gap:8px; margin-top:8px; }
+      .stk-btn { padding: 8px 12px; border-radius: 6px; border:1px solid var(--border); background:#2d2d2d; color:#fff; cursor:pointer; }
+      .stk-btn:hover { background:#3a3a3a; }
+      .stk-help { color: var(--text-weak); font-size:.9rem; margin-top:6px; }
+    </style>
+    <div class="stk-wrap">
+      <div class="stk-header">
+        <div class="stk-title">Stack Tower</div>
+        <div class="stk-stats">Level: <span id="skLevel">1</span></div>
+      </div>
+      <div id="skMount"></div>
+      <div class="stk-controls">
+        <button class="stk-btn" id="skStart">▶ Start</button>
+        <button class="stk-btn" id="skReset">🔄 Reset</button>
+      </div>
+      <div class="stk-help">Space/クリックで落下。ずれた分だけ縮小、積み上げ続けよう。</div>
+    </div>
+    <script src="https://unpkg.com/three@0.158.0/build/three.min.js"></script>
+    <script>
+      (function(){
+        const mount = document.getElementById('skMount');
+        const levelEl = document.getElementById('skLevel');
+        let scene, camera, renderer, layers=[], moving=null, dir=1, running=false, animId=0, level=1;
+        const baseSize = { x:3, z:3, y:0.6 };
+        function addLayer(w, d, y, x=0, z=0){
+          const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, baseSize.y, d), new THREE.MeshPhongMaterial({ color: new THREE.Color(`hsl(${(y*15)%360},60%,55%)`) }));
+          mesh.position.set(x, y, z); scene.add(mesh); layers.push(mesh); return mesh;
+        }
+        function clearOverlays(){ mount.querySelectorAll('.game-overlay').forEach(n=>n.remove()); }
+        function init(){
+          scene = new THREE.Scene();
+          camera = new THREE.PerspectiveCamera(60, 4/3, 0.1, 100);
+          camera.position.set(4, 8, 10); camera.lookAt(0,3,0);
+          renderer = new THREE.WebGLRenderer({ antialias:true });
+          const w=520, h=390; renderer.setSize(w,h); renderer.setPixelRatio(window.devicePixelRatio||1); camera.aspect=w/h; camera.updateProjectionMatrix();
+          renderer.domElement.className='stk-canvas'; mount.innerHTML=''; mount.appendChild(renderer.domElement); clearOverlays();
+          const hemi = new THREE.HemisphereLight(0xffffff, 0x222222, 0.9); scene.add(hemi);
+          scene.add(new THREE.AmbientLight(0xbbbbbb)); const dl=new THREE.DirectionalLight(0xffffff,1.2); dl.position.set(3,8,6); scene.add(dl);
+          layers=[]; moving=null; dir=1; level=1; levelEl.textContent=level;
+          addLayer(baseSize.x, baseSize.z, baseSize.y/2, 0, 0); // base
+          spawnMoving();
+        }
+        function spawnMoving(){
+          const top = layers[layers.length-1];
+          const y = baseSize.y/2 + layers.length*baseSize.y;
+          // alternate direction
+          const axisX = layers.length % 2 === 1;
+          const w = top.geometry.parameters.width;
+          const d = top.geometry.parameters.depth;
+          moving = addLayer(w, d, y, axisX? -6:0, axisX? top.position.z: -6);
+          moving.userData.axisX = axisX;
+        }
+        function cutAndStack(){
+          if(!moving) return;
+          const top = layers[layers.length-2];
+          const ax = moving.userData.axisX;
+          const delta = ax ? moving.position.x - top.position.x : moving.position.z - top.position.z;
+          const size = ax ? moving.geometry.parameters.width : moving.geometry.parameters.depth;
+          const overlap = size - Math.abs(delta);
+          if (overlap <= 0){ gameOver(); return; }
+          const newSize = overlap;
+          const keepPos = (ax ? top.position.x : top.position.z) + (delta>0 ? (size-overlap)/2 : -(size-overlap)/2);
+          // resize moving
+          const newW = ax ? newSize : moving.geometry.parameters.width;
+          const newD = ax ? moving.geometry.parameters.depth : newSize;
+          scene.remove(moving); layers.pop();
+          moving = addLayer(newW, newD, top.position.y + baseSize.y, ax? keepPos: top.position.x, ax? top.position.z: keepPos);
+          moving.userData.axisX = !ax; // next axis flips after spawn
+          level++; levelEl.textContent=level;
+          spawnMoving();
+        }
+        function loop(){ if(!running) return; if(moving){ moving.position[moving.userData.axisX?'x':'z'] += 0.06*dir; if(Math.abs(moving.position[moving.userData.axisX?'x':'z'])>6) dir*=-1; } renderer.render(scene,camera); animId=requestAnimationFrame(loop); }
+        function start(){ if(running) return; if(!renderer) init(); clearOverlays(); running=true; animId=requestAnimationFrame(loop); }
+        function reset(){ running=false; cancelAnimationFrame(animId); init(); }
+        function showOverlay(text){ const over=document.createElement('div'); over.className='game-overlay'; over.style.cssText='position:absolute;inset:0;background:rgba(0,0,0,.6);color:#fff;display:flex;align-items:center;justify-content:center;border-radius:8px;font:700 22px system-ui'; over.textContent=text; mount.style.position='relative'; mount.appendChild(over); setTimeout(()=>{ over.remove(); }, 1200); }
+        function gameOver(){ running=false; cancelAnimationFrame(animId); showOverlay('Game Over'); }
+        document.getElementById('skStart').onclick = start;
+        document.getElementById('skReset').onclick = reset;
+        document.addEventListener('keydown', (e)=>{ if(e.key===' '||e.key==='Enter') cutAndStack(); });
+        // click only on canvas performs cut
+        document.addEventListener('click', (e)=>{ if(e.target===renderer?.domElement) cutAndStack(); });
+        init();
+      })();
+    </script>

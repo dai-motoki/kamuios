@@ -1,0 +1,166 @@
+# シンプルスネークゲーム
+
+- id: game-snake
+  category: 11
+  category_name: ゲーム
+  title: スネーク
+  content: ""
+  custom_html: |
+    <div style="margin-bottom: 20px;">
+      <button onclick="window.location.hash=''; location.reload();" style="padding: 8px 16px; background: #4a4a4a; border: none; border-radius: 6px; color: white; cursor: pointer; font-size: 14px;">
+        ← SaaS一覧に戻る
+      </button>
+    </div>
+    <style>
+      .snake-wrap {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px;
+      }
+      .snake-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+      .snake-title { font-weight: 700; font-size: 1.2rem; }
+      .snake-stats { color: var(--text-weak); font-size: 0.95rem; }
+      .snake-board {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #111;
+        border-radius: 8px;
+        padding: 10px;
+      }
+      .snake-controls { margin-top: 12px; display: flex; gap: 8px; }
+      .snake-btn { padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border); background: #2d2d2d; color: #fff; cursor: pointer; }
+      .snake-btn:hover { background: #3a3a3a; }
+      .snake-help { margin-top: 8px; color: var(--text-weak); font-size: 0.9rem; }
+    </style>
+    <div class="snake-wrap">
+      <div class="snake-header">
+        <div class="snake-title">Snake</div>
+        <div class="snake-stats">Score: <span id="snakeScore">0</span> / High: <span id="snakeHigh">0</span></div>
+      </div>
+      <div class="snake-board">
+        <canvas id="snakeCanvas" width="480" height="480" style="background:#000;border-radius:6px"></canvas>
+      </div>
+      <div class="snake-controls">
+        <button class="snake-btn" id="snakeStart">▶ Start</button>
+        <button class="snake-btn" id="snakePause">⏸ Pause</button>
+        <button class="snake-btn" id="snakeReset">🔄 Reset</button>
+        <select id="snakeSpeed" class="snake-btn">
+          <option value="150">Easy</option>
+          <option value="110" selected>Normal</option>
+          <option value="80">Hard</option>
+          <option value="55">Extreme</option>
+        </select>
+      </div>
+      <div class="snake-help">矢印キー/WASDで操作。赤い餌を食べると成長します。</div>
+    </div>
+    <script>
+      (function(){
+        const canvas = document.getElementById('snakeCanvas');
+        const ctx = canvas.getContext('2d');
+        const size = 20; // cell size
+        const cols = canvas.width / size;
+        const rows = canvas.height / size;
+        let snake, dir, food, timer, running = false, paused = false, speed = 110;
+        let score = 0; let high = Number(localStorage.getItem('snakeHigh')||0);
+        const scoreEl = document.getElementById('snakeScore');
+        const highEl = document.getElementById('snakeHigh');
+        highEl.textContent = high;
+
+        function init(){
+          snake = [{x: Math.floor(cols/2), y: Math.floor(rows/2)}];
+          dir = {x:1, y:0};
+          spawnFood();
+          score = 0; scoreEl.textContent = score;
+          draw();
+        }
+        function spawnFood(){
+          do {
+            food = {x: Math.floor(Math.random()*cols), y: Math.floor(Math.random()*rows)};
+          } while (snake.some(s=>s.x===food.x && s.y===food.y));
+        }
+        function setDir(nx, ny){
+          if (!running) return;
+          // prevent reversing
+          if (snake.length>1 && snake[0].x+nx===snake[1].x && snake[0].y+ny===snake[1].y) return;
+          dir = {x:nx, y:ny};
+        }
+        window.addEventListener('keydown', (e)=>{
+          const k = e.key.toLowerCase();
+          if (k==='arrowup' || k==='w') setDir(0,-1);
+          else if (k==='arrowdown' || k==='s') setDir(0,1);
+          else if (k==='arrowleft' || k==='a') setDir(-1,0);
+          else if (k==='arrowright' || k==='d') setDir(1,0);
+          else if (k===' ') togglePause();
+        });
+        function update(){
+          if (!running || paused) return;
+          const head = {x: snake[0].x + dir.x, y: snake[0].y + dir.y};
+          // wrap around
+          head.x = (head.x + cols) % cols;
+          head.y = (head.y + rows) % rows;
+          // hit self
+          if (snake.some((s,i)=> i>0 && s.x===head.x && s.y===head.y)){
+            gameOver();
+            return;
+          }
+          snake.unshift(head);
+          if (head.x===food.x && head.y===food.y){
+            score++; scoreEl.textContent = score; spawnFood();
+            if (score>high){ high=score; localStorage.setItem('snakeHigh', String(high)); highEl.textContent=high; }
+          } else {
+            snake.pop();
+          }
+          draw();
+        }
+        function draw(){
+          ctx.fillStyle = '#000'; ctx.fillRect(0,0,canvas.width,canvas.height);
+          // grid (subtle)
+          ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+          for(let x=0;x<=canvas.width;x+=size){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,canvas.height); ctx.stroke(); }
+          for(let y=0;y<=canvas.height;y+=size){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(canvas.width,y); ctx.stroke(); }
+          // food
+          ctx.fillStyle = '#ff4d4f';
+          ctx.fillRect(food.x*size, food.y*size, size, size);
+          // snake
+          for (let i=0;i<snake.length;i++){
+            const s = snake[i];
+            const hue = 140 + i*2;
+            ctx.fillStyle = i===0 ? '#4a9eff' : `hsl(${hue},60%,45%)`;
+            ctx.fillRect(s.x*size, s.y*size, size, size);
+          }
+        }
+        function start(){
+          if (running) return; running = true; paused = false;
+          speed = Number(document.getElementById('snakeSpeed').value);
+          timer = setInterval(update, speed);
+        }
+        function togglePause(){
+          if (!running) return; paused = !paused;
+        }
+        function reset(){
+          clearInterval(timer); running=false; paused=false; init();
+        }
+        function gameOver(){
+          clearInterval(timer); running=false; paused=false;
+          ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(0,0,canvas.width,canvas.height);
+          ctx.fillStyle = '#fff'; ctx.font = '28px system-ui, sans-serif';
+          ctx.fillText('Game Over - Score: '+score, 60, canvas.height/2);
+        }
+
+        document.getElementById('snakeStart').onclick = start;
+        document.getElementById('snakePause').onclick = togglePause;
+        document.getElementById('snakeReset').onclick = reset;
+        document.getElementById('snakeSpeed').onchange = ()=>{
+          if (running){ clearInterval(timer); timer=setInterval(update, Number(document.getElementById('snakeSpeed').value)); }
+        };
+        init();
+      })();
+    </script>
+

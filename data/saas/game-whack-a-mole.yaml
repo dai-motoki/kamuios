@@ -1,0 +1,92 @@
+# ワック・ア・モール（もぐらたたき）
+
+- id: game-whack-a-mole
+  category: 11
+  category_name: ゲーム
+  title: もぐらたたき
+  content: ""
+  custom_html: |
+    <div style="margin-bottom: 20px;">
+      <button onclick="window.location.hash=''; location.reload();" style="padding: 8px 16px; background: #4a4a4a; border: none; border-radius: 6px; color: white; cursor: pointer; font-size: 14px;">
+        ← SaaS一覧に戻る
+      </button>
+    </div>
+    <style>
+      .wam-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; max-width: 520px; margin: 0 auto; }
+      .wam-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+      .wam-title { font-weight:700; font-size:1.2rem; }
+      .wam-stats { color: var(--text-weak); }
+      .wam-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; }
+      .wam-hole { position:relative; width:100%; aspect-ratio:1; background:#101010; border-radius:12px; border:1px solid var(--border); overflow:hidden; }
+      .wam-mole { position:absolute; left:50%; transform:translateX(-50%); bottom:-60%; width:70%; aspect-ratio:1; border-radius:50%; background:radial-gradient(circle at 30% 30%, #8b5, #473); display:flex; align-items:center; justify-content:center; color:#fff; font-size:1.6rem; transition: bottom 0.15s ease; }
+      .wam-hole.show .wam-mole { bottom:8%; cursor:pointer; }
+      .wam-controls { margin-top:12px; display:flex; gap:8px; }
+      .wam-btn { padding:8px 12px; border-radius:6px; border:1px solid var(--border); background:#2d2d2d; color:#fff; cursor:pointer; }
+      .wam-btn:hover { background:#3a3a3a; }
+      @media (max-width: 560px){
+        .wam-wrap { padding: 14px; }
+        .wam-grid { gap: 8px; }
+        .wam-mole { width: 62%; font-size: 1.4rem; }
+      }
+    </style>
+    <div class="wam-wrap">
+      <div class="wam-header">
+        <div class="wam-title">Whack-a-Mole</div>
+        <div class="wam-stats">Score: <span id="wamScore">0</span> | Time: <span id="wamTime">30</span>s</div>
+      </div>
+      <div class="wam-grid" id="wamGrid"></div>
+      <div class="wam-controls">
+        <button class="wam-btn" id="wamStart">▶ Start</button>
+        <button class="wam-btn" id="wamReset">🔄 Reset</button>
+        <label class="wam-btn" style="display:flex;gap:6px;align-items:center;">Speed
+          <select id="wamSpeed" style="background:#2d2d2d;color:#fff;border:1px solid var(--border);border-radius:6px;padding:4px 8px;">
+            <option value="900">Easy</option>
+            <option value="700" selected>Normal</option>
+            <option value="500">Hard</option>
+          </select>
+        </label>
+      </div>
+    </div>
+    <script>
+      (function(){
+        const grid = document.getElementById('wamGrid');
+        let score=0, time=30, timer=null, loop=null, running=false;
+        const holes = [];
+        function makeGrid(){
+          grid.innerHTML='';
+          for(let i=0;i<9;i++){
+            const hole=document.createElement('div'); hole.className='wam-hole';
+            const mole=document.createElement('div'); mole.className='wam-mole'; mole.textContent='🐹';
+            mole.addEventListener('click', ()=>{
+              if(!running) return; if(!hole.classList.contains('show')) return;
+              score++; document.getElementById('wamScore').textContent=score; hole.classList.remove('show');
+            });
+            hole.appendChild(mole); grid.appendChild(hole); holes.push(hole);
+          }
+        }
+        function tick(){
+          time--; document.getElementById('wamTime').textContent=time;
+          if(time<=0){ end(); }
+        }
+        function loopShow(){
+          const speed = Number(document.getElementById('wamSpeed').value);
+          holes.forEach(h=>h.classList.remove('show'));
+          // show 1-2 random moles
+          const count = 1 + Math.floor(Math.random()*2);
+          const idxs = [...holes.keys()].sort(()=>Math.random()-0.5).slice(0,count);
+          idxs.forEach(i=> holes[i].classList.add('show'));
+          loop = setTimeout(loopShow, speed);
+        }
+        function start(){ if(running) return; running=true; score=0; time=30; update(); loopShow(); timer=setInterval(tick, 1000); }
+        function end(){ running=false; clearTimeout(loop); clearInterval(timer); holes.forEach(h=>h.classList.remove('show'));
+          const ov=document.createElement('div'); ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:9999';
+          const msg=document.createElement('div'); msg.style.cssText='background:#222;color:#fff;padding:16px 24px;border-radius:8px;font:700 22px system-ui'; msg.textContent='Time Up! Score: '+score; ov.appendChild(msg);
+          document.body.appendChild(ov); setTimeout(()=>ov.remove(),1200);
+        }
+        function reset(){ running=false; clearTimeout(loop); clearInterval(timer); score=0; time=30; update(); holes.forEach(h=>h.classList.remove('show')); }
+        function update(){ document.getElementById('wamScore').textContent=score; document.getElementById('wamTime').textContent=time; }
+        document.getElementById('wamStart').onclick = start;
+        document.getElementById('wamReset').onclick = reset;
+        makeGrid(); update();
+      })();
+    </script>

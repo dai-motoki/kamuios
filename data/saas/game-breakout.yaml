@@ -1,0 +1,156 @@
+# ブロック崩しゲーム
+
+- id: game-breakout
+  category: 11
+  category_name: ゲーム
+  title: ブレイクアウト
+  content: ""
+  custom_html: |
+    <div style="margin-bottom: 20px;">
+      <button onclick="window.location.hash=''; location.reload();" style="padding: 8px 16px; background: #4a4a4a; border: none; border-radius: 6px; color: white; cursor: pointer; font-size: 14px;">
+        ← SaaS一覧に戻る
+      </button>
+    </div>
+    <style>
+      .breakout-wrap { background: var(--card); border:1px solid var(--border); border-radius:12px; padding:16px; max-width: 560px; margin: 0 auto; }
+      .breakout-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap: wrap; gap: 8px; }
+      .breakout-title { font-weight:700; font-size:1.2rem; }
+      .breakout-stats { color: var(--text-weak); }
+      .breakout-board { display:flex; justify-content:center; align-items:center; background:#0b0b0b; border-radius:8px; padding:10px; }
+      #boCanvas { width: 100%; height: auto; max-width: 520px; display:block; border-radius:6px; }
+      @media (max-width: 800px){ .breakout-wrap { padding:12px; } }
+      .breakout-controls { margin-top:10px; display:flex; gap:8px; }
+      .bo-btn { padding:8px 12px; border-radius:6px; border:1px solid var(--border); background:#2d2d2d; color:#fff; cursor:pointer; }
+      .bo-btn:hover { background:#3a3a3a; }
+      .breakout-help { margin-top:6px; color:var(--text-weak); font-size:0.9rem; }
+    </style>
+    <div class="breakout-wrap">
+      <div class="breakout-header">
+        <div class="breakout-title">Breakout</div>
+        <div class="breakout-stats">Score: <span id="boScore">0</span> | Lives: <span id="boLives">3</span></div>
+      </div>
+      <div class="breakout-board">
+        <canvas id="boCanvas" width="480" height="360" style="background:#000;border-radius:6px"></canvas>
+      </div>
+      <div class="breakout-controls">
+        <button class="bo-btn" id="boStart">▶ Start</button>
+        <button class="bo-btn" id="boReset">🔄 Reset</button>
+        <label class="bo-btn" style="display:flex;gap:6px;align-items:center;">
+          Speed
+          <select id="boSpeed" style="background:#2d2d2d;color:#fff;border:1px solid var(--border);border-radius:6px;padding:4px 8px;">
+            <option value="4">Easy</option>
+            <option value="5" selected>Normal</option>
+            <option value="6">Hard</option>
+          </select>
+        </label>
+      </div>
+      <div class="breakout-help">← → でパドル移動。全ブロック破壊でクリア。</div>
+    </div>
+    <script>
+      (function(){
+        const canvas = document.getElementById('boCanvas');
+        const ctx = canvas.getContext('2d');
+        let paddleW=90, paddleH=12, paddleX=(canvas.width-paddleW)/2;
+        let right=false, left=false, lives=3, score=0; 
+        let ballX, ballY, ballR=7, dx=4, dy=-4, running=false;
+        let rows=5, cols=10, brickW=56, brickH=18, brickPad=6, offsetTop=50, offsetLeft=20;
+        let bricks=[];
+        function resetBricks(){
+          bricks=[];
+          for(let c=0;c<cols;c++){
+            bricks[c]=[];
+            for(let r=0;r<rows;r++){
+              bricks[c][r]={x:0,y:0,status:1,color:`hsl(${(r*40+c*6)%360},70%,50%)`};
+            }
+          }
+        }
+        function init(){
+          lives=3; score=0; document.getElementById('boSpeed').value='5';
+          dx=5; dy=-5; paddleX=(canvas.width-paddleW)/2; resetBricks(); resetBall(); draw();
+          document.getElementById('boScore').textContent=score;
+          document.getElementById('boLives').textContent=lives;
+        }
+        function resetBall(){
+          ballX=canvas.width/2; ballY=canvas.height-30; dx = Number(document.getElementById('boSpeed').value); dy = -dx;
+        }
+        function drawPaddle(){ ctx.fillStyle='#4a9eff'; ctx.fillRect(paddleX, canvas.height-paddleH-10, paddleW, paddleH); }
+        function drawBall(){ ctx.beginPath(); ctx.arc(ballX,ballY,ballR,0,Math.PI*2); ctx.fillStyle='#fff'; ctx.fill(); ctx.closePath(); }
+        function drawBricks(){
+          for(let c=0;c<cols;c++){
+            for(let r=0;r<rows;r++){
+              const b=bricks[c][r];
+              if(b.status===1){
+                const x = c*(brickW+brickPad)+offsetLeft;
+                const y = r*(brickH+brickPad)+offsetTop;
+                b.x=x; b.y=y;
+                ctx.fillStyle=b.color; ctx.fillRect(x,y,brickW,brickH);
+              }
+            }
+          }
+        }
+        function collision(){
+          for(let c=0;c<cols;c++){
+            for(let r=0;r<rows;r++){
+              const b=bricks[c][r];
+              if(b.status===1){
+                if(ballX> b.x && ballX < b.x+brickW && ballY> b.y && ballY < b.y+brickH){
+                  dy = -dy; b.status=0; score+=10; document.getElementById('boScore').textContent=score;
+                  if (isCleared()) { victory(); }
+                }
+              }
+            }
+          }
+        }
+        function isCleared(){
+          return bricks.every(col=>col.every(b=>b.status===0));
+        }
+        function victory(){
+          running=false; ctx.fillStyle='rgba(0,0,0,0.6)'; ctx.fillRect(0,0,canvas.width,canvas.height);
+          ctx.fillStyle='#fff'; ctx.font='28px system-ui'; ctx.fillText('CLEAR! Score: '+score, 210, 240);
+        }
+        function gameOver(){
+          running=false; ctx.fillStyle='rgba(0,0,0,0.6)'; ctx.fillRect(0,0,canvas.width,canvas.height);
+          ctx.fillStyle='#fff'; ctx.font='28px system-ui'; ctx.fillText('Game Over', 250, 240);
+        }
+        function draw(){
+          ctx.setTransform(1,0,0,1,0,0);
+          ctx.clearRect(0,0,canvas.width,canvas.height);
+          // background grid
+          ctx.fillStyle='#000'; ctx.fillRect(0,0,canvas.width,canvas.height);
+          ctx.strokeStyle='rgba(255,255,255,0.06)';
+          for(let x=0;x<=canvas.width;x+=20){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,canvas.height); ctx.stroke(); }
+          for(let y=0;y<=canvas.height;y+=20){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(canvas.width,y); ctx.stroke(); }
+          drawBricks(); drawBall(); drawPaddle();
+        }
+        function update(){
+          if (!running) return;
+          draw(); collision();
+          // wall
+          if(ballX+dx>canvas.width-ballR || ballX+dx<ballR) dx=-dx;
+          if(ballY+dy<ballR) dy=-dy;
+          else if(ballY+dy>canvas.height-ballR-10-paddleH){
+            if(ballX>paddleX && ballX < paddleX+paddleW){
+              // reflect based on hit position
+              const hit = (ballX-(paddleX+paddleW/2))/(paddleW/2);
+              const speed = Number(document.getElementById('boSpeed').value);
+              dx = hit*speed*1.5; dy = -Math.abs(speed + Math.abs(hit));
+            } else {
+              lives--; document.getElementById('boLives').textContent=lives;
+              if(lives===0) { gameOver(); return; }
+              resetBall();
+            }
+          }
+          // move
+          ballX += dx; ballY += dy;
+          if(right && paddleX < canvas.width-paddleW) paddleX += 8;
+          if(left && paddleX > 0) paddleX -= 8;
+          requestAnimationFrame(update);
+        }
+        document.addEventListener('keydown', e=>{ if(e.key==='ArrowRight') right=true; else if(e.key==='ArrowLeft') left=true; });
+        document.addEventListener('keyup', e=>{ if(e.key==='ArrowRight') right=false; else if(e.key==='ArrowLeft') left=false; });
+        document.getElementById('boSpeed').addEventListener('change', ()=>{ if(!running) draw(); });
+        document.getElementById('boStart').onclick = ()=>{ if(!running){ running=true; requestAnimationFrame(update);} };
+        document.getElementById('boReset').onclick = ()=>{ running=false; init(); };
+        init();
+      })();
+    </script>

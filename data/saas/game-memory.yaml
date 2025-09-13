@@ -1,0 +1,89 @@
+# 神経衰弱（メモリー）
+
+- id: game-memory
+  category: 11
+  category_name: ゲーム
+  title: メモリー
+  content: ""
+  custom_html: |
+    <div style="margin-bottom: 20px;">
+      <button onclick="window.location.hash=''; location.reload();" style="padding: 8px 16px; background: #4a4a4a; border: none; border-radius: 6px; color: white; cursor: pointer; font-size: 14px;">
+        ← SaaS一覧に戻る
+      </button>
+    </div>
+    <style>
+      .mem-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; max-width: 560px; margin: 0 auto; }
+      .mem-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+      .mem-title { font-weight:700; font-size:1.2rem; }
+      .mem-stats { color: var(--text-weak); }
+      .mem-grid { display:grid; grid-template-columns: repeat(4, 1fr); gap:12px; }
+      .mem-card { position:relative; width:100%; aspect-ratio:1; cursor:pointer; perspective:800px; }
+      .mem-inner { position:absolute; inset:0; transform-style:preserve-3d; transition:transform 0.4s ease; }
+      .mem-card.flipped .mem-inner, .mem-card.matched .mem-inner { transform: rotateY(180deg); }
+      .mem-front, .mem-back { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; border-radius:10px; font-size:1.8rem; font-weight:700; backface-visibility:hidden; }
+      .mem-front { background:#2a2a2a; color:#fff; border:1px solid var(--border); }
+      .mem-back { transform: rotateY(180deg); color:#fff; }
+      .mem-controls { margin-top:12px; display:flex; gap:8px; }
+      .mem-btn { padding:8px 12px; border-radius:6px; border:1px solid var(--border); background:#2d2d2d; color:#fff; cursor:pointer; }
+      .mem-btn:hover { background:#3a3a3a; }
+      .mem-help { margin-top:6px; color:var(--text-weak); font-size:0.9rem; }
+      @media (max-width: 520px){
+        .mem-wrap { padding: 14px; }
+        .mem-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .mem-front, .mem-back { font-size: 1.5rem; }
+      }
+      @media (max-width: 380px){
+        .mem-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        .mem-front, .mem-back { font-size: 1.3rem; }
+      }
+    </style>
+    <div class="mem-wrap">
+      <div class="mem-header">
+        <div class="mem-title">Memory</div>
+        <div class="mem-stats">Moves: <span id="memMoves">0</span> | Matches: <span id="memMatches">0</span>/8</div>
+      </div>
+      <div class="mem-grid" id="memGrid"></div>
+      <div class="mem-controls">
+        <button class="mem-btn" id="memNew">🔄 New Game</button>
+        <span class="mem-help">同じ絵柄をペアにするとマッチ！全て揃えるとクリア。</span>
+      </div>
+    </div>
+    <script>
+      (function(){
+        const grid = document.getElementById('memGrid');
+        const emojis = ['🍎','🍋','🍇','🍓','🍒','🥝','🍍','🥥'];
+        let deck = []; let flipped=[]; let moves=0; let matches=0; let lock=false;
+        function colorFor(e){ const codes=[...e].map(c=>c.codePointAt(0)).reduce((a,b)=>a+b,0); const hue=(codes%360); return `hsl(${hue},60%,45%)`; }
+        function newDeck(){ deck = [...emojis, ...emojis].sort(()=>Math.random()-0.5); }
+        function draw(){ grid.innerHTML=''; deck.forEach((e,i)=>{
+          const card=document.createElement('div'); card.className='mem-card'; card.dataset.index=i; card.dataset.emoji=e;
+          const inner=document.createElement('div'); inner.className='mem-inner';
+          const front=document.createElement('div'); front.className='mem-front'; front.textContent='?';
+          const back=document.createElement('div'); back.className='mem-back'; back.textContent=e; back.style.background=colorFor(e);
+          inner.appendChild(front); inner.appendChild(back); card.appendChild(inner); grid.appendChild(card);
+        }); }
+        function reset(){ moves=0; matches=0; flipped=[]; lock=false; newDeck(); draw(); update(); }
+        function update(){ document.getElementById('memMoves').textContent=moves; document.getElementById('memMatches').textContent=matches; }
+        grid.addEventListener('click', (e)=>{
+          const card = e.target.closest('.mem-card'); if(!card || lock) return; if(card.classList.contains('matched')||card.classList.contains('flipped')) return;
+          card.classList.add('flipped'); flipped.push(card);
+          if(flipped.length===2){
+            moves++; update();
+            const [a,b]=flipped; lock=true;
+            if(a.dataset.emoji===b.dataset.emoji){
+              setTimeout(()=>{ a.classList.add('matched'); b.classList.add('matched'); flipped=[]; matches++; update(); lock=false; checkClear(); }, 350);
+            } else {
+              setTimeout(()=>{ a.classList.remove('flipped'); b.classList.remove('flipped'); flipped=[]; lock=false; }, 700);
+            }
+          }
+        });
+        function checkClear(){
+          if(matches===8){
+            const ov=document.createElement('div'); ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:9999';
+            const msg=document.createElement('div'); msg.style.cssText='background:#222;color:#fff;padding:16px 24px;border-radius:8px;font:700 22px system-ui'; msg.textContent='CLEAR!'; ov.appendChild(msg);
+            document.body.appendChild(ov); setTimeout(()=>ov.remove(),1000);
+          }
+        }
+        document.getElementById('memNew').onclick=reset; reset();
+      })();
+    </script>

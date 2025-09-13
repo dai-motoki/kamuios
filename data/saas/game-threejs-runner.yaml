@@ -1,0 +1,127 @@
+# Three.js ランナー（障害物よけ）
+
+- id: game-threejs-runner
+  category: 11
+  category_name: ゲーム
+  title: Three.js ランナー
+  content: ""
+  custom_html: |
+    <div style="margin-bottom: 20px;">
+      <button onclick="window.location.hash=''; location.reload();" style="padding: 8px 16px; background: #4a4a4a; border: none; border-radius: 6px; color: white; cursor: pointer; font-size: 14px;">
+        ← SaaS一覧に戻る
+      </button>
+    </div>
+    <style>
+      .three-wrap { background: var(--card); border:1px solid var(--border); border-radius:12px; padding: 12px; max-width: 560px; margin: 0 auto; }
+      .three-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+      .three-title { font-weight:700; font-size:1.1rem; }
+      .three-stats { color: var(--text-weak); font-size:.95rem; }
+      .three-canvas { width: 100%; height: auto; display:block; background:#000; border-radius:8px; }
+      .three-controls { display:flex; gap:8px; margin-top:8px; }
+      .three-btn { padding: 8px 12px; border-radius: 6px; border:1px solid var(--border); background:#2d2d2d; color:#fff; cursor:pointer; }
+      .three-btn:hover { background:#3a3a3a; }
+      .three-help { color: var(--text-weak); font-size:.9rem; margin-top:6px; }
+    </style>
+    <div class="three-wrap">
+      <div class="three-header">
+        <div class="three-title">Runner</div>
+        <div class="three-stats">Score: <span id="trScore">0</span></div>
+      </div>
+      <div id="trMount"></div>
+      <div class="three-controls">
+        <button class="three-btn" id="trStart">▶ Start</button>
+        <button class="three-btn" id="trReset">🔄 Reset</button>
+        <label class="three-btn" style="display:flex;align-items:center;gap:6px;">Speed
+          <select id="trSpeed" style="background:#2d2d2d;color:#fff;border:1px solid var(--border);border-radius:6px;padding:4px 8px;">
+            <option value="6">Easy</option>
+            <option value="8" selected>Normal</option>
+            <option value="10">Hard</option>
+          </select>
+        </label>
+      </div>
+      <div class="three-help">← → / A D で移動。障害物をよけてスコアを伸ばそう。</div>
+    </div>
+    <script src="https://unpkg.com/three@0.158.0/build/three.min.js"></script>
+    <script>
+      (function(){
+        const mount = document.getElementById('trMount');
+        const scoreEl = document.getElementById('trScore');
+        let scene, camera, renderer, player, lanes=[-2,0,2], laneIdx=1, obstacles=[], running=false, animId=0, speed=8, score=0, lastSpawn=0;
+        function clearOverlays(){ mount.querySelectorAll('.game-overlay').forEach(n=>n.remove()); }
+        function init(){
+          scene = new THREE.Scene();
+          camera = new THREE.PerspectiveCamera(60, 4/3, 0.1, 100);
+          camera.position.set(0, 4.5, 8); camera.lookAt(0,0,0);
+          renderer = new THREE.WebGLRenderer({ antialias:true });
+          const w = 520, h = 390; renderer.setSize(w, h); renderer.setPixelRatio(window.devicePixelRatio||1); camera.aspect = w/h; camera.updateProjectionMatrix();
+          renderer.domElement.className='three-canvas';
+          mount.innerHTML=''; mount.appendChild(renderer.domElement); clearOverlays();
+          const hemi = new THREE.HemisphereLight(0xffffff, 0x222222, 0.9); scene.add(hemi);
+          const light = new THREE.DirectionalLight(0xffffff, 1.2); light.position.set(3,6,5); scene.add(light);
+          scene.add(new THREE.AmbientLight(0xaaaaaa));
+          const plane = new THREE.Mesh(new THREE.PlaneGeometry(6, 60), new THREE.MeshPhongMaterial({ color:0x111111, side:THREE.DoubleSide }));
+          plane.rotation.x = -Math.PI/2; plane.position.z = -20; scene.add(plane);
+          // Player car (simple)
+          player = new THREE.Group();
+          const body = new THREE.Mesh(new THREE.BoxGeometry(1.2,0.4,2), new THREE.MeshPhongMaterial({ color:0x4a9eff }));
+          body.position.y = 0.4; player.add(body);
+          const cabin = new THREE.Mesh(new THREE.BoxGeometry(0.8,0.5,0.9), new THREE.MeshPhongMaterial({ color:0x74b4ff }));
+          cabin.position.set(0,0.8,-0.1); player.add(cabin);
+          const wheelMat = new THREE.MeshPhongMaterial({ color:0x222222 });
+          const wheelGeo = new THREE.CylinderGeometry(0.25,0.25,0.2,16);
+          ;[
+            [-0.6,0.25, 0.9], [0.6,0.25, 0.9], [-0.6,0.25,-0.9], [0.6,0.25,-0.9]
+          ].forEach(p=>{ const w=new THREE.Mesh(wheelGeo, wheelMat); w.rotation.z=Math.PI/2; w.position.set(p[0],p[1],p[2]); player.add(w); });
+          player.position.set(lanes[laneIdx], 0, 2.5); scene.add(player);
+          obstacles=[]; score=0; scoreEl.textContent=score; lastSpawn=performance.now();
+        }
+        function spawn(){
+          const lane = lanes[Math.floor(Math.random()*lanes.length)];
+          const box = new THREE.Mesh(new THREE.BoxGeometry(0.9,0.9,0.9), new THREE.MeshPhongMaterial({ color:0xff4d4f }));
+          box.position.set(lane, 0.45, -20); scene.add(box); obstacles.push(box);
+        }
+        function update(dt){
+          const v = speed * dt * 0.006;
+          obstacles.forEach(o=>{ o.position.z += v; });
+          // remove passed
+          for(let i=obstacles.length-1;i>=0;i--){ if (obstacles[i].position.z > 5){ scene.remove(obstacles[i]); obstacles.splice(i,1); score++; scoreEl.textContent=score; } }
+          // collide
+          for(const o of obstacles){
+            const dz = Math.abs(o.position.z - player.position.z);
+            const dx = Math.abs(o.position.x - player.position.x);
+            if (dz < 0.8 && dx < 0.8){ gameOver(); return; }
+          }
+        }
+        function loop(t){
+          if (!running) return;
+          if (typeof loop.prev !== 'number') loop.prev = t; const dt = Math.min(32, t - loop.prev); loop.prev = t;
+          if (t - lastSpawn > Math.max(500, 1100 - speed*60)) { spawn(); lastSpawn=t; }
+          update(dt); renderer.render(scene, camera); animId = requestAnimationFrame(loop);
+        }
+        function start(){
+          if(running) return;
+          if(!renderer) init();
+          clearOverlays();
+          speed = Number(document.getElementById('trSpeed').value) || 8;
+          running = true;
+          // spawn something immediately so動いている感が出る
+          spawn(); lastSpawn = performance.now();
+          loop.prev = undefined;
+          animId = requestAnimationFrame(loop);
+        }
+        function reset(){ running=false; cancelAnimationFrame(animId); init(); }
+        function showOverlay(text){
+          const over=document.createElement('div'); over.className='game-overlay'; over.style.cssText='position:absolute;inset:0;background:rgba(0,0,0,.6);color:#fff;display:flex;align-items:center;justify-content:center;border-radius:8px;font:700 22px system-ui'; over.textContent=text; mount.style.position='relative'; mount.appendChild(over); setTimeout(()=>{ over.remove(); }, 1200);
+        }
+        function gameOver(){ running=false; cancelAnimationFrame(animId); showOverlay('Game Over'); }
+        document.addEventListener('keydown', (e)=>{
+          if(!running) return; const k=e.key.toLowerCase();
+          if(k==='arrowleft'||k==='a'){ laneIdx=Math.max(0,laneIdx-1); player.position.x = lanes[laneIdx]; }
+          else if(k==='arrowright'||k==='d'){ laneIdx=Math.min(lanes.length-1,laneIdx+1); player.position.x = lanes[laneIdx]; }
+        });
+        document.getElementById('trStart').onclick = start;
+        document.getElementById('trReset').onclick = reset;
+        document.getElementById('trSpeed').onchange = ()=>{ if(running){ speed = Number(document.getElementById('trSpeed').value); }}
+        init();
+      })();
+    </script>
